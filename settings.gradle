@@ -1,0 +1,7 @@
+// include 'eventuate-jpa-sagas'
+
+include 'eventuate-jpa-sagas-framework'
+include 'eventuate-tram-sagas-simple-dsl'
+include 'eventuate-tram-sagas-in-memory'
+include "eventuate-tram-sagas-event-sourcing-support"
+include 'orders-and-customers'

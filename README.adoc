@@ -1,0 +1,106 @@
+= Eventuate Tram Saga
+
+The Eventuate Tram Saga framework is a saga orchestration framework built on the Eventuate Tram framework.
+A saga maintains consistency across multiple microservices by using a series of a local transactions that are coordinated using messages or events.
+
+A saga consists of a series of steps.
+Each step consists of either transaction, a compensating transaction or both.
+Each transaction is the invocation of a saga participant using a command message.
+A saga executes the forward transactions sequentially.
+If one of them fails then the saga executes the compensating transactions in reverse order to rollback the saga.
+
+Eventuate Tram Saga  is described in more detail in my book https://www.manning.com/books/microservice-patterns[Microservice Patterns].
+
+== Writing an orchestrator
+
+In the order creation example, the `CreateOrderSaga` consists of the following three steps:
+
+1. The `CreateOrderSaga` is instantiated after the `Order` is created.
+Consequently, the first step is simply a compensating transaction, which is executed in the credit cannot be reserved to reject the order.
+2. Requests the `CustomerService` to reserve credit for the order.
+If the reservation is success, the next step is executed.
+Otherwise, the compensating transactions are executed to roll back the saga.
+3. Approves the order, if the credit is reserved.
+
+Here is part of the definition of `CreateOrderSaga`.
+
+```java
+public class CreateOrderSaga implements SimpleSaga<CreateOrderSagaData> {
+
+  private SagaDefinition<CreateOrderSagaData> sagaDefinition =
+          step()
+            .withCompensation(this::reject)
+          .step()
+            .invokeParticipant(this::reserveCredit)
+          .step()
+            .invokeParticipant(this::approve)
+          .build();
+
+
+  @Override
+  public SagaDefinition<CreateOrderSagaData> getSagaDefinition() {
+    return this.sagaDefinition;
+  }
+
+
+  private CommandWithDestination reserveCredit(CreateOrderSagaData data) {
+    long orderId = data.getOrderId();
+    Long customerId = data.getOrderDetails().getCustomerId();
+    Money orderTotal = data.getOrderDetails().getOrderTotal();
+    return send(new ReserveCreditCommand(customerId, orderId, orderTotal))
+            .to("customerService")
+            .build();
+
+...
+```
+
+The `reserveCredit()` creates a message to send to the `Customer Service` to reserve credit.
+
+== Creating an saga orchestrator
+
+The `OrderService` creates the saga:
+
+```java
+public class OrderService {
+
+  @Autowired
+  private SagaManager<CreateOrderSagaData> createOrderSagaManager;
+
+  @Autowired
+  private OrderRepository orderRepository;
+
+  @Transactional
+  public Order createOrder(OrderDetails orderDetails) {
+    ResultWithEvents<Order> oe = Order.createOrder(orderDetails);
+    Order order = oe.result;
+    orderRepository.save(order);
+    CreateOrderSagaData data = new CreateOrderSagaData(order.getId(), orderDetails);
+    createOrderSagaManager.create(data, Order.class, order.getId());
+    return order;
+  }
+
+}
+```
+
+== Writing a saga participant
+
+Here is the  `CustomerCommandHandler`, which handles the command to reserve credit:
+
+```java
+public class CustomerCommandHandler {
+
+  @Autowired
+  private CustomerRepository customerRepository;
+
+  public CommandHandlers commandHandlerDefinitions() {
+    return SagaCommandHandlersBuilder
+            .fromChannel("customerService")
+            .onMessage(ReserveCreditCommand.class, this::reserveCredit)
+            .build();
+  }
+
+  public Message reserveCredit(CommandMessage<ReserveCreditCommand> cm) {
+     ...
+  }
+  ...
+```
