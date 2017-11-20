@@ -22,11 +22,23 @@ public class SagaInstanceRepositoryJdbc implements SagaInstanceRepository {
   @Autowired
   private IdGenerator idGenerator;
 
+  private String sagaInstanceTable;
+  private String sagaInstanceParticipantsTable;
+
+  public SagaInstanceRepositoryJdbc() {
+    this("eventuate");
+  }
+
+  public SagaInstanceRepositoryJdbc(String database) {
+    sagaInstanceTable = database + ".saga_instance";
+    sagaInstanceParticipantsTable = database + ".saga_instance_participants";
+  }
+
   @Override
   public void save(SagaInstance sagaInstance) {
     sagaInstance.setId(idGenerator.genId().asString());
     logger.info("Saving {} {}", sagaInstance.getSagaType(), sagaInstance.getId());
-    jdbcTemplate.update("INSERT INTO saga_instance(saga_type, saga_id, state_name, last_request_id, saga_data_type, saga_data_json) VALUES(?, ?, ?,?,?,?)",
+    jdbcTemplate.update(String.format("INSERT INTO %s(saga_type, saga_id, state_name, last_request_id, saga_data_type, saga_data_json) VALUES(?, ?, ?,?,?,?)", sagaInstanceTable),
             sagaInstance.getSagaType(),
             sagaInstance.getId(),
             sagaInstance.getStateName(),
@@ -40,7 +52,7 @@ public class SagaInstanceRepositoryJdbc implements SagaInstanceRepository {
   private void saveDestinationsAndResources(SagaInstance sagaInstance) {
     for (DestinationAndResource dr : sagaInstance.getDestinationsAndResources()) {
       try {
-        jdbcTemplate.update("INSERT INTO saga_instance_participants(saga_type, saga_id, destination, resource) values(?,?,?,?)",
+        jdbcTemplate.update(String.format("INSERT INTO %s(saga_type, saga_id, destination, resource) values(?,?,?,?)", sagaInstanceParticipantsTable),
                 sagaInstance.getSagaType(),
                 sagaInstance.getId(),
                 dr.getDestination(),
@@ -57,14 +69,14 @@ public class SagaInstanceRepositoryJdbc implements SagaInstanceRepository {
     logger.info("finding {} {}", sagaType, sagaId);
 
     Set<DestinationAndResource> destinationsAndResources = new HashSet<>(jdbcTemplate.query(
-            "SELECT destination, resource FROM saga_instance_participants WHERE saga_type = ? AND saga_id = ?",
+            String.format("SELECT destination, resource FROM %s WHERE saga_type = ? AND saga_id = ?", sagaInstanceParticipantsTable),
             (rs, rownum) ->
                     new DestinationAndResource(rs.getString("destination"), rs.getString("resource")),
             sagaType,
             sagaId));
 
     return DataAccessUtils.requiredSingleResult(jdbcTemplate.query(
-            "SELECT * FROM saga_instance WHERE saga_type = ? AND saga_id = ?",
+            String.format("SELECT * FROM %s WHERE saga_type = ? AND saga_id = ?", sagaInstanceTable),
             (rs, rownum) ->
                     new SagaInstance(sagaType, sagaId, rs.getString("state_name"),
                             rs.getString("last_request_id"),
@@ -77,7 +89,7 @@ public class SagaInstanceRepositoryJdbc implements SagaInstanceRepository {
   @Override
   public void update(SagaInstance sagaInstance) {
     logger.info("Updating {} {}", sagaInstance.getSagaType(), sagaInstance.getId());
-    int count = jdbcTemplate.update("UPDATE saga_instance SET state_name = ?, last_request_id = ?, saga_data_type = ?, saga_data_json = ? where saga_type = ? AND saga_id = ?",
+    int count = jdbcTemplate.update(String.format("UPDATE %s SET state_name = ?, last_request_id = ?, saga_data_type = ?, saga_data_json = ? where saga_type = ? AND saga_id = ?", sagaInstanceTable),
             sagaInstance.getStateName(),
             sagaInstance.getLastRequestId(),
             sagaInstance.getSerializedSagaData().getSagaDataType(),

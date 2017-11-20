@@ -10,10 +10,20 @@ public class AggregateInstanceSubscriptionsDAO {
   @Autowired
   private JdbcTemplate jdbcTemplate;
 
+  private String aggregateInstanceSubscriptionsTable;
+
+  public AggregateInstanceSubscriptionsDAO() {
+    this("eventuate");
+  }
+
+  public AggregateInstanceSubscriptionsDAO(String database) {
+    aggregateInstanceSubscriptionsTable = database + ".aggregate_instance_subscriptions";
+  }
+
   public void update(String sagaType, String sagaId, List<EventClassAndAggregateId> eventHandlers) {
-    jdbcTemplate.update("DELETE FROM aggregate_instance_subscriptions WHERE saga_type = ? AND saga_id =?", sagaType, sagaId);
+    jdbcTemplate.update(String.format("DELETE FROM %s WHERE saga_type = ? AND saga_id =?", aggregateInstanceSubscriptionsTable), sagaType, sagaId);
     for  (EventClassAndAggregateId eventClassAndAggregateId : eventHandlers) {
-      jdbcTemplate.update("INSERT INTO aggregate_instance_subscriptions(aggregate_id, event_type, saga_type, saga_id) values(?, ?, ?, ?)",
+      jdbcTemplate.update(String.format("INSERT INTO %s(aggregate_id, event_type, saga_type, saga_id) values(?, ?, ?, ?)", aggregateInstanceSubscriptionsTable),
               Long.toString(eventClassAndAggregateId.getAggregateId()),
               eventClassAndAggregateId.getEventClass().getName(),
               sagaType,
@@ -22,7 +32,7 @@ public class AggregateInstanceSubscriptionsDAO {
   }
 
   public List<SagaTypeAndId> findSagas(String aggregateType, String aggregateId, String eventType) {
-    return jdbcTemplate.query("Select saga_type, saga_id from aggregate_instance_subscriptions where aggregate_id = ? and event_type = ?",
+    return jdbcTemplate.query(String.format("select saga_type, saga_id from %s where aggregate_id = ? and event_type = ?", aggregateInstanceSubscriptionsTable),
             (rs, rowNum) -> new SagaTypeAndId(rs.getString("saga_type"), rs.getString("saga_Id")),
             aggregateId,
             eventType
