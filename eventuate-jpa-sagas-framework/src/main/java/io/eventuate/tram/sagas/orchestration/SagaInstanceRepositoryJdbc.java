@@ -26,12 +26,8 @@ public class SagaInstanceRepositoryJdbc implements SagaInstanceRepository {
   private String sagaInstanceParticipantsTable;
 
   public SagaInstanceRepositoryJdbc() {
-    this("eventuate");
-  }
-
-  public SagaInstanceRepositoryJdbc(String database) {
-    sagaInstanceTable = database + ".saga_instance";
-    sagaInstanceParticipantsTable = database + ".saga_instance_participants";
+    sagaInstanceTable = "eventuate.saga_instance";
+    sagaInstanceParticipantsTable = "eventuate.saga_instance_participants";
   }
 
   @Override

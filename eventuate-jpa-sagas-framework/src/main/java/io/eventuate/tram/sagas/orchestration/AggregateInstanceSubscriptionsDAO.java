@@ -13,11 +13,7 @@ public class AggregateInstanceSubscriptionsDAO {
   private String aggregateInstanceSubscriptionsTable;
 
   public AggregateInstanceSubscriptionsDAO() {
-    this("eventuate");
-  }
-
-  public AggregateInstanceSubscriptionsDAO(String database) {
-    aggregateInstanceSubscriptionsTable = database + ".aggregate_instance_subscriptions";
+    aggregateInstanceSubscriptionsTable = "eventuate.aggregate_instance_subscriptions";
   }
 
   public void update(String sagaType, String sagaId, List<EventClassAndAggregateId> eventHandlers) {

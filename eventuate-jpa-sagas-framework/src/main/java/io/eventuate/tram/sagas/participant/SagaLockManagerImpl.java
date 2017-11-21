@@ -26,12 +26,8 @@ public class SagaLockManagerImpl implements SagaLockManager {
   private String sagaStashTable;
 
   public SagaLockManagerImpl() {
-    this("eventuate");
-  }
-
-  public SagaLockManagerImpl(String database) {
-    sagaLockTable = database + ".saga_lock_table";
-    sagaStashTable = database + ".saga_stash_table";
+    sagaLockTable = "eventuate.saga_lock_table";
+    sagaStashTable = "eventuate.saga_stash_table";
   }
 
   @Override
