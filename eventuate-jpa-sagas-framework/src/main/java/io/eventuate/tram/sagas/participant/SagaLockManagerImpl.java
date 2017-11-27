@@ -1,6 +1,7 @@
 package io.eventuate.tram.sagas.participant;
 
 import io.eventuate.javaclient.commonimpl.JSonMapper;
+import io.eventuate.javaclient.spring.jdbc.EventuateSchema;
 import io.eventuate.tram.messaging.common.Message;
 import io.eventuate.tram.messaging.producer.MessageBuilder;
 import org.slf4j.Logger;
@@ -22,19 +23,64 @@ public class SagaLockManagerImpl implements SagaLockManager {
   @Autowired
   private JdbcTemplate jdbcTemplate;
 
-  private String sagaLockTable;
-  private String sagaStashTable;
+  private String insertIntoSagaLockTableSql;
+  private String insertIntoSagaStashTableSql;
+  private String selectFromSagaLockTableSql;
+  private String selectFromSagaStashTableSql;
+  private String updateSagaLockTableSql;
+  private String deleteFromSagaLockTableSql;
+  private String deleteFromSagaStashTableSql;
 
   public SagaLockManagerImpl() {
-    sagaLockTable = "eventuate.saga_lock_table";
-    sagaStashTable = "eventuate.saga_stash_table";
+    this(new EventuateSchema());
+  }
+
+  public SagaLockManagerImpl(EventuateSchema eventuateSchema) {
+    String sagaLockTable = eventuateSchema.qualifyTable("saga_lock_table");
+    String sagaStashTable = eventuateSchema.qualifyTable("saga_stash_table");
+
+    insertIntoSagaLockTableSql = String.format("INSERT INTO %s(target, saga_type, saga_id) VALUES(?, ?,?)", sagaLockTable);
+    insertIntoSagaStashTableSql = String.format("INSERT INTO %s(message_id, target, saga_type, saga_id, message_headers, message_payload) VALUES(?, ?,?, ?, ?, ?)", sagaStashTable);
+    selectFromSagaLockTableSql = String.format("select saga_id from %s WHERE target = ? FOR UPDATE", sagaLockTable);
+    selectFromSagaStashTableSql = String.format("select message_id, target, saga_type, saga_id, message_headers, message_payload from %s WHERE target = ? ORDER BY message_id LIMIT 1", sagaStashTable);
+    updateSagaLockTableSql = String.format("update %s set saga_type = ?, saga_id = ? where target = ?", sagaLockTable);
+    deleteFromSagaLockTableSql = String.format("delete from %s where target = ?", sagaLockTable);
+    deleteFromSagaStashTableSql = String.format("delete from %s where message_id = ?", sagaStashTable);
+  }
+
+  public String getInsertIntoSagaLockTableSql() {
+    return insertIntoSagaLockTableSql;
+  }
+
+  public String getInsertIntoSagaStashTableSql() {
+    return insertIntoSagaStashTableSql;
+  }
+
+  public String getSelectFromSagaLockTableSql() {
+    return selectFromSagaLockTableSql;
+  }
+
+  public String getSelectFromSagaStashTableSql() {
+    return selectFromSagaStashTableSql;
+  }
+
+  public String getUpdateSagaLockTableSql() {
+    return updateSagaLockTableSql;
+  }
+
+  public String getDeleteFromSagaLockTableSql() {
+    return deleteFromSagaLockTableSql;
+  }
+
+  public String getDeleteFromSagaStashTableSql() {
+    return deleteFromSagaStashTableSql;
   }
 
   @Override
   public boolean claimLock(String sagaType, String sagaId, String target) {
     while (true)
       try {
-        jdbcTemplate.update(String.format("INSERT INTO %s(target, saga_type, saga_id) VALUES(?, ?,?)", sagaLockTable), target, sagaType, sagaId);
+        jdbcTemplate.update(insertIntoSagaLockTableSql, target, sagaType, sagaId);
         logger.debug("Saga {} {} has locked {}", sagaType, sagaId, target);
         return true;
       } catch (DuplicateKeyException e) {
@@ -52,7 +98,7 @@ public class SagaLockManagerImpl implements SagaLockManager {
   }
 
   private Optional<String> selectForUpdate(String target) {
-    return Optional.ofNullable(DataAccessUtils.singleResult(jdbcTemplate.query(String.format("select saga_id from %s WHERE target = ? FOR UPDATE", sagaLockTable), (rs, rowNum) -> {
+    return Optional.ofNullable(DataAccessUtils.singleResult(jdbcTemplate.query(selectFromSagaLockTableSql, (rs, rowNum) -> {
             return rs.getString("saga_id");
           }, target)));
   }
@@ -62,7 +108,7 @@ public class SagaLockManagerImpl implements SagaLockManager {
 
     logger.debug("Stashing message from {} for {} : {}", sagaId, target, message);
 
-    jdbcTemplate.update(String.format("INSERT INTO %s(message_id, target, saga_type, saga_id, message_headers, message_payload) VALUES(?, ?,?, ?, ?, ?)", sagaStashTable),
+    jdbcTemplate.update(insertIntoSagaStashTableSql,
             message.getRequiredHeader(Message.ID),
             target,
             sagaType,
@@ -80,14 +126,14 @@ public class SagaLockManagerImpl implements SagaLockManager {
 
     logger.debug("Saga {} has unlocked {}", sagaId, target);
 
-    List<StashedMessage> stashedMessages = jdbcTemplate.query(String.format("select message_id, target, saga_type, saga_id, message_headers, message_payload from %s WHERE target = ? ORDER BY message_id LIMIT 1", sagaStashTable), (rs, rowNum) -> {
+    List<StashedMessage> stashedMessages = jdbcTemplate.query(selectFromSagaStashTableSql, (rs, rowNum) -> {
       return new StashedMessage(rs.getString("saga_type"), rs.getString("saga_id"),
               MessageBuilder.withPayload(rs.getString("message_payload")).withExtraHeaders("",
                       JSonMapper.fromJson(rs.getString("message_headers"), Map.class)).build());
     }, target);
 
     if (stashedMessages.isEmpty()) {
-      assertEqualToOne(jdbcTemplate.update(String.format("delete from %s where target = ?", sagaLockTable), target));
+      assertEqualToOne(jdbcTemplate.update(deleteFromSagaLockTableSql, target));
       return Optional.empty();
     }
 
@@ -95,9 +141,9 @@ public class SagaLockManagerImpl implements SagaLockManager {
 
     logger.debug("unstashed from {}  for {} : {}", sagaId, target, stashedMessage.getMessage());
 
-    assertEqualToOne(jdbcTemplate.update(String.format("update %s set saga_type = ?, saga_id = ? where target = ?", sagaLockTable), stashedMessage.getSagaType(),
+    assertEqualToOne(jdbcTemplate.update(updateSagaLockTableSql, stashedMessage.getSagaType(),
             stashedMessage.getSagaId(), target));
-    assertEqualToOne(jdbcTemplate.update(String.format("delete from %s where message_id = ?", sagaStashTable), stashedMessage.getMessage().getId()));
+    assertEqualToOne(jdbcTemplate.update(deleteFromSagaStashTableSql, stashedMessage.getMessage().getId()));
 
     return Optional.of(stashedMessage.getMessage());
   }
