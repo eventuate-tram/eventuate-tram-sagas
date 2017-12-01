@@ -1,3 +1,6 @@
+CREATE SCHEMA IF NOT EXISTS eventuate AUTHORIZATION SA;
+SET SCHEMA eventuate;
+
 CREATE TABLE aggregate_instance_subscriptions(
   aggregate_type VARCHAR(200) DEFAULT NULL,
   aggregate_id VARCHAR(1000) NOT NULL,
