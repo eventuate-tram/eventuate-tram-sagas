@@ -3,7 +3,7 @@
 
 DOCKER_REPO=eventuateio
 REMOTE_PREFIX=eventuate-tram-sagas
-IMAGES="mysql"
+IMAGES="mysql postgres"
 
 DOCKER_COMPOSE_PREFIX=$(echo ${PWD##*/} | sed -e 's/-//g')_
 
