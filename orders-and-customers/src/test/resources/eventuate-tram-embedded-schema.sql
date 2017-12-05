@@ -1,6 +1,21 @@
 CREATE SCHEMA IF NOT EXISTS eventuate AUTHORIZATION SA;
 SET SCHEMA eventuate;
 
+DROP Table IF Exists message;
+
+CREATE TABLE message (
+  ID VARCHAR(1000) PRIMARY KEY,
+  DESTINATION VARCHAR(1000) NOT NULL,
+  HEADERS VARCHAR(1000) NOT NULL,
+  PAYLOAD VARCHAR(1000) NOT NULL
+);
+
+CREATE TABLE received_messages (
+  CONSUMER_ID VARCHAR(1000),
+  MESSAGE_ID VARCHAR(1000),
+  PRIMARY KEY(CONSUMER_ID, MESSAGE_ID)
+);
+
 CREATE TABLE aggregate_instance_subscriptions(
   aggregate_type VARCHAR(200) DEFAULT NULL,
   aggregate_id VARCHAR(1000) NOT NULL,
@@ -19,7 +34,6 @@ CREATE TABLE saga_instance(
   saga_data_json VARCHAR(1000) NOT NULL,
   PRIMARY KEY(saga_type, saga_id)
 );
-
 
 CREATE TABLE saga_instance_participants (
   saga_type VARCHAR(100) NOT NULL,
@@ -44,4 +58,5 @@ create table saga_stash_table(
   message_headers VARCHAR(1000) NOT NULL,
   message_payload VARCHAR(1000) NOT NULL
   );
+
 
