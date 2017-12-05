@@ -12,7 +12,8 @@ jobs:
           paths:
             - ~/.gradle
           key: eventuate-tram-sagas-{{ checksum "gradle.properties" }}
-      - run: TERM=dumb ./build-and-test-all.sh
+      - run: TERM=dumb ./build-and-test-all-mysql.sh
+      - run: TERM=dumb ./build-and-test-all-postgres.sh
       - run:
           name: Save JUNIT test results
           command: |
