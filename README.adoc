@@ -1,8 +1,12 @@
 = Eventuate Tram Saga
 
-The Eventuate Tram Saga framework is a saga orchestration framework built on the Eventuate Tram framework.
-A saga maintains consistency across multiple microservices by using a series of a local transactions that are coordinated using messages or events.
+The Eventuate Tram Saga framework is a saga framework for Java microservices that use JDBC/JPA.
 
+A major challenge when implementing business applications using the microservice architecture is maintaining data consistency across services.
+Each service has its own private data and you can't use distributed transactions.
+The solution is to use sagas.
+
+A http://microservices.io/patterns/data/saga.html[saga] maintains consistency across multiple microservices by using a series of a local transactions that are coordinated using messages or events.
 A saga consists of a series of steps.
 Each step consists of either transaction, a compensating transaction or both.
 Each transaction is the invocation of a saga participant using a command message.
@@ -10,10 +14,25 @@ A saga executes the forward transactions sequentially.
 If one of them fails then the saga executes the compensating transactions in reverse order to rollback the saga.
 
 Eventuate Tram Saga  is described in more detail in my book https://www.manning.com/books/microservice-patterns[Microservice Patterns].
+It is built on the https://github.com/eventuate-tram/eventuate-tram-core[Eventuate Tram framework], which enables an application to atomically update a database and publish a message without using JTA.
+
+== Learn more
+
+Recent presentations:
+
+* QCONSF 2017 - http://microservices.io/microservices/news/2017/12/04/qconsf2017-presentation.html[slides]
+* JavaOne 2017 - https://www.slideshare.net/chris.e.richardson/javaone2017-acid-is-so-yesterday-maintaining-data-consistency-with-sagas[slides] and https://www.youtube.com/watch?v=6P6dvNyvtps[video]
+
+Example applications:
+
+* https://github.com/eventuate-tram/eventuate-tram-sagas-examples-customers-and-orders[Customers and Orders]
+* https://github.com/microservice-patterns/ftgo-application[FTGO Example application for Microservice Patterns book]
+
 
 == Writing an orchestrator
 
-In the order creation example, the `CreateOrderSaga` consists of the following three steps:
+The https://github.com/eventuate-tram/eventuate-tram-sagas-examples-customers-and-orders[Customers and Orders] uses a saga to create an `Order` in the `Order Service` and reserve credit in the `Customer Service`.
+The `CreateOrderSaga` consists of the following three steps:
 
 1. The `CreateOrderSaga` is instantiated after the `Order` is created.
 Consequently, the first step is simply a compensating transaction, which is executed in the credit cannot be reserved to reject the order.
