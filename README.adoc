@@ -1,6 +1,9 @@
 = Eventuate Tram Saga
 
+image::https://api.bintray.com/packages/eventuateio-oss/eventuate-maven-release/eventuate-tram-sagas/images/download.svg[link="https://bintray.com/eventuateio-oss/eventuate-maven-release/eventuate-tram-sagas/_latestVersion"]
+
 The Eventuate Tram Saga framework is a saga framework for Java microservices that use JDBC/JPA.
+
 
 A major challenge when implementing business applications using the microservice architecture is maintaining data consistency across services.
 Each service has its own private data and you can't use distributed transactions.
@@ -123,3 +126,31 @@ public class CustomerCommandHandler {
   }
   ...
 ```
+
+== Maven/Gradle artifacts
+
+The artifacts are in https://bintray.com/eventuateio-oss/eventuate-maven-release/eventuate-tram-sagas[JCenter].
+The latest version is:
+
+image::https://api.bintray.com/packages/eventuateio-oss/eventuate-maven-release/eventuate-tram-sagas/images/download.svg[link="https://bintray.com/eventuateio-oss/eventuate-maven-release/eventuate-tram-sagas/_latestVersion"]
+
+If you are writing a Saga orchestrator add this dependency to your project:
+
+* `io.eventuate.tram.sagas:eventuate-tram-sagas-simple-dsl:$eventuateTramSagasVersion`
+
+If you are writing a saga participant then add this dependency:
+
+* `io.eventuate.tram.sagas:eventuate-jpa-sagas-framework:$eventuateTramSagasVersion`
+
+You must also include one of the https://github.com/eventuate-tram/eventuate-tram-core[Eventuate Tram] 'implementation' artifacts:
+
+* `io.eventuate.tram.core:eventuate-tram-jdbc-kafka:$eventuateTramVersion` - JDBC database and Apache Kafka message broker
+* `io.eventuate.tram.core:eventuate-tram-in-memory:$eventuateTramVersion` - In-memory JDBC database and in-memory messaging for testing
+
+== Running the CDC service
+
+In addition to a database and message broker, you will need to run the Eventuate Tram CDC service.
+It reads events inserted into the database and publishes them to Apache Kafka.
+It is written using Spring Boot.
+The easiest way to run this service during development is to use Docker Compose.
+The https://github.com/eventuate-tram/eventuate-tram-core-examples-basic[Eventuate Tram Code Basic examples] project has an example https://github.com/eventuate-tram/eventuate-tram-core-examples-basic/blob/master/docker-compose.yml[docker-compose.yml file].
