@@ -150,7 +150,7 @@ You must also include one of the https://github.com/eventuate-tram/eventuate-tra
 == Running the CDC service
 
 In addition to a database and message broker, you will need to run the Eventuate Tram CDC service.
-It reads events inserted into the database and publishes them to Apache Kafka.
+It reads messages and events inserted into the database and publishes them to Apache Kafka.
 It is written using Spring Boot.
 The easiest way to run this service during development is to use Docker Compose.
 The https://github.com/eventuate-tram/eventuate-tram-core-examples-basic[Eventuate Tram Code Basic examples] project has an example https://github.com/eventuate-tram/eventuate-tram-core-examples-basic/blob/master/docker-compose.yml[docker-compose.yml file].
