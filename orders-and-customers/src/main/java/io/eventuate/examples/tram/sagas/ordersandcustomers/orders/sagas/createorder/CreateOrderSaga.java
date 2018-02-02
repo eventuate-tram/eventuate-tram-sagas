@@ -5,8 +5,8 @@ import io.eventuate.examples.tram.sagas.ordersandcustomers.orders.sagas.particip
 import io.eventuate.examples.tram.sagas.ordersandcustomers.orders.sagas.participants.ReserveCreditCommand;
 import io.eventuate.examples.tram.sagas.ordersandcustomers.orders.service.RejectOrderCommand;
 import io.eventuate.tram.commands.consumer.CommandWithDestination;
-import io.eventuate.tram.sagas.simpledsl.SimpleSaga;
 import io.eventuate.tram.sagas.orchestration.SagaDefinition;
+import io.eventuate.tram.sagas.simpledsl.SimpleSaga;
 
 import static io.eventuate.tram.commands.consumer.CommandWithDestinationBuilder.send;
 
@@ -29,6 +29,7 @@ public class CreateOrderSaga implements SimpleSaga<CreateOrderSagaData> {
 
 
   private CommandWithDestination reserveCredit(CreateOrderSagaData data) {
+
     long orderId = data.getOrderId();
     Long customerId = data.getOrderDetails().getCustomerId();
     Money orderTotal = data.getOrderDetails().getOrderTotal();

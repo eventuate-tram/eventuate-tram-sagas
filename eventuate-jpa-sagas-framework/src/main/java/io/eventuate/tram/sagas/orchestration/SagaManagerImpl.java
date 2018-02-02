@@ -72,6 +72,45 @@ public class SagaManagerImpl<Data>
   private SagaLockManager sagaLockManager;
 
 
+  public void setSagaCommandProducer(SagaCommandProducer sagaCommandProducer) {
+    this.sagaCommandProducer = sagaCommandProducer;
+  }
+
+  @Autowired
+  private SagaCommandProducer sagaCommandProducer;
+
+  public void setSagaInstanceRepository(SagaInstanceRepository sagaInstanceRepository) {
+    this.sagaInstanceRepository = sagaInstanceRepository;
+  }
+
+  public void setCommandProducer(CommandProducer commandProducer) {
+    this.commandProducer = commandProducer;
+  }
+
+  public void setMessageConsumer(MessageConsumer messageConsumer) {
+    this.messageConsumer = messageConsumer;
+  }
+
+  public void setIdGenerator(IdGenerator idGenerator) {
+    this.idGenerator = idGenerator;
+  }
+
+  public void setAggregateInstanceSubscriptionsDAO(AggregateInstanceSubscriptionsDAO aggregateInstanceSubscriptionsDAO) {
+    this.aggregateInstanceSubscriptionsDAO = aggregateInstanceSubscriptionsDAO;
+  }
+
+  public void setChannelMapping(ChannelMapping channelMapping) {
+    this.channelMapping = channelMapping;
+  }
+
+  public void setSagaLockManager(SagaLockManager sagaLockManager) {
+    this.sagaLockManager = sagaLockManager;
+  }
+
+  public void setDomainEventPublisher(DomainEventPublisher domainEventPublisher) {
+    this.domainEventPublisher = domainEventPublisher;
+  }
+
   @Override
   public SagaInstance create(Data sagaData) {
     return create(sagaData, Optional.empty());
@@ -190,11 +229,7 @@ public class SagaManagerImpl<Data>
 
     for (CommandWithDestination command : commands) {
       lastRequestId = idGenerator.genId().asString();
-      Map<String, String> headers = new HashMap<>();
-      headers.put(SagaCommandHeaders.SAGA_TYPE, getSagaType());
-      headers.put(SagaCommandHeaders.SAGA_ID, sagaId);
-      headers.put(SagaCommandHeaders.SAGA_REQUEST_ID, lastRequestId);
-      commandProducer.send(command.getDestinationChannel(), command.getResource(), command.getCommand(), makeSagaReplyChannel(), headers);
+      sagaCommandProducer.sendCommand(getSagaType(), sagaId, command.getDestinationChannel(), command.getResource(), lastRequestId, command.getCommand(), makeSagaReplyChannel());
     }
 
     return lastRequestId;

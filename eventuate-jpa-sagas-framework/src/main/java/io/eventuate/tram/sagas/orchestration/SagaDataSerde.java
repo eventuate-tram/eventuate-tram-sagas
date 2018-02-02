@@ -5,11 +5,11 @@ import io.eventuate.javaclient.commonimpl.JSonMapper;
 
 public class SagaDataSerde {
 
-  static <Data> SerializedSagaData serializeSagaData(Data sagaData) {
+  public static <Data> SerializedSagaData serializeSagaData(Data sagaData) {
     return new SerializedSagaData(sagaData.getClass().getName(), JSonMapper.toJson(sagaData));
   }
 
-  static <Data> Data deserializeSagaData(SerializedSagaData serializedSagaData) {
+  public static <Data> Data deserializeSagaData(SerializedSagaData serializedSagaData) {
     Class<?> clasz = null;
     try {
       clasz = SagaDataSerde.class.getClassLoader().loadClass(serializedSagaData.getSagaDataType());

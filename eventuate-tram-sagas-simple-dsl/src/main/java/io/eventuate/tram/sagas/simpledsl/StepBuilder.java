@@ -15,7 +15,7 @@ public class StepBuilder<Data>  {
   }
 
   public LocalStepBuilder<Data> invokeLocal(Consumer<Data> localFunction) {
-    return new LocalStepBuilder<Data>(parent, localFunction);
+    return new LocalStepBuilder<>(parent, localFunction);
   }
 
 
@@ -26,5 +26,14 @@ public class StepBuilder<Data>  {
 
   public <C extends Command> InvokeParticipantStepBuilder<Data> withCompensation(Function<Data, CommandWithDestination> compensation) {
     return new InvokeParticipantStepBuilder<>(parent).withCompensation(compensation);
+  }
+
+  public <C extends Command> InvokeParticipantStepBuilder<Data> invokeParticipant(CommandEndpoint<C> commandEndpoint, Function<Data, C> commandProvider) {
+    return new InvokeParticipantStepBuilder<>(parent).withAction(commandEndpoint, commandProvider);
+  }
+
+
+  public <C extends Command> InvokeParticipantStepBuilder<Data> withCompensation(CommandEndpoint<C> commandEndpoint, Function<Data, C> commandProvider) {
+    return new InvokeParticipantStepBuilder<>(parent).withCompensation(commandEndpoint, commandProvider);
   }
 }

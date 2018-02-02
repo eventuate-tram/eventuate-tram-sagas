@@ -1,5 +1,6 @@
 package io.eventuate.tram.sagas.simpledsl;
 
+import io.eventuate.tram.commands.common.Command;
 import io.eventuate.tram.commands.consumer.CommandWithDestination;
 import io.eventuate.tram.sagas.orchestration.SagaDefinition;
 
@@ -25,9 +26,18 @@ public class InvokeParticipantStepBuilder<Data> {
     this.action = Optional.of(new ParticipantInvocationImpl<>(action));
     return this;
   }
+  public <C extends Command> InvokeParticipantStepBuilder<Data> withAction(CommandEndpoint<C> commandEndpoint, Function<Data, C> commandProvider) {
+    this.action = Optional.of(new ParticipantEndpointInvocationImpl<>(commandEndpoint, commandProvider));
+    return this;
+  }
 
   public InvokeParticipantStepBuilder<Data> withCompensation(Function<Data, CommandWithDestination> compensation) {
     this.compensation = Optional.of(new ParticipantInvocationImpl<>(compensation));
+    return this;
+  }
+
+  public <C extends Command> InvokeParticipantStepBuilder<Data> withCompensation(CommandEndpoint<C> commandEndpoint, Function<Data, C> commandProvider) {
+    this.compensation = Optional.of(new ParticipantEndpointInvocationImpl<>(commandEndpoint, commandProvider));
     return this;
   }
 

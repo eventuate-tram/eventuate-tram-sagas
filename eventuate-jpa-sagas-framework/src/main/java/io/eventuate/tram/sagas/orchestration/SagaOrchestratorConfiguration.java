@@ -1,5 +1,6 @@
 package io.eventuate.tram.sagas.orchestration;
 
+import io.eventuate.tram.commands.producer.CommandProducer;
 import io.eventuate.tram.commands.producer.TramCommandProducerConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -19,4 +20,8 @@ public class SagaOrchestratorConfiguration {
     return new SagaInstanceRepositoryJdbc();
   }
 
+  @Bean
+  public SagaCommandProducer sagaCommandProducer(CommandProducer commandProducer) {
+    return new SagaCommandProducer(commandProducer);
+  }
 }
