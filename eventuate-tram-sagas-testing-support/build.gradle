@@ -1,0 +1,10 @@
+apply plugin: PublicModulePlugin
+
+dependencies {
+    compile project(":eventuate-tram-sagas-simple-dsl")
+
+    compile "io.eventuate.tram.core:eventuate-tram-testing-support:$eventuateTramVersion"
+
+    compile "org.springframework.boot:spring-boot-starter-test:$springBootVersion"
+
+}
