@@ -4,4 +4,6 @@ include 'eventuate-jpa-sagas-framework'
 include 'eventuate-tram-sagas-simple-dsl'
 include 'eventuate-tram-sagas-in-memory'
 include "eventuate-tram-sagas-event-sourcing-support"
+include 'eventuate-tram-sagas-testing-support'
+
 include 'orders-and-customers'
