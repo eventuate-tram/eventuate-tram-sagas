@@ -74,9 +74,6 @@ public class SagaUnitTestSupport {
     sagaManager.setCommandProducer(commandProducer);
     sagaManager.setSagaCommandProducer(new SagaCommandProducer(commandProducer));
 
-
-    sagaManager.setAggregateInstanceSubscriptionsDAO(Mockito.mock(AggregateInstanceSubscriptionsDAO.class));
-    
     sagaManager.create(sagaData);
     return this;
   }
