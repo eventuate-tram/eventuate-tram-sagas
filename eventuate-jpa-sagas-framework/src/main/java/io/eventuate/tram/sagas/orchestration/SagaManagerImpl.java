@@ -54,10 +54,6 @@ public class SagaManagerImpl<Data>
   private IdGenerator idGenerator;
 
 
-  @Autowired
-  private AggregateInstanceSubscriptionsDAO aggregateInstanceSubscriptionsDAO;
-
-  private EnlistedAggregatesDao enlistedAggregatesDao;
 
   @Autowired
   private ChannelMapping channelMapping;
@@ -95,9 +91,6 @@ public class SagaManagerImpl<Data>
     this.idGenerator = idGenerator;
   }
 
-  public void setAggregateInstanceSubscriptionsDAO(AggregateInstanceSubscriptionsDAO aggregateInstanceSubscriptionsDAO) {
-    this.aggregateInstanceSubscriptionsDAO = aggregateInstanceSubscriptionsDAO;
-  }
 
   public void setChannelMapping(ChannelMapping channelMapping) {
     this.channelMapping = channelMapping;
@@ -108,7 +101,6 @@ public class SagaManagerImpl<Data>
   }
 
   public void setDomainEventPublisher(DomainEventPublisher domainEventPublisher) {
-    this.domainEventPublisher = domainEventPublisher;
   }
 
   @Override
@@ -147,45 +139,15 @@ public class SagaManagerImpl<Data>
 
     sagaInstance.setSerializedSagaData(SagaDataSerde.serializeSagaData(sagaData));
 
-    publishEvents(sagaId, actions.getEventsToPublish(), actions.getUpdatedState());
-
     Optional<String> possibleNewState = actions.getUpdatedState();
     maybeUpdateState(sagaInstance, possibleNewState);
     maybePerformEndStateActions(sagaId, sagaInstance, possibleNewState);
 
     sagaInstanceRepository.update(sagaInstance);
 
-    updateEnlistedAggregates(sagaId, actions.getEnlistedAggregates());
-
-    updateEventInstanceSubscriptions(sagaData, sagaId, sagaInstance.getStateName());
-
     return sagaInstance;
   }
 
-  private void publishEvents(String sagaId, Set<EventToPublish> eventsToPublish, Optional<String> updatedState) {
-    Set<EnlistedAggregate> elas = emptySet(); //enlistedAggregatesDao.findEnlistedAggregates(sagaId);
-    boolean isEndState = updatedState.filter(s -> getStateDefinition().isEndState(s)).isPresent();
-
-    // TODO - an alternative model is to 'onResume()' based on a SagaCompletedEvent being published
-    // Domain object doesn't have to publish event
-    // What about automatically suspending if there is already a saga-in-progress? and delay the state check until much later
-
-    for (EventToPublish event : eventsToPublish) {
-      Map<String, String> headers = new HashMap<>();
-      if (isEndState) {
-        Set<String> sagaIds = enlistedAggregatesDao.findSagas(event.getAggregateType(), event.getAggregateId());
-        sagaIds.remove(sagaId);
-        headers.put("participating-saga-ids", sagaIds.stream().collect(joining(",")));
-      }
-      domainEventPublisher.publish(event.getAggregateType().getName(),
-              event.getAggregateId(),
-              headers,
-              event.getDomainEvents());
-    }
-  }
-
-  @Autowired
-  private DomainEventPublisher domainEventPublisher;
 
   private void performEndStateActions(String sagaId, SagaInstance sagaInstance) {
     for (DestinationAndResource dr : sagaInstance.getDestinationsAndResources()) {
@@ -209,7 +171,6 @@ public class SagaManagerImpl<Data>
 
   @PostConstruct
   public void subscribeToReplyChannel() {
-    // TODO subscribe to events that trigger the creation of a saga
     messageConsumer.subscribe(saga.getClass().getName() + "-consumer", singleton(channelMapping.transform(makeSagaReplyChannel())), this::handleMessage);
   }
 
@@ -217,11 +178,6 @@ public class SagaManagerImpl<Data>
     return getSagaType() + "-reply";
   }
 
-
-  private void updateEventInstanceSubscriptions(Data sagaData, String sagaId, String stateName) {
-    List<EventClassAndAggregateId> instanceEvents = getStateDefinition().findEventHandlers(saga, stateName, sagaData);
-    aggregateInstanceSubscriptionsDAO.update(getSagaType(), sagaId, instanceEvents);
-  }
 
   private String sendCommands(String sagaId, List<CommandWithDestination> commands) {
 
@@ -241,52 +197,11 @@ public class SagaManagerImpl<Data>
     logger.debug("handle message invoked {}", message);
     if (message.hasHeader(SagaReplyHeaders.REPLY_SAGA_ID)) {
       handleReply(message);
-    } else if (message.hasHeader(EventMessageHeaders.EVENT_TYPE)) {
-
-      String aggregateType = message.getRequiredHeader(EventMessageHeaders.AGGREGATE_TYPE);
-      String aggregateId = message.getRequiredHeader(Message.PARTITION_ID);
-      String eventType = message.getRequiredHeader(EventMessageHeaders.EVENT_TYPE);
-      // TODO query the saga event routing table: (at, aId, et) -> [(sagaType, sagaId)]
-      for (SagaTypeAndId sagaTypeAndId : aggregateInstanceSubscriptionsDAO.findSagas(aggregateType, aggregateId, eventType)) {
-        handleAggregateInstanceEvent(sagaTypeAndId.getSagaType(), sagaTypeAndId.getSagaId(), message, aggregateType, aggregateId, eventType);
-      }
-      ;
-
-
-    } else {
+    }  else {
       logger.warn("Handle message doesn't know what to do with: {} ", message);
     }
   }
 
-
-  private void handleAggregateInstanceEvent(String sagaType, String sagaId, Message message, String aggregateType, String aggregateId, String eventType) {
-    System.out.println("Got handleAggregateInstanceEvent: " + message + ", type=" + sagaType + ", instance=" + sagaId);
-
-    SagaInstanceData<Data> sagaInstanceAndData = sagaInstanceRepository.findWithData(sagaType, sagaId);
-    SagaInstance sagaInstance = sagaInstanceAndData.getSagaInstance();
-    Data sagaData = sagaInstanceAndData.getSagaData();
-
-    String currentState = sagaInstance.getStateName();
-    logger.info("Current state={}", currentState);
-
-    Optional<SagaEventHandler<Data>> eventHandler = getStateDefinition().findEventHandler(saga, currentState, sagaData, aggregateType, Long.parseLong(aggregateId), eventType);
-
-    if (!eventHandler.isPresent()) {
-      logger.error("No event handler for: {}", message);
-      return;
-    }
-
-    logger.info("Invoking event handler for {}", message);
-
-
-    SagaActions<Data> actions = eventHandler.get().getAction().apply(sagaData, new DomainEventEnvelopeImpl<>(null, null, null, null, null)); // TOOD
-
-    // TODO - doesn't this do something??? Commands
-
-    sagaInstance.setSerializedSagaData(SagaDataSerde.serializeSagaData(sagaData));
-    sagaInstanceRepository.update(sagaInstance);
-
-  }
 
   private void handleReply(Message message) {
 
@@ -301,11 +216,6 @@ public class SagaManagerImpl<Data>
 
     String messageId = message.getId();
 
-    if (isDuplicateReply(messageId, sagaType, sagaId))
-      return;
-
-
-    String messageType = message.getRequiredHeader(ReplyMessageHeaders.REPLY_TYPE);
     String messageJson = message.getPayload();
 
     SagaInstanceData<Data> sagaInstanceAndData = sagaInstanceRepository.findWithData(sagaType, sagaId);
@@ -340,14 +250,10 @@ public class SagaManagerImpl<Data>
 
     logger.info("Handled reply. Sending commands {}", commands);
 
-    publishEvents(sagaId, actions.getEventsToPublish(), actions.getUpdatedState());
-
     Optional<String> possibleNewState = actions.getUpdatedState();
     maybeUpdateState(sagaInstance, possibleNewState);
     maybePerformEndStateActions(sagaId, sagaInstance, possibleNewState);
-    updateEnlistedAggregates(sagaId, actions.getEnlistedAggregates());
     sagaInstance.setLastRequestId(sendCommands(sagaId, commands));
-    updateEventInstanceSubscriptions(sagaData, sagaId, sagaInstance.getStateName());
 
     sagaInstance.setSerializedSagaData(SagaDataSerde.serializeSagaData(sagaData));
 
@@ -357,14 +263,6 @@ public class SagaManagerImpl<Data>
 
   private Boolean isReplyForThisSagaType(Message message) {
     return message.getHeader(SagaReplyHeaders.REPLY_SAGA_TYPE).map(x -> x.equals(getSagaType())).orElse(false);
-  }
-
-  private DestinationAndResource toDestinationAndResource(CommandWithDestination commandToSend) {
-    return new DestinationAndResource(commandToSend.getDestinationChannel(), commandToSend.getResource());
-  }
-
-  private void updateEnlistedAggregates(String sagaId, Set<EnlistedAggregate> enlistedAggregates) {
-    // TODO enlistedAggregatesDao.save(sagaId, enlistedAggregates);
   }
 
   private void maybeUpdateState(SagaInstance sagaInstance, Optional<String> possibleNewState) {
@@ -379,11 +277,6 @@ public class SagaManagerImpl<Data>
     });
   }
 
-
-  private boolean isDuplicateReply(String messageId, String sagaType, String sagaId) {
-    String consumerId = makeConsumerIdFor(sagaType, sagaId);
-    return false;
-  }
 
   private String makeConsumerIdFor(String sagaType, String sagaId) {
     return "consumer-" + sagaType + "-" + sagaId;

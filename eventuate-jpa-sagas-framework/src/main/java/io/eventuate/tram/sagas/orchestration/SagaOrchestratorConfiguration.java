@@ -10,10 +10,6 @@ import org.springframework.context.annotation.Import;
 @Import({TramCommandProducerConfiguration.class})
 public class SagaOrchestratorConfiguration {
 
-  @Bean
-  public AggregateInstanceSubscriptionsDAO aggregateInstanceSubscriptionsDAO() {
-    return new AggregateInstanceSubscriptionsDAO();
-  }
 
   @Bean
   public SagaInstanceRepository sagaInstanceRepository() {
