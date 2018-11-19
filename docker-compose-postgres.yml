@@ -1,5 +1,5 @@
 zookeeper:
-  image: eventuateio/eventuateio-local-zookeeper:0.21.0.RELEASE
+  image: eventuateio/eventuateio-local-zookeeper:0.30.0.M6
   ports:
     - 2181:2181
     - 2888:2888
@@ -7,7 +7,7 @@ zookeeper:
 
 
 kafka:
-  image: eventuateio/eventuateio-local-kafka:0.21.0.RELEASE
+  image: eventuateio/eventuateio-local-kafka:0.30.0.M6
   ports:
     - 9092:9092
   links:
@@ -27,7 +27,7 @@ postgres:
     POSTGRES_PASSWORD: eventuate
 
 cdcservice:
-  image: eventuateio/eventuate-tram-cdc-mysql-service:0.10.0.RELEASE
+  image: eventuateio/eventuate-tram-cdc-mysql-service:0.20.0.M5
   ports:
     - "8099:8080"
   links:
@@ -41,6 +41,7 @@ cdcservice:
     SPRING_DATASOURCE_TEST_ON_BORROW: "true"
     SPRING_DATASOURCE_VALIDATION_QUERY: SELECT 1
     SPRING_DATASOURCE_DRIVER_CLASS_NAME: org.postgresql.Driver
+    EVENTUATE_CURRENT_TIME_IN_MILLISECONDS_SQL: ${EVENTUATE_CURRENT_TIME_IN_MILLISECONDS_SQL}
     EVENTUATELOCAL_CDC_POLLING_INTERVAL_IN_MILLISECONDS: 500
     EVENTUATELOCAL_CDC_MAX_EVENTS_PER_POLLING: 1000
     EVENTUATELOCAL_CDC_MAX_ATTEMPTS_FOR_POLLING: 100
