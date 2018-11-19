@@ -22,7 +22,7 @@ public class SimpleSagaDefinition<Data> implements SagaDefinition<Data> {
   }
 
   @Override
-  public SagaActions<Data> invokeStartingHandler(Data sagaData) {
+  public SagaActions<Data> start(Data sagaData) {
     return getStartingHandler().get().apply(sagaData);
   }
 

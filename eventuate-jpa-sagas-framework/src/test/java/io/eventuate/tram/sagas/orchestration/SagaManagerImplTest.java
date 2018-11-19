@@ -11,11 +11,14 @@ import io.eventuate.tram.messaging.producer.MessageBuilder;
 import io.eventuate.tram.sagas.common.SagaReplyHeaders;
 import io.eventuate.tram.sagas.participant.SagaLockManager;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.MockitoAnnotations;
+import org.mockito.invocation.InvocationOnMock;
+import org.mockito.junit.MockitoJUnit;
+import org.mockito.junit.MockitoRule;
 
 import java.util.Collections;
 
@@ -59,9 +62,6 @@ public class SagaManagerImplTest {
   private SagaDefinition<TestSagaData> sagaDefinition;
 
 
-  @Mock
-  private RawSagaStateMachineAction replyHandler;
-
   private String testResource = "SomeResource";
   private String sagaType = "MySagaType";
   private String sagaId = "MySagaId";
@@ -73,10 +73,10 @@ public class SagaManagerImplTest {
   private TestCommand command1 = new TestCommand();
   private TestCommand command2 = new TestCommand();
 
-  CommandWithDestination commandForParticipant1 = new CommandWithDestination(participantChannel1, testResource,
+  private CommandWithDestination commandForParticipant1 = new CommandWithDestination(participantChannel1, testResource,
           SagaManagerImplTest.this.command1);
 
-  CommandWithDestination commandForParticipant2 = new CommandWithDestination(participantChannel2, testResource,
+  private CommandWithDestination commandForParticipant2 = new CommandWithDestination(participantChannel2, testResource,
           SagaManagerImplTest.this.command2);
 
   private SagaInstance sagaInstance;
@@ -86,15 +86,16 @@ public class SagaManagerImplTest {
 
   private MessageHandler sagaMessageHandler;
 
-  Message replyFromParticipant1 = MessageBuilder.withPayload("{}")
+  private Message replyFromParticipant1 = MessageBuilder.withPayload("{}")
           .withHeader(SagaReplyHeaders.REPLY_SAGA_TYPE, sagaType)
           .withHeader(SagaReplyHeaders.REPLY_SAGA_ID, sagaId)
           .build();
 
+  @Rule
+  public MockitoRule rule = MockitoJUnit.rule();
+
   @Before
   public void setUp() {
-
-    MockitoAnnotations.initMocks(this);
 
     sm = new SagaManagerImpl<>(testSaga, sagaInstanceRepository,
             commandProducer, messageConsumer, channelMapping,
@@ -112,22 +113,30 @@ public class SagaManagerImplTest {
   @Test
   public void shouldExecuteSaga() {
 
-    when(channelMapping.transform(sagaReplyChannel)).thenReturn(sagaReplyChannel);
-
     initializeSagaManager();
 
-    when(sagaDefinition.invokeStartingHandler(initialSagaData)).thenReturn(makeFirstSagaActions());
+    startSaga();
+
+    reset(sagaInstanceRepository, sagaCommandProducer);
+
+    handleReply();
+
+
+    reset(sagaInstanceRepository, sagaCommandProducer);
+
+  }
+
+  private void startSaga() {
+    when(sagaDefinition.start(initialSagaData)).thenReturn(makeFirstSagaActions());
 
     when(sagaCommandProducer.sendCommands(anyString(), anyString(), anyList(), anyString()))
             .thenReturn(requestId1.asString());
 
-    assignSagaIdWhenSaved();
+    doAnswer(this::assignSagaIdWhenSaved).when(sagaInstanceRepository).save(any(SagaInstance.class));
 
     sagaInstance = sm.create(initialSagaData);
 
-    SagaInstance expectedSagaInstanceAfterFirstStep = new SagaInstance(sagaType, sagaId, "state-A", requestId1.asString(), SagaDataSerde
-            .serializeSagaData(sagaDataUpdatedByStartingHandler), Collections.emptySet());
-
+    SagaInstance expectedSagaInstanceAfterFirstStep = makeExpectedSagaInstanceAfterFirstStep();
 
     assertSagaInstanceEquals(expectedSagaInstanceAfterFirstStep, sagaInstance);
 
@@ -135,18 +144,23 @@ public class SagaManagerImplTest {
             sagaReplyChannel);
 
 
-    SagaInstance savedSagaInstance = verifySagaInstanceSaved();
+    verify(sagaInstanceRepository).save(any(SagaInstance.class));
 
-    verify(sagaInstanceRepository).update(sagaInstance);
-
-    // Verify what is being persisted
+    verify(sagaInstanceRepository).update(argThat(sagaInstance -> sagaInstanceEquals(expectedSagaInstanceAfterFirstStep, sagaInstance)));
 
     assertSagaInstanceEquals(expectedSagaInstanceAfterFirstStep, sagaInstance);
 
     verifyNoMoreInteractions(sagaInstanceRepository, sagaCommandProducer);
-    reset(sagaInstanceRepository, sagaCommandProducer);
+  }
 
-    // Handle a reply
+  private SagaInstance makeExpectedSagaInstanceAfterFirstStep() {
+    return new SagaInstance(sagaType, sagaId, "state-A", requestId1.asString(),
+            SagaDataSerde.serializeSagaData(sagaDataUpdatedByStartingHandler), Collections.emptySet());
+  }
+
+  private void handleReply() {
+    SagaInstance expectedSagaInstanceAfterSecondStep = makeExpectedSagaInstanceAfterSecondStep();
+
 
     when(sagaInstanceRepository.find(sagaType, sagaId))
             .thenReturn(sagaInstance);
@@ -166,15 +180,20 @@ public class SagaManagerImplTest {
 
     verify(sagaInstanceRepository).update(sagaInstance);
 
-    SagaInstance expectedSagaInstanceAfterSecondStep = new SagaInstance(sagaType, sagaId, "state-B",
-            requestId2.asString(),
-            SagaDataSerde.serializeSagaData(sagaDataUpdatedByReplyHandler), Collections.emptySet());
-
     assertSagaInstanceEquals(expectedSagaInstanceAfterSecondStep, sagaInstance);
 
     verifyNoMoreInteractions(sagaInstanceRepository, sagaCommandProducer);
-    reset(sagaInstanceRepository, sagaCommandProducer);
+  }
 
+  private SagaInstance makeExpectedSagaInstanceAfterSecondStep() {
+    return new SagaInstance(sagaType, sagaId, "state-B",
+            requestId2.asString(),
+            SagaDataSerde.serializeSagaData(sagaDataUpdatedByReplyHandler), Collections.emptySet());
+  }
+
+  private boolean sagaInstanceEquals(SagaInstance expectedSagaInstanceAfterFirstStep, SagaInstance sagaInstance) {
+    assertSagaInstanceEquals(expectedSagaInstanceAfterFirstStep, sagaInstance);
+    return true;
   }
 
   private void assertSagaInstanceEquals(SagaInstance expectedSagaInstance, SagaInstance sagaInstance) {
@@ -203,27 +222,15 @@ public class SagaManagerImplTest {
             .build();
   }
 
-  private SagaInstance verifySagaInstanceUpdated() {
-    ArgumentCaptor<SagaInstance> updateArg = ArgumentCaptor.forClass(SagaInstance.class);
-    verify(sagaInstanceRepository).update(updateArg.capture());
-    return updateArg.getValue();
-  }
-
-  private SagaInstance verifySagaInstanceSaved() {
-    ArgumentCaptor<SagaInstance> saveArg = ArgumentCaptor.forClass(SagaInstance.class);
-    verify(sagaInstanceRepository).save(saveArg.capture());
-    return saveArg.getValue();
-  }
-
-  private void assignSagaIdWhenSaved() {
-    doAnswer(invocation -> {
-      SagaInstance sagaInstance = invocation.getArgumentAt(0, SagaInstance.class);
+  private Object assignSagaIdWhenSaved(InvocationOnMock invocation) {
+      SagaInstance sagaInstance = invocation.getArgument(0);
       sagaInstance.setId(sagaId);
       return null;
-    }).when(sagaInstanceRepository).save(any(SagaInstance.class));
   }
 
   private void initializeSagaManager() {
+    when(channelMapping.transform(sagaReplyChannel)).thenReturn(sagaReplyChannel);
+
     sm.subscribeToReplyChannel();
 
     ArgumentCaptor<MessageHandler> messageHandlerArgumentCaptor = ArgumentCaptor.forClass(MessageHandler.class);

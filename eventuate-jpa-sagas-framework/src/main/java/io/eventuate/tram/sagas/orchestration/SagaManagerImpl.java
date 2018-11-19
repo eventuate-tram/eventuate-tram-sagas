@@ -128,7 +128,7 @@ public class SagaManagerImpl<Data>
 
     resource.ifPresent( r -> Assert.isTrue(sagaLockManager.claimLock(getSagaType(), sagaId, r), "Cannot claim lock for resource"));
 
-    SagaActions<Data> actions = getStateDefinition().invokeStartingHandler(sagaData);
+    SagaActions<Data> actions = getStateDefinition().start(sagaData);
 
     processActions(sagaId, sagaInstance, sagaData, actions);
 
