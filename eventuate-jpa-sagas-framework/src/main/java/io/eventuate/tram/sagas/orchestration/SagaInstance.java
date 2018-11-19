@@ -4,8 +4,8 @@ import java.util.Set;
 
 public class SagaInstance {
 
-  private String id;
   private String sagaType;
+  private String id;
   private String lastRequestId;
   private SerializedSagaData serializedSagaData;
   private String stateName;

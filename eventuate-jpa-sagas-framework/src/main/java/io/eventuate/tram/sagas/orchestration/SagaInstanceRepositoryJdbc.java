@@ -153,11 +153,5 @@ public class SagaInstanceRepositoryJdbc implements SagaInstanceRepository {
     saveDestinationsAndResources(sagaInstance);
   }
 
-  @Override
-  public <Data> SagaInstanceData<Data> findWithData(String sagaType, String sagaId) {
-    SagaInstance sagaInstance = find(sagaType, sagaId);
-    Data sagaData = SagaDataSerde.deserializeSagaData(sagaInstance.getSerializedSagaData());
-    return new SagaInstanceData<>(sagaInstance, sagaData);
-  }
 
 }

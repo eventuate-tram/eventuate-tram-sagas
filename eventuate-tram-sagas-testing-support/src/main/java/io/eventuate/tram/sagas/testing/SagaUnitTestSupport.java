@@ -56,12 +56,6 @@ public class SagaUnitTestSupport {
         this.sagaInstance = sagaInstance;
       }
 
-      @Override
-      public <Data> SagaInstanceData<Data> findWithData(String sagaType, String sagaId) {
-        SagaInstance sagaInstance = find(sagaType, sagaId);
-        Data sagaData = SagaDataSerde.deserializeSagaData(sagaInstance.getSerializedSagaData());
-        return new SagaInstanceData<>(sagaInstance, sagaData);
-      }
     });
     sagaManager.setIdGenerator(idGenerator);
 
