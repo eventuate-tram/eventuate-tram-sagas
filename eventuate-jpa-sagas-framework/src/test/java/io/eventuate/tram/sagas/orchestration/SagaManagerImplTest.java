@@ -2,8 +2,12 @@ package io.eventuate.tram.sagas.orchestration;
 
 import io.eventuate.Int128;
 import io.eventuate.tram.commands.common.ChannelMapping;
+import io.eventuate.tram.commands.common.CommandReplyOutcome;
+import io.eventuate.tram.commands.common.ReplyMessageHeaders;
 import io.eventuate.tram.commands.consumer.CommandWithDestination;
 import io.eventuate.tram.commands.producer.CommandProducer;
+import io.eventuate.tram.events.common.DomainEvent;
+import io.eventuate.tram.events.publisher.DomainEventPublisher;
 import io.eventuate.tram.messaging.common.Message;
 import io.eventuate.tram.messaging.consumer.MessageConsumer;
 import io.eventuate.tram.messaging.consumer.MessageHandler;
@@ -21,6 +25,7 @@ import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 
 import java.util.Collections;
+import java.util.Optional;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertSame;
@@ -61,6 +66,8 @@ public class SagaManagerImplTest {
   @Mock
   private SagaDefinition<TestSagaData> sagaDefinition;
 
+  @Mock
+  private DomainEventPublisher domainEventPublisher;
 
   private String testResource = "SomeResource";
   private String sagaType = "MySagaType";
@@ -89,6 +96,7 @@ public class SagaManagerImplTest {
   private Message replyFromParticipant1 = MessageBuilder.withPayload("{}")
           .withHeader(SagaReplyHeaders.REPLY_SAGA_TYPE, sagaType)
           .withHeader(SagaReplyHeaders.REPLY_SAGA_ID, sagaId)
+          .withHeader(ReplyMessageHeaders.REPLY_OUTCOME, CommandReplyOutcome.SUCCESS.name())
           .build();
 
   @Rule
@@ -99,7 +107,7 @@ public class SagaManagerImplTest {
 
     sm = new SagaManagerImpl<>(testSaga, sagaInstanceRepository,
             commandProducer, messageConsumer, channelMapping,
-            sagaLockManager, sagaCommandProducer);
+            sagaLockManager, sagaCommandProducer, domainEventPublisher);
 
     initialSagaData = new TestSagaData("initialSagaData");
     sagaDataUpdatedByStartingHandler = new TestSagaData("sagaDataUpdatedByStartingHandler");
@@ -108,10 +116,15 @@ public class SagaManagerImplTest {
     when(testSaga.getSagaType()).thenReturn(sagaType);
     when(testSaga.getSagaDefinition()).thenReturn(sagaDefinition);
 
+    when(testSaga.makeSagaCompletedSuccessfullyEvent(any())).thenReturn(Optional.of(new TestSagaCompletedSuccessfully()));
+    when(testSaga.makeSagaRolledBackEvent(any())).thenReturn(Optional.of(new TestSagaRolledBack()));
+
+    when(channelMapping.transform(anyString())).thenAnswer(invocation -> invocation.getArgument(0));
+
   }
 
   @Test
-  public void shouldExecuteSaga() {
+  public void shouldExecuteSagaSuccessfully() {
 
     initializeSagaManager();
 
@@ -119,8 +132,22 @@ public class SagaManagerImplTest {
 
     reset(sagaInstanceRepository, sagaCommandProducer);
 
-    handleReply();
+    handleReply(false, TestSagaCompletedSuccessfully.class);
 
+    reset(sagaInstanceRepository, sagaCommandProducer);
+
+  }
+
+  @Test
+  public void shouldExecuteSagaRolledBack() {
+
+    initializeSagaManager();
+
+    startSaga();
+
+    reset(sagaInstanceRepository, sagaCommandProducer);
+
+    handleReply(true, TestSagaRolledBack.class);
 
     reset(sagaInstanceRepository, sagaCommandProducer);
 
@@ -150,7 +177,7 @@ public class SagaManagerImplTest {
 
     assertSagaInstanceEquals(expectedSagaInstanceAfterFirstStep, sagaInstance);
 
-    verifyNoMoreInteractions(sagaInstanceRepository, sagaCommandProducer);
+    verifyNoMoreInteractions(sagaInstanceRepository, sagaCommandProducer, domainEventPublisher);
   }
 
   private SagaInstance makeExpectedSagaInstanceAfterFirstStep() {
@@ -158,7 +185,7 @@ public class SagaManagerImplTest {
             SagaDataSerde.serializeSagaData(sagaDataUpdatedByStartingHandler), Collections.emptySet());
   }
 
-  private void handleReply() {
+  private void handleReply(boolean compensating, Class<? extends DomainEvent> completionEventClass) {
     SagaInstance expectedSagaInstanceAfterSecondStep = makeExpectedSagaInstanceAfterSecondStep();
 
 
@@ -166,11 +193,10 @@ public class SagaManagerImplTest {
             .thenReturn(sagaInstance);
 
     when(sagaDefinition.handleReply(anyString(), any(TestSagaData.class), any(Message.class)))
-            .thenReturn(makeSecondSagaActions());
+            .thenReturn(makeSecondSagaActions(compensating));
 
     when(sagaCommandProducer.sendCommands(anyString(), anyString(), anyList(), anyString())).thenReturn
             (requestId2.asString());
-
 
     sagaMessageHandler.accept(replyFromParticipant1);
 
@@ -178,9 +204,11 @@ public class SagaManagerImplTest {
 
     verify(sagaCommandProducer).sendCommands(sagaType, sagaId, Collections.singletonList(commandForParticipant2), sagaReplyChannel);
 
-    verify(sagaInstanceRepository).update(sagaInstance);
+    verify(sagaInstanceRepository).update(argThat(sagaInstance -> sagaInstanceEquals(expectedSagaInstanceAfterSecondStep, sagaInstance)));
 
     assertSagaInstanceEquals(expectedSagaInstanceAfterSecondStep, sagaInstance);
+
+    verify(domainEventPublisher).publish(eq(sagaType), eq(sagaId), argThat(arg -> arg.size() == 1 && completionEventClass.isInstance(arg.get(0))));
 
     verifyNoMoreInteractions(sagaInstanceRepository, sagaCommandProducer);
   }
@@ -213,12 +241,13 @@ public class SagaManagerImplTest {
             .withCommand(commandForParticipant1).withUpdatedState("state-A").build();
   }
 
-  private SagaActions<TestSagaData> makeSecondSagaActions() {
+  private SagaActions<TestSagaData> makeSecondSagaActions(boolean compensating) {
     return SagaActions.<TestSagaData>builder()
             .withCommand(commandForParticipant2)
             .withUpdatedState("state-B")
             .withUpdatedSagaData(sagaDataUpdatedByReplyHandler)
             .withIsEndState(true)
+            .withIsCompensating(compensating)
             .build();
   }
 
@@ -229,7 +258,6 @@ public class SagaManagerImplTest {
   }
 
   private void initializeSagaManager() {
-    when(channelMapping.transform(sagaReplyChannel)).thenReturn(sagaReplyChannel);
 
     sm.subscribeToReplyChannel();
 

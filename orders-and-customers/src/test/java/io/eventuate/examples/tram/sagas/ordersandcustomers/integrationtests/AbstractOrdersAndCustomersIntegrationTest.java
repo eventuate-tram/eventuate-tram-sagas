@@ -6,13 +6,14 @@ import io.eventuate.examples.tram.sagas.ordersandcustomers.customers.service.Cus
 import io.eventuate.examples.tram.sagas.ordersandcustomers.orders.domain.Order;
 import io.eventuate.examples.tram.sagas.ordersandcustomers.orders.domain.OrderRepository;
 import io.eventuate.examples.tram.sagas.ordersandcustomers.orders.domain.OrderState;
+import io.eventuate.examples.tram.sagas.ordersandcustomers.orders.sagas.createorder.CreateOrderSagaCompletedSuccesfully;
+import io.eventuate.examples.tram.sagas.ordersandcustomers.orders.sagas.createorder.CreateOrderSagaRolledBack;
 import io.eventuate.examples.tram.sagas.ordersandcustomers.orders.service.OrderDetails;
 import io.eventuate.examples.tram.sagas.ordersandcustomers.orders.service.OrderService;
+import io.eventuate.util.test.async.Eventually;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.support.TransactionTemplate;
-
-import java.util.concurrent.TimeUnit;
 
 import static org.junit.Assert.assertEquals;
 
@@ -30,32 +31,43 @@ public abstract class AbstractOrdersAndCustomersIntegrationTest {
   @Autowired
   private TransactionTemplate transactionTemplate;
 
+  @Autowired
+  private SagaEventsConsumer sagaEventsConsumer;
+
   @Test
-  public void shouldApproveOrder() throws InterruptedException {
+  public void shouldApproveOrder() {
     Money creditLimit = new Money("15.00");
     Customer customer = customerService.createCustomer("Fred", creditLimit);
     Order order = orderService.createOrder(new OrderDetails(customer.getId(), new Money("12.34")));
 
     assertOrderState(order.getId(), OrderState.APPROVED);
+
+    Eventually.eventually(() -> {
+      sagaEventsConsumer.assertEventReceived(CreateOrderSagaCompletedSuccesfully.class);
+    });
+
   }
+
   @Test
-  public void shouldRejectOrder() throws InterruptedException {
+  public void shouldRejectOrder()  {
     Money creditLimit = new Money("15.00");
     Customer customer = customerService.createCustomer("Fred", creditLimit);
     Order order = orderService.createOrder(new OrderDetails(customer.getId(), new Money("123.40")));
 
     assertOrderState(order.getId(), OrderState.REJECTED);
+
+    Eventually.eventually(() -> {
+      sagaEventsConsumer.assertEventReceived(CreateOrderSagaRolledBack.class);
+    });
+
   }
 
-  private void assertOrderState(Long id, OrderState expectedState) throws InterruptedException {
-    Order order = null;
-    for (int i = 0; i < 30; i++) {
-      order = transactionTemplate.execute(s -> orderRepository.findById(id).get());
-      if (order.getState() == expectedState)
-        break;
-      TimeUnit.MILLISECONDS.sleep(400);
-    }
+  private void assertOrderState(Long id, OrderState expectedState) {
 
-    assertEquals(expectedState, order.getState());
+    Eventually.eventually(() -> {
+      Order order = transactionTemplate.execute(s -> orderRepository.findById(id).get());
+      assertEquals(expectedState, order.getState());
+    });
+
   }
 }

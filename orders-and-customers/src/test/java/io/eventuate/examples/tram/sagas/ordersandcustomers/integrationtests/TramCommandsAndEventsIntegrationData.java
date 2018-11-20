@@ -7,6 +7,7 @@ public class TramCommandsAndEventsIntegrationData {
   private String commandChannel = "command-channel-" + now;
   private String aggregateDestination = "aggregate-destination-" + now;
   private String eventDispatcherId  = "event-dispatcher-" + now;
+  private String sagaEventsChannel = "sagaEventsChannel-" + now;
 
   public String getAggregateDestination() {
     return aggregateDestination;
@@ -23,5 +24,9 @@ public class TramCommandsAndEventsIntegrationData {
 
   public String getEventDispatcherId() {
     return eventDispatcherId;
+  }
+
+  public String getSagaEventsChannel() {
+    return sagaEventsChannel;
   }
 }

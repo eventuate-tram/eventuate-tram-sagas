@@ -1,16 +1,13 @@
 package io.eventuate.tram.sagas.orchestration;
 
-import io.eventuate.javaclient.spring.jdbc.IdGenerator;
 import io.eventuate.tram.commands.common.ChannelMapping;
 import io.eventuate.tram.commands.common.CommandMessageHeaders;
 import io.eventuate.tram.commands.producer.CommandProducer;
+import io.eventuate.tram.events.common.DomainEvent;
 import io.eventuate.tram.events.publisher.DomainEventPublisher;
 import io.eventuate.tram.messaging.common.Message;
 import io.eventuate.tram.messaging.consumer.MessageConsumer;
-import io.eventuate.tram.sagas.common.LockTarget;
-import io.eventuate.tram.sagas.common.SagaCommandHeaders;
-import io.eventuate.tram.sagas.common.SagaReplyHeaders;
-import io.eventuate.tram.sagas.common.SagaUnlockCommand;
+import io.eventuate.tram.sagas.common.*;
 import io.eventuate.tram.sagas.participant.SagaLockManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,6 +19,7 @@ import javax.annotation.PostConstruct;
 import java.util.*;
 
 import static java.util.Collections.singleton;
+import static java.util.Collections.singletonList;
 
 @Component
 public class SagaManagerImpl<Data>
@@ -44,13 +42,16 @@ public class SagaManagerImpl<Data>
 
   private Saga<Data> saga;
 
+  @Autowired
+  private DomainEventPublisher domainEventPublisher;
+
   public SagaManagerImpl(Saga<Data> saga) {
     this.saga = saga;
   }
 
   public SagaManagerImpl(Saga<Data> saga, SagaInstanceRepository sagaInstanceRepository, CommandProducer
           commandProducer, MessageConsumer messageConsumer, ChannelMapping channelMapping,
-                         SagaLockManager sagaLockManager, SagaCommandProducer sagaCommandProducer) {
+                         SagaLockManager sagaLockManager, SagaCommandProducer sagaCommandProducer, DomainEventPublisher domainEventPublisher) {
     this.saga = saga;
     this.sagaInstanceRepository = sagaInstanceRepository;
     this.commandProducer = commandProducer;
@@ -58,6 +59,7 @@ public class SagaManagerImpl<Data>
     this.channelMapping = channelMapping;
     this.sagaLockManager = sagaLockManager;
     this.sagaCommandProducer = sagaCommandProducer;
+    this.domainEventPublisher = domainEventPublisher;
   }
 
 
@@ -87,9 +89,6 @@ public class SagaManagerImpl<Data>
     this.messageConsumer = messageConsumer;
   }
 
-  public void setIdGenerator(IdGenerator idGenerator) {
-  }
-
 
   public void setChannelMapping(ChannelMapping channelMapping) {
     this.channelMapping = channelMapping;
@@ -100,6 +99,7 @@ public class SagaManagerImpl<Data>
   }
 
   public void setDomainEventPublisher(DomainEventPublisher domainEventPublisher) {
+    this.domainEventPublisher = domainEventPublisher;
   }
 
   @Override
@@ -137,13 +137,18 @@ public class SagaManagerImpl<Data>
 
 
 
-  private void performEndStateActions(String sagaId, SagaInstance sagaInstance) {
+  private void performEndStateActions(String sagaId, SagaInstance sagaInstance, boolean compensating, Data sagaData) {
     for (DestinationAndResource dr : sagaInstance.getDestinationsAndResources()) {
       Map<String, String> headers = new HashMap<>();
       headers.put(SagaCommandHeaders.SAGA_ID, sagaId);
       headers.put(SagaCommandHeaders.SAGA_TYPE, getSagaType()); // FTGO SagaCommandHandler failed without this but the OrdersAndCustomersIntegrationTest was fine?!?
       commandProducer.send(dr.getDestination(), dr.getResource(), new SagaUnlockCommand(), makeSagaReplyChannel(), headers);
     }
+
+    Optional<DomainEvent> domainEvent = compensating ? saga.makeSagaRolledBackEvent(sagaData) : saga.makeSagaCompletedSuccessfullyEvent(sagaData);
+
+    domainEvent.ifPresent(de ->
+            domainEventPublisher.publish(channelMapping.transform(getSagaType()), sagaId, singletonList(de)));
   }
 
   private SagaDefinition<Data> getStateDefinition() {
@@ -218,7 +223,7 @@ public class SagaManagerImpl<Data>
     sagaInstance.setSerializedSagaData(SagaDataSerde.serializeSagaData(actions.getUpdatedSagaData().orElse(sagaData)));
 
     if (actions.isEndState()) {
-      performEndStateActions(sagaId, sagaInstance);
+      performEndStateActions(sagaId, sagaInstance, actions.isCompensating(), sagaData);
     }
 
     sagaInstanceRepository.update(sagaInstance);

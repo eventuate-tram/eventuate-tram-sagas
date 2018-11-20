@@ -63,6 +63,7 @@ public class SimpleSagaDefinition<Data> implements SagaDefinition<Data> {
             .withUpdatedSagaData(data)
             .withUpdatedState(encodeState(newState))
             .withIsEndState(newState.isEndState())
+            .withIsCompensating(currentState.isCompensating())
             .build();
 
   }
@@ -135,8 +136,11 @@ public class SimpleSagaDefinition<Data> implements SagaDefinition<Data> {
         return (rawSagaData, reply) -> {
           possibleReplyHandler.ifPresent(handler -> handler.accept(data, reply));
           if (stepsToExecute.isEmpty()) {
-            return SagaActions.builder().withUpdatedState(encodeState(SagaExecutionState.makeEndState()))
-                    .withIsEndState(true).build();
+            return SagaActions.builder()
+                    .withUpdatedState(encodeState(SagaExecutionState.makeEndState()))
+                    .withIsEndState(true)
+                    .withIsCompensating(state.isCompensating())
+                    .build();
           } else {
             // do something
             return makeSagaActions(data, stepsToExecute, state, state.nextState(stepsToExecute.size()));

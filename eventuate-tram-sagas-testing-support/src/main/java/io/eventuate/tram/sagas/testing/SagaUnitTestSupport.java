@@ -3,10 +3,15 @@ package io.eventuate.tram.sagas.testing;
 import io.eventuate.javaclient.commonimpl.JSonMapper;
 import io.eventuate.javaclient.spring.jdbc.IdGeneratorImpl;
 import io.eventuate.tram.commands.common.*;
+import io.eventuate.tram.commands.producer.CommandProducer;
 import io.eventuate.tram.commands.producer.CommandProducerImpl;
+import io.eventuate.tram.events.common.DomainEvent;
+import io.eventuate.tram.events.publisher.DomainEventPublisher;
 import io.eventuate.tram.messaging.common.Message;
+import io.eventuate.tram.messaging.consumer.MessageConsumer;
 import io.eventuate.tram.messaging.producer.MessageBuilder;
 import io.eventuate.tram.sagas.orchestration.*;
+import io.eventuate.tram.sagas.participant.SagaLockManager;
 import io.eventuate.tram.sagas.simpledsl.SimpleSaga;
 import org.mockito.Mockito;
 
@@ -16,7 +21,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import static java.util.Collections.emptyList;
+import static org.hamcrest.Matchers.isA;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Provides a DSL for writing unit tests for saga orchestrators
@@ -29,14 +38,14 @@ public class SagaUnitTestSupport {
 
   private List<MessageWithDestination> sentCommands = new ArrayList<>();
   private MessageWithDestination sentCommand;
+  private List<DomainEvent> publishedDomainEvents = new ArrayList<>();
 
   public static SagaUnitTestSupport given() {
     return new SagaUnitTestSupport();
   }
 
   public <T> SagaUnitTestSupport saga(SimpleSaga<T> saga, T sagaData) {
-    sagaManager = new SagaManagerImpl<>(saga);
-    sagaManager.setSagaInstanceRepository(new SagaInstanceRepository() {
+    SagaInstanceRepository sagaInstanceRepository = new SagaInstanceRepository() {
 
       private SagaInstance sagaInstance;
 
@@ -56,8 +65,7 @@ public class SagaUnitTestSupport {
         this.sagaInstance = sagaInstance;
       }
 
-    });
-    sagaManager.setIdGenerator(idGenerator);
+    };
 
     CommandProducerImpl commandProducer = new CommandProducerImpl((destination, message) -> {
       String id = idGenerator.genId().asString();
@@ -65,8 +73,25 @@ public class SagaUnitTestSupport {
       sentCommands.add(new MessageWithDestination(destination, message));
     }, new DefaultChannelMapping(Collections.emptyMap()));
 
-    sagaManager.setCommandProducer(commandProducer);
-    sagaManager.setSagaCommandProducer(new SagaCommandProducer(commandProducer));
+    SagaCommandProducer sagaCommandProducer = new SagaCommandProducer(commandProducer);
+
+    MessageConsumer messageConsumer = null;
+    SagaLockManager sagaLockManager = null;
+    DomainEventPublisher domainEventPublisher = new DomainEventPublisher() {
+      @Override
+      public void publish(String aggregateType, Object aggregateId, List<DomainEvent> domainEvents) {
+        publish(aggregateType, aggregateId, Collections.emptyMap(), domainEvents);
+      }
+
+      @Override
+      public void publish(String aggregateType, Object aggregateId, Map<String, String> headers, List<DomainEvent> domainEvents) {
+        publishedDomainEvents.addAll(domainEvents);
+      }
+    };
+
+    sagaManager = new SagaManagerImpl<>(saga, sagaInstanceRepository, commandProducer, messageConsumer, new DefaultChannelMapping(Collections.emptyMap()),
+            sagaLockManager, sagaCommandProducer, domainEventPublisher);
+
 
     sagaManager.create(sagaData);
     return this;
@@ -134,5 +159,20 @@ public class SagaUnitTestSupport {
             .withHeader(ReplyMessageHeaders.REPLY_TYPE, reply.getClass().getName())
             .withExtraHeaders("", correlationHeaders(sentCommand.getMessage().getHeaders()))
             .build();
+  }
+
+  public SagaUnitTestSupport expectCompletedSuccessfully() {
+    assertEquals(emptyList(), sentCommands);
+    return this;
+  }
+
+  public SagaUnitTestSupport expectRolledBack() {
+    assertEquals(emptyList(), sentCommands);
+    return this;
+  }
+
+  public void withPublishedEventOfType(Class<? extends DomainEvent> expectedDomainEventClass) {
+    assertEquals(1, publishedDomainEvents.size());
+    assertEquals(expectedDomainEventClass, publishedDomainEvents.get(0).getClass());
   }
 }

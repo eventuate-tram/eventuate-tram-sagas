@@ -16,12 +16,14 @@ public class SagaActions<Data> {
   private final Optional<Data> updatedSagaData;
   private final Optional<String> updatedState;
   private boolean endState;
+  private boolean compensating;
 
-  public SagaActions(List<CommandWithDestination> commands, Optional<Data> updatedSagaData, Optional<String> updatedState, boolean endState) {
+  public SagaActions(List<CommandWithDestination> commands, Optional<Data> updatedSagaData, Optional<String> updatedState, boolean endState, boolean compensating) {
     this.commands = commands;
     this.updatedSagaData = updatedSagaData;
     this.updatedState = updatedState;
     this.endState = endState;
+    this.compensating = compensating;
   }
 
   List<CommandWithDestination> getCommands() {
@@ -40,17 +42,26 @@ public class SagaActions<Data> {
     return endState;
   }
 
+  public boolean isCompensating() {
+    return compensating;
+  }
+
+  public void setCompensating(boolean compensating) {
+    this.compensating = compensating;
+  }
+
   public static class Builder<Data> {
     private List<CommandWithDestination> commands = new ArrayList<>();
     private Optional<Data> updatedSagaData = Optional.empty();
     private Optional<String> updatedState = Optional.empty();
     private boolean endState;
+    private boolean compensating;
 
     public Builder() {
     }
 
     public SagaActions<Data> build() {
-      return new SagaActions<>(commands, updatedSagaData, updatedState, endState);
+      return new SagaActions<>(commands, updatedSagaData, updatedState, endState, compensating);
     }
 
     public Builder<Data> withCommand(CommandWithDestination command) {
@@ -77,6 +88,13 @@ public class SagaActions<Data> {
       this.endState = endState;
       return this;
     }
+
+    public Builder<Data> withIsCompensating(boolean compensating) {
+      this.compensating = compensating;
+      return this;
+    }
+
+
   }
 
 

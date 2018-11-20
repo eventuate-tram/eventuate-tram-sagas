@@ -5,8 +5,11 @@ import io.eventuate.examples.tram.sagas.ordersandcustomers.orders.sagas.particip
 import io.eventuate.examples.tram.sagas.ordersandcustomers.orders.sagas.participants.ReserveCreditCommand;
 import io.eventuate.examples.tram.sagas.ordersandcustomers.orders.service.RejectOrderCommand;
 import io.eventuate.tram.commands.consumer.CommandWithDestination;
+import io.eventuate.tram.events.common.DomainEvent;
 import io.eventuate.tram.sagas.orchestration.SagaDefinition;
 import io.eventuate.tram.sagas.simpledsl.SimpleSaga;
+
+import java.util.Optional;
 
 import static io.eventuate.tram.commands.consumer.CommandWithDestinationBuilder.send;
 
@@ -50,5 +53,13 @@ public class CreateOrderSaga implements SimpleSaga<CreateOrderSagaData> {
             .build();
   }
 
+  @Override
+  public Optional<DomainEvent> makeSagaCompletedSuccessfullyEvent(CreateOrderSagaData createOrderSagaData) {
+    return Optional.of(new CreateOrderSagaCompletedSuccesfully());
+  }
 
+  @Override
+  public Optional<DomainEvent> makeSagaRolledBackEvent(CreateOrderSagaData createOrderSagaData) {
+    return Optional.of(new CreateOrderSagaRolledBack());
+  }
 }
