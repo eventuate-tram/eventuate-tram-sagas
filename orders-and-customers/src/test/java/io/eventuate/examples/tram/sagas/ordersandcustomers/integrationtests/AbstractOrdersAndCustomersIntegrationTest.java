@@ -43,7 +43,9 @@ public abstract class AbstractOrdersAndCustomersIntegrationTest {
     assertOrderState(order.getId(), OrderState.APPROVED);
 
     Eventually.eventually(() -> {
-      sagaEventsConsumer.assertEventReceived(CreateOrderSagaCompletedSuccesfully.class);
+      sagaEventsConsumer.assertEventReceived(CreateOrderSagaCompletedSuccesfully.class, event -> {
+        assertEquals(order.getId(), (Long)event.getOrderId());
+      });
     });
 
   }
@@ -57,7 +59,9 @@ public abstract class AbstractOrdersAndCustomersIntegrationTest {
     assertOrderState(order.getId(), OrderState.REJECTED);
 
     Eventually.eventually(() -> {
-      sagaEventsConsumer.assertEventReceived(CreateOrderSagaRolledBack.class);
+      sagaEventsConsumer.assertEventReceived(CreateOrderSagaRolledBack.class, event -> {
+        assertEquals(order.getId(), (Long)event.getOrderId());
+      });
     });
 
   }

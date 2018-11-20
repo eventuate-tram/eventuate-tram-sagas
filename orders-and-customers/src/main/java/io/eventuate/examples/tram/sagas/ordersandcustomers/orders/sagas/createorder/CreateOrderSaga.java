@@ -5,15 +5,21 @@ import io.eventuate.examples.tram.sagas.ordersandcustomers.orders.sagas.particip
 import io.eventuate.examples.tram.sagas.ordersandcustomers.orders.sagas.participants.ReserveCreditCommand;
 import io.eventuate.examples.tram.sagas.ordersandcustomers.orders.service.RejectOrderCommand;
 import io.eventuate.tram.commands.consumer.CommandWithDestination;
-import io.eventuate.tram.events.common.DomainEvent;
+import io.eventuate.tram.events.publisher.DomainEventPublisher;
 import io.eventuate.tram.sagas.orchestration.SagaDefinition;
 import io.eventuate.tram.sagas.simpledsl.SimpleSaga;
 
-import java.util.Optional;
+import java.util.Collections;
 
 import static io.eventuate.tram.commands.consumer.CommandWithDestinationBuilder.send;
 
 public class CreateOrderSaga implements SimpleSaga<CreateOrderSagaData> {
+
+  private DomainEventPublisher domainEventPublisher;
+
+  public CreateOrderSaga(DomainEventPublisher domainEventPublisher) {
+    this.domainEventPublisher = domainEventPublisher;
+  }
 
   private SagaDefinition<CreateOrderSagaData> sagaDefinition =
           step()
@@ -54,12 +60,12 @@ public class CreateOrderSaga implements SimpleSaga<CreateOrderSagaData> {
   }
 
   @Override
-  public Optional<DomainEvent> makeSagaCompletedSuccessfullyEvent(CreateOrderSagaData createOrderSagaData) {
-    return Optional.of(new CreateOrderSagaCompletedSuccesfully());
+  public void onSagaCompletedSuccessfully(String sagaId, CreateOrderSagaData createOrderSagaData) {
+    domainEventPublisher.publish(CreateOrderSaga.class, sagaId, Collections.singletonList(new CreateOrderSagaCompletedSuccesfully(createOrderSagaData.getOrderId())));
   }
 
   @Override
-  public Optional<DomainEvent> makeSagaRolledBackEvent(CreateOrderSagaData createOrderSagaData) {
-    return Optional.of(new CreateOrderSagaRolledBack());
+  public void onSagaRolledBack(String sagaId, CreateOrderSagaData createOrderSagaData) {
+    domainEventPublisher.publish(CreateOrderSaga.class, sagaId, Collections.singletonList(new CreateOrderSagaRolledBack(createOrderSagaData.getOrderId())));
   }
 }

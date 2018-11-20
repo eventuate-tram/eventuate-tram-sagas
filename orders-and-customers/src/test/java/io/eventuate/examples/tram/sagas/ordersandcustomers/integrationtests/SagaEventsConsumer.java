@@ -12,17 +12,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.Arrays;
 import java.util.concurrent.LinkedBlockingDeque;
+import java.util.function.Consumer;
+import java.util.function.Predicate;
 
 public class SagaEventsConsumer {
-
-  @Autowired
-  private ChannelMapping channelMapping;
 
   private LinkedBlockingDeque<DomainEventEnvelope> domainEvents = new LinkedBlockingDeque<>();
 
   public DomainEventHandlers domainEventHandlers() {
     return DomainEventHandlersBuilder
-            .forAggregateType(channelMapping.transform(CreateOrderSaga.class.getName()))
+            .forAggregateType(CreateOrderSaga.class.getName())
             .onEvent(CreateOrderSagaCompletedSuccesfully.class, this::sagaCompleted)
             .onEvent(CreateOrderSagaRolledBack.class, this::sagaRolledBack)
             .build();
@@ -36,7 +35,12 @@ public class SagaEventsConsumer {
     domainEvents.add(dee);
   }
 
-  public void assertEventReceived(Class<? extends DomainEvent> domainEventClass) {
-    Arrays.stream(domainEvents.toArray(new DomainEventEnvelope[0])).filter(dee -> domainEventClass.isInstance(dee.getEvent())).findFirst().get();
+  public  <T extends DomainEvent> void assertEventReceived(Class<T> domainEventClass, Consumer<T> consumer) {
+    Arrays.stream(domainEvents.toArray(new DomainEventEnvelope[0])).filter((DomainEventEnvelope dee) -> {
+      if (!domainEventClass.isInstance(dee.getEvent()))
+        return false;
+      consumer.accept((T) dee.getEvent());
+      return true;
+    }).findFirst().get();
   }
 }

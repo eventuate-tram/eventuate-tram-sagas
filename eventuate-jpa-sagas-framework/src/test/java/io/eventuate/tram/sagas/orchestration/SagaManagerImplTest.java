@@ -6,8 +6,6 @@ import io.eventuate.tram.commands.common.CommandReplyOutcome;
 import io.eventuate.tram.commands.common.ReplyMessageHeaders;
 import io.eventuate.tram.commands.consumer.CommandWithDestination;
 import io.eventuate.tram.commands.producer.CommandProducer;
-import io.eventuate.tram.events.common.DomainEvent;
-import io.eventuate.tram.events.publisher.DomainEventPublisher;
 import io.eventuate.tram.messaging.common.Message;
 import io.eventuate.tram.messaging.consumer.MessageConsumer;
 import io.eventuate.tram.messaging.consumer.MessageHandler;
@@ -25,7 +23,6 @@ import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 
 import java.util.Collections;
-import java.util.Optional;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertSame;
@@ -66,9 +63,6 @@ public class SagaManagerImplTest {
   @Mock
   private SagaDefinition<TestSagaData> sagaDefinition;
 
-  @Mock
-  private DomainEventPublisher domainEventPublisher;
-
   private String testResource = "SomeResource";
   private String sagaType = "MySagaType";
   private String sagaId = "MySagaId";
@@ -107,7 +101,7 @@ public class SagaManagerImplTest {
 
     sm = new SagaManagerImpl<>(testSaga, sagaInstanceRepository,
             commandProducer, messageConsumer, channelMapping,
-            sagaLockManager, sagaCommandProducer, domainEventPublisher);
+            sagaLockManager, sagaCommandProducer);
 
     initialSagaData = new TestSagaData("initialSagaData");
     sagaDataUpdatedByStartingHandler = new TestSagaData("sagaDataUpdatedByStartingHandler");
@@ -115,9 +109,6 @@ public class SagaManagerImplTest {
 
     when(testSaga.getSagaType()).thenReturn(sagaType);
     when(testSaga.getSagaDefinition()).thenReturn(sagaDefinition);
-
-    when(testSaga.makeSagaCompletedSuccessfullyEvent(any())).thenReturn(Optional.of(new TestSagaCompletedSuccessfully()));
-    when(testSaga.makeSagaRolledBackEvent(any())).thenReturn(Optional.of(new TestSagaRolledBack()));
 
     when(channelMapping.transform(anyString())).thenAnswer(invocation -> invocation.getArgument(0));
 
@@ -132,7 +123,9 @@ public class SagaManagerImplTest {
 
     reset(sagaInstanceRepository, sagaCommandProducer);
 
-    handleReply(false, TestSagaCompletedSuccessfully.class);
+    handleReply(false);
+
+    verify(testSaga).onSagaCompletedSuccessfully(eq(sagaId), any(TestSagaData.class));
 
     reset(sagaInstanceRepository, sagaCommandProducer);
 
@@ -147,7 +140,9 @@ public class SagaManagerImplTest {
 
     reset(sagaInstanceRepository, sagaCommandProducer);
 
-    handleReply(true, TestSagaRolledBack.class);
+    handleReply(true);
+
+    verify(testSaga).onSagaRolledBack(eq(sagaId), any(TestSagaData.class));
 
     reset(sagaInstanceRepository, sagaCommandProducer);
 
@@ -177,7 +172,7 @@ public class SagaManagerImplTest {
 
     assertSagaInstanceEquals(expectedSagaInstanceAfterFirstStep, sagaInstance);
 
-    verifyNoMoreInteractions(sagaInstanceRepository, sagaCommandProducer, domainEventPublisher);
+    verifyNoMoreInteractions(sagaInstanceRepository, sagaCommandProducer);
   }
 
   private SagaInstance makeExpectedSagaInstanceAfterFirstStep() {
@@ -185,7 +180,7 @@ public class SagaManagerImplTest {
             SagaDataSerde.serializeSagaData(sagaDataUpdatedByStartingHandler), Collections.emptySet());
   }
 
-  private void handleReply(boolean compensating, Class<? extends DomainEvent> completionEventClass) {
+  private void handleReply(boolean compensating) {
     SagaInstance expectedSagaInstanceAfterSecondStep = makeExpectedSagaInstanceAfterSecondStep();
 
 
@@ -207,8 +202,6 @@ public class SagaManagerImplTest {
     verify(sagaInstanceRepository).update(argThat(sagaInstance -> sagaInstanceEquals(expectedSagaInstanceAfterSecondStep, sagaInstance)));
 
     assertSagaInstanceEquals(expectedSagaInstanceAfterSecondStep, sagaInstance);
-
-    verify(domainEventPublisher).publish(eq(sagaType), eq(sagaId), argThat(arg -> arg.size() == 1 && completionEventClass.isInstance(arg.get(0))));
 
     verifyNoMoreInteractions(sagaInstanceRepository, sagaCommandProducer);
   }

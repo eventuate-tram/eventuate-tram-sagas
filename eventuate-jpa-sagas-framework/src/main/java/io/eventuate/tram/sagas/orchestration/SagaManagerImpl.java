@@ -3,8 +3,6 @@ package io.eventuate.tram.sagas.orchestration;
 import io.eventuate.tram.commands.common.ChannelMapping;
 import io.eventuate.tram.commands.common.CommandMessageHeaders;
 import io.eventuate.tram.commands.producer.CommandProducer;
-import io.eventuate.tram.events.common.DomainEvent;
-import io.eventuate.tram.events.publisher.DomainEventPublisher;
 import io.eventuate.tram.messaging.common.Message;
 import io.eventuate.tram.messaging.consumer.MessageConsumer;
 import io.eventuate.tram.sagas.common.*;
@@ -19,7 +17,6 @@ import javax.annotation.PostConstruct;
 import java.util.*;
 
 import static java.util.Collections.singleton;
-import static java.util.Collections.singletonList;
 
 @Component
 public class SagaManagerImpl<Data>
@@ -42,16 +39,13 @@ public class SagaManagerImpl<Data>
 
   private Saga<Data> saga;
 
-  @Autowired
-  private DomainEventPublisher domainEventPublisher;
-
   public SagaManagerImpl(Saga<Data> saga) {
     this.saga = saga;
   }
 
   public SagaManagerImpl(Saga<Data> saga, SagaInstanceRepository sagaInstanceRepository, CommandProducer
           commandProducer, MessageConsumer messageConsumer, ChannelMapping channelMapping,
-                         SagaLockManager sagaLockManager, SagaCommandProducer sagaCommandProducer, DomainEventPublisher domainEventPublisher) {
+                         SagaLockManager sagaLockManager, SagaCommandProducer sagaCommandProducer) {
     this.saga = saga;
     this.sagaInstanceRepository = sagaInstanceRepository;
     this.commandProducer = commandProducer;
@@ -59,7 +53,6 @@ public class SagaManagerImpl<Data>
     this.channelMapping = channelMapping;
     this.sagaLockManager = sagaLockManager;
     this.sagaCommandProducer = sagaCommandProducer;
-    this.domainEventPublisher = domainEventPublisher;
   }
 
 
@@ -96,10 +89,6 @@ public class SagaManagerImpl<Data>
 
   public void setSagaLockManager(SagaLockManager sagaLockManager) {
     this.sagaLockManager = sagaLockManager;
-  }
-
-  public void setDomainEventPublisher(DomainEventPublisher domainEventPublisher) {
-    this.domainEventPublisher = domainEventPublisher;
   }
 
   @Override
@@ -145,10 +134,11 @@ public class SagaManagerImpl<Data>
       commandProducer.send(dr.getDestination(), dr.getResource(), new SagaUnlockCommand(), makeSagaReplyChannel(), headers);
     }
 
-    Optional<DomainEvent> domainEvent = compensating ? saga.makeSagaRolledBackEvent(sagaData) : saga.makeSagaCompletedSuccessfullyEvent(sagaData);
+    if (compensating)
+      saga.onSagaRolledBack(sagaId, sagaData);
+    else
+      saga.onSagaCompletedSuccessfully(sagaId, sagaData);
 
-    domainEvent.ifPresent(de ->
-            domainEventPublisher.publish(channelMapping.transform(getSagaType()), sagaId, singletonList(de)));
   }
 
   private SagaDefinition<Data> getStateDefinition() {

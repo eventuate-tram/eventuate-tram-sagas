@@ -1,15 +1,23 @@
 package io.eventuate.examples.tram.sagas.ordersandcustomers.orders.sagas.createorder;
 
-import static org.junit.Assert.*;
-
-import static io.eventuate.tram.sagas.testing.SagaUnitTestSupport.given;
-
 import io.eventuate.examples.tram.sagas.ordersandcustomers.commondomain.Money;
 import io.eventuate.examples.tram.sagas.ordersandcustomers.orders.sagas.participants.ApproveOrderCommand;
 import io.eventuate.examples.tram.sagas.ordersandcustomers.orders.sagas.participants.ReserveCreditCommand;
 import io.eventuate.examples.tram.sagas.ordersandcustomers.orders.service.OrderDetails;
 import io.eventuate.examples.tram.sagas.ordersandcustomers.orders.service.RejectOrderCommand;
+import io.eventuate.tram.events.publisher.DomainEventPublisher;
+import io.eventuate.tram.sagas.testing.SagaUnitTestSupport;
+import org.junit.Rule;
 import org.junit.Test;
+import org.mockito.Mock;
+import org.mockito.junit.MockitoJUnit;
+import org.mockito.junit.MockitoRule;
+
+import static io.eventuate.tram.sagas.testing.SagaUnitTestSupport.given;
+import static org.junit.Assert.assertEquals;
+import static org.mockito.ArgumentMatchers.argThat;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.verify;
 
 public class CreateOrderSagaTest {
 
@@ -17,6 +25,12 @@ public class CreateOrderSagaTest {
   private long customerId = 102;
   private Money orderTotal = new Money("12.34");
   private OrderDetails orderDetails = new OrderDetails(customerId, orderTotal);
+
+  @Mock
+  private DomainEventPublisher domainEventPublisher;
+
+  @Rule
+  public MockitoRule rule = MockitoJUnit.rule();
 
   @Test
   public void shouldCreateOrder() {
@@ -33,9 +47,14 @@ public class CreateOrderSagaTest {
     .andGiven()
         .successReply()
     .expectCompletedSuccessfully()
-     .withPublishedEventOfType(CreateOrderSagaCompletedSuccesfully.class)
         ;
 
+    verify(domainEventPublisher).publish(eq(CreateOrderSaga.class), eq(SagaUnitTestSupport.SAGA_ID), argThat(events -> {
+      assertEquals(1, events.size());
+      CreateOrderSagaCompletedSuccesfully event = (CreateOrderSagaCompletedSuccesfully) events.get(0);
+      assertEquals(orderId, event.getOrderId());
+      return true;
+    }));
   }
 
   @Test
@@ -53,12 +72,20 @@ public class CreateOrderSagaTest {
     .andGiven()
        .successReply()
     .expectRolledBack()
-       .withPublishedEventOfType(CreateOrderSagaRolledBack.class)
         ;
+
+
+    verify(domainEventPublisher).publish(eq(CreateOrderSaga.class), eq(SagaUnitTestSupport.SAGA_ID), argThat(events -> {
+      assertEquals(1, events.size());
+      CreateOrderSagaRolledBack event = (CreateOrderSagaRolledBack) events.get(0);
+      assertEquals(orderId, event.getOrderId());
+      return true;
+    }));
+
 
   }
 
   private CreateOrderSaga makeCreateOrderSaga() {
-    return new CreateOrderSaga();
+    return new CreateOrderSaga(domainEventPublisher);
   }
 }
