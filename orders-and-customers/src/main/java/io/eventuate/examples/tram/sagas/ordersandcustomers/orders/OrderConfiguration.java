@@ -5,6 +5,7 @@ import io.eventuate.examples.tram.sagas.ordersandcustomers.orders.sagas.createor
 import io.eventuate.examples.tram.sagas.ordersandcustomers.orders.service.OrderCommandHandler;
 import io.eventuate.examples.tram.sagas.ordersandcustomers.orders.service.OrderService;
 import io.eventuate.tram.commands.consumer.CommandDispatcher;
+import io.eventuate.tram.events.publisher.DomainEventPublisher;
 import io.eventuate.tram.sagas.orchestration.Saga;
 import io.eventuate.tram.sagas.orchestration.SagaManager;
 import io.eventuate.tram.sagas.orchestration.SagaManagerImpl;
@@ -32,8 +33,8 @@ public class OrderConfiguration {
 
 
   @Bean
-  public CreateOrderSaga createOrderSaga() {
-    return new CreateOrderSaga();
+  public CreateOrderSaga createOrderSaga(DomainEventPublisher domainEventPublisher) {
+    return new CreateOrderSaga(domainEventPublisher);
   }
 
   @Bean

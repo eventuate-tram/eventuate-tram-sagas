@@ -28,7 +28,7 @@ public class CustomerCommandHandler {
   public Message reserveCredit(CommandMessage<ReserveCreditCommand> cm) {
     ReserveCreditCommand cmd = cm.getCommand();
     long customerId = cmd.getCustomerId();
-    Customer customer = customerRepository.findOne(customerId);
+    Customer customer = customerRepository.findById(customerId).get();
     // TODO null check
     try {
       customer.reserveCredit(cmd.getOrderId(), cmd.getOrderTotal());
