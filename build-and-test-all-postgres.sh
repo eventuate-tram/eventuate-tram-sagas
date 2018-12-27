@@ -4,6 +4,8 @@ set -e
 
 . ./set-env-postgres.sh
 
+./gradlew testClasses
+
 docker-compose -f docker-compose-postgres.yml down -v
 
 docker-compose -f docker-compose-postgres.yml up -d --build zookeeper postgres kafka

@@ -8,4 +8,8 @@ public interface Saga<Data> {
   default String getSagaType() {
     return getClass().getName();
   }
+
+  default void onSagaCompletedSuccessfully(String sagaId, Data data) {  }
+  default void onSagaRolledBack(String sagaId, Data data) {  }
+
 }

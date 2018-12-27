@@ -5,12 +5,21 @@ import io.eventuate.examples.tram.sagas.ordersandcustomers.orders.sagas.particip
 import io.eventuate.examples.tram.sagas.ordersandcustomers.orders.sagas.participants.ReserveCreditCommand;
 import io.eventuate.examples.tram.sagas.ordersandcustomers.orders.service.RejectOrderCommand;
 import io.eventuate.tram.commands.consumer.CommandWithDestination;
+import io.eventuate.tram.events.publisher.DomainEventPublisher;
 import io.eventuate.tram.sagas.orchestration.SagaDefinition;
 import io.eventuate.tram.sagas.simpledsl.SimpleSaga;
+
+import java.util.Collections;
 
 import static io.eventuate.tram.commands.consumer.CommandWithDestinationBuilder.send;
 
 public class CreateOrderSaga implements SimpleSaga<CreateOrderSagaData> {
+
+  private DomainEventPublisher domainEventPublisher;
+
+  public CreateOrderSaga(DomainEventPublisher domainEventPublisher) {
+    this.domainEventPublisher = domainEventPublisher;
+  }
 
   private SagaDefinition<CreateOrderSagaData> sagaDefinition =
           step()
@@ -50,5 +59,13 @@ public class CreateOrderSaga implements SimpleSaga<CreateOrderSagaData> {
             .build();
   }
 
+  @Override
+  public void onSagaCompletedSuccessfully(String sagaId, CreateOrderSagaData createOrderSagaData) {
+    domainEventPublisher.publish(CreateOrderSaga.class, sagaId, Collections.singletonList(new CreateOrderSagaCompletedSuccesfully(createOrderSagaData.getOrderId())));
+  }
 
+  @Override
+  public void onSagaRolledBack(String sagaId, CreateOrderSagaData createOrderSagaData) {
+    domainEventPublisher.publish(CreateOrderSaga.class, sagaId, Collections.singletonList(new CreateOrderSagaRolledBack(createOrderSagaData.getOrderId())));
+  }
 }
