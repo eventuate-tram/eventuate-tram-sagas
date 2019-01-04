@@ -1,61 +1,54 @@
 package io.eventuate.tram.sagas.simpledsl;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import org.apache.commons.lang.builder.ToStringBuilder;
 
 public class SagaExecutionState {
 
-  private int currentlyExecuting;
-  private boolean compensating;
-  private boolean endState;
+    private final int currentlyExecuting;
+    private final boolean compensating;
+    private final boolean endState;
 
-  @Override
-  public String toString() {
-    return ToStringBuilder.reflectionToString(this);
-  }
+    @JsonCreator
+    public SagaExecutionState(@JsonProperty("currentlyExecuting") final int currentlyExecuting,
+                              @JsonProperty("compensating") final boolean compensating,
+                              @JsonProperty("endState") final boolean endState) {
+        this.currentlyExecuting = currentlyExecuting;
+        this.compensating = compensating;
+        this.endState = endState;
+    }
 
-  public SagaExecutionState() {
-  }
+    @JsonProperty("currentlyExecuting")
+    public int getCurrentlyExecuting() {
+        return currentlyExecuting;
+    }
 
-  public SagaExecutionState(int currentlyExecuting, boolean compensating) {
-    this.currentlyExecuting = currentlyExecuting;
-    this.compensating = compensating;
-  }
+    @JsonProperty("compensating")
+    public boolean isCompensating() {
+        return compensating;
+    }
 
-  public int getCurrentlyExecuting() {
-    return currentlyExecuting;
-  }
+    @JsonProperty("endState")
+    public boolean isEndState() {
+        return endState;
+    }
 
-  public void setCurrentlyExecuting(int currentlyExecuting) {
-    this.currentlyExecuting = currentlyExecuting;
-  }
+    public SagaExecutionState startCompensating() {
+        return new SagaExecutionState(currentlyExecuting, true, false);
+    }
 
-  public boolean isCompensating() {
-    return compensating;
-  }
+    public SagaExecutionState nextState(final int size) {
+        return new SagaExecutionState(compensating ? currentlyExecuting - size : currentlyExecuting + size, compensating, false);
+    }
 
-  public void setCompensating(boolean compensating) {
-    this.compensating = compensating;
-  }
+    public static SagaExecutionState makeEndState() {
+        return new SagaExecutionState(-1, false, true);
+    }
 
-  public SagaExecutionState startCompensating() {
-    return new SagaExecutionState(currentlyExecuting, true);
-  }
+    @Override
+    public String toString() {
+        return ToStringBuilder.reflectionToString(this);
+    }
 
-  public SagaExecutionState nextState(int size) {
-    return new SagaExecutionState(compensating ? currentlyExecuting - size : currentlyExecuting + size, compensating);
-  }
-
-  public boolean isEndState() {
-    return endState;
-  }
-
-  public void setEndState(boolean endState) {
-    this.endState = endState;
-  }
-
-  public static SagaExecutionState makeEndState() {
-    SagaExecutionState x = new SagaExecutionState();
-    x.setEndState(true);
-    return x;
-  }
 }

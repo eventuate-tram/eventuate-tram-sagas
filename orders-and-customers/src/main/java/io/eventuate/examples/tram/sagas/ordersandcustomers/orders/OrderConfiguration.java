@@ -9,6 +9,7 @@ import io.eventuate.tram.events.publisher.DomainEventPublisher;
 import io.eventuate.tram.sagas.orchestration.Saga;
 import io.eventuate.tram.sagas.orchestration.SagaManager;
 import io.eventuate.tram.sagas.orchestration.SagaManagerImpl;
+import io.eventuate.tram.sagas.orchestration.SagaOrchestrator;
 import io.eventuate.tram.sagas.participant.SagaCommandDispatcher;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.context.annotation.Bean;
@@ -20,31 +21,31 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 @EnableAutoConfiguration
 public class OrderConfiguration {
 
-  @Bean
-  public OrderService orderService() {
-    return new OrderService();
-  }
+    @Bean
+    public OrderService orderService() {
+        return new OrderService();
+    }
 
 
-  @Bean
-  public SagaManager<CreateOrderSagaData> createOrderSagaManager(Saga<CreateOrderSagaData> saga) {
-    return new SagaManagerImpl<>(saga);
-  }
+    @Bean
+    public SagaManager<CreateOrderSagaData> createOrderSagaManager(final Saga<CreateOrderSagaData> saga, final SagaOrchestrator orchestrator) {
+        return new SagaManagerImpl<>(saga, orchestrator);
+    }
 
 
-  @Bean
-  public CreateOrderSaga createOrderSaga(DomainEventPublisher domainEventPublisher) {
-    return new CreateOrderSaga(domainEventPublisher);
-  }
+    @Bean
+    public CreateOrderSaga createOrderSaga(DomainEventPublisher domainEventPublisher) {
+        return new CreateOrderSaga(domainEventPublisher);
+    }
 
-  @Bean
-  public OrderCommandHandler orderCommandHandler() {
-    return new OrderCommandHandler();
-  }
+    @Bean
+    public OrderCommandHandler orderCommandHandler() {
+        return new OrderCommandHandler();
+    }
 
-  @Bean
-  public CommandDispatcher orderCommandDispatcher(OrderCommandHandler target) {
-    return new SagaCommandDispatcher("orderCommandDispatcher", target.commandHandlerDefinitions());
-  }
+    @Bean
+    public CommandDispatcher orderCommandDispatcher(OrderCommandHandler target) {
+        return new SagaCommandDispatcher("orderCommandDispatcher", target.commandHandlerDefinitions());
+    }
 
 }

@@ -11,6 +11,7 @@ import io.eventuate.examples.tram.sagas.ordersandcustomers.orders.sagas.createor
 import io.eventuate.examples.tram.sagas.ordersandcustomers.orders.service.OrderDetails;
 import io.eventuate.examples.tram.sagas.ordersandcustomers.orders.service.OrderService;
 import io.eventuate.util.test.async.Eventually;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.support.TransactionTemplate;
@@ -35,6 +36,7 @@ public abstract class AbstractOrdersAndCustomersIntegrationTest {
   private SagaEventsConsumer sagaEventsConsumer;
 
   @Test
+  @Ignore
   public void shouldApproveOrder() {
     Money creditLimit = new Money("15.00");
     Customer customer = customerService.createCustomer("Fred", creditLimit);
@@ -51,6 +53,7 @@ public abstract class AbstractOrdersAndCustomersIntegrationTest {
   }
 
   @Test
+  @Ignore
   public void shouldRejectOrder()  {
     Money creditLimit = new Money("15.00");
     Customer customer = customerService.createCustomer("Fred", creditLimit);

@@ -1,6 +1,6 @@
 package io.eventuate.tram.sagas.orchestration;
 
-public interface RawSagaStateMachineAction {
-
-  SagaActions apply(Object sagaData, Object reply);
+@FunctionalInterface
+public interface RawSagaStateMachineAction<Data> {
+    SagaActions<Data> apply(final Data sagaData, final Object reply);
 }

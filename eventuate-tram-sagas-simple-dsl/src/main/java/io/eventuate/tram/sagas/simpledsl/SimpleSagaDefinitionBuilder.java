@@ -14,6 +14,6 @@ public class SimpleSagaDefinitionBuilder<Data> {
   }
 
   public SagaDefinition<Data> build() {
-    return new SimpleSagaDefinition<>(sagaSteps);
+    return new SimpleSagaDefinition<>(new StepCoordinatorImpl<>(sagaSteps));
   }
 }

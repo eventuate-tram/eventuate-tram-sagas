@@ -5,8 +5,8 @@ import io.eventuate.tram.messaging.common.Message;
 
 public interface SagaDefinition<Data> {
 
-  SagaActions<Data> start(Data sagaData);
+    SagaActions<Data> getActions(final Data sagaData);
 
-  SagaActions<Data> handleReply(String currentState, Data sagaData, Message message);
+    SagaActions<Data> getReplyActions(final String currentState, final Data sagaData, Message message);
 
 }
