@@ -11,7 +11,6 @@ import io.eventuate.tram.messaging.consumer.MessageConsumer;
 import io.eventuate.tram.messaging.producer.MessageBuilder;
 import io.eventuate.tram.sagas.orchestration.*;
 import io.eventuate.tram.sagas.participant.SagaLockManager;
-import io.eventuate.tram.sagas.simpledsl.SimpleSaga;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -47,7 +46,7 @@ public class SagaUnitTestSupport {
     return Integer.toString(counter++);  
   }
   
-  public <T> SagaUnitTestSupport saga(SimpleSaga<T> saga, T sagaData) {
+  public <T> SagaUnitTestSupport saga(Saga<T> saga, T sagaData) {
     SagaInstanceRepository sagaInstanceRepository = new SagaInstanceRepository() {
 
       private SagaInstance sagaInstance;
