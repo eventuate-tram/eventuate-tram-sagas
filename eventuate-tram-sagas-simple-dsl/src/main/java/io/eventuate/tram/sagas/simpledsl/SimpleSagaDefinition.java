@@ -48,7 +48,7 @@ public class SimpleSagaDefinition<Data> implements SagaDefinition<Data> {
   private SagaActions startingHandler(Data data) {
     SagaExecutionState currentState = new SagaExecutionState(-1, false);
 
-    StepsToExecute<Data> stepsToExecute = nextStepsToExecute(currentState);
+    StepsToExecute<Data> stepsToExecute = nextStepsToExecute(currentState, data);
     SagaExecutionState newState = currentState.nextState(stepsToExecute.size());
 
     return makeSagaActions(data, stepsToExecute, currentState, newState);
@@ -69,7 +69,7 @@ public class SimpleSagaDefinition<Data> implements SagaDefinition<Data> {
   }
 
 
-  private StepsToExecute<Data> nextStepsToExecute(SagaExecutionState state) {
+  private StepsToExecute<Data> nextStepsToExecute(SagaExecutionState state, Data data) {
     List<LocalStep<Data>> localSteps = new LinkedList<>();
 
     int skipped = 0;
@@ -79,7 +79,7 @@ public class SimpleSagaDefinition<Data> implements SagaDefinition<Data> {
         SagaStep<Data> step = sagaSteps.get(i--);
         if (step instanceof LocalStep) {
           localSteps.add((LocalStep<Data>) step);
-        } else if (step instanceof ParticipantInvocationStep && ((ParticipantInvocationStep)step).hasCompensation()) {
+        } else if (step instanceof ParticipantInvocationStep && ((ParticipantInvocationStep)step).hasCompensation(data)) {
           return new StepsToExecute<>(localSteps, Optional.of((ParticipantInvocationStep) step), skipped);
         } else
           skipped++;
@@ -92,7 +92,7 @@ public class SimpleSagaDefinition<Data> implements SagaDefinition<Data> {
         SagaStep<Data> step = sagaSteps.get(i++);
         if (step instanceof LocalStep) {
           localSteps.add((LocalStep<Data>) step);
-        } else if (step instanceof ParticipantInvocationStep && ((ParticipantInvocationStep)step).hasAction()) {
+        } else if (step instanceof ParticipantInvocationStep && ((ParticipantInvocationStep)step).hasAction(data)) {
           return new StepsToExecute<>(localSteps, Optional.of((ParticipantInvocationStep) step), skipped);
         } else
           skipped++;
@@ -129,7 +129,7 @@ public class SimpleSagaDefinition<Data> implements SagaDefinition<Data> {
   }
 
   private Optional<ReplyClassAndHandler> figureOutNextStepsAndState(final Data data, final String messageType, final SagaExecutionState state, Optional<BiConsumer<Data, Object>> possibleReplyHandler) {
-    StepsToExecute<Data> stepsToExecute = nextStepsToExecute(state);
+    StepsToExecute<Data> stepsToExecute = nextStepsToExecute(state, data);
     return Optional.of(new ReplyClassAndHandler() {
       @Override
       public RawSagaStateMachineAction getReplyHandler() {

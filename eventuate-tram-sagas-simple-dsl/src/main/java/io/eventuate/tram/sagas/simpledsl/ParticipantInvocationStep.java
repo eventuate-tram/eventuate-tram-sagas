@@ -5,6 +5,7 @@ import org.springframework.util.Assert;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.BiConsumer;
+import java.util.function.Predicate;
 
 public class ParticipantInvocationStep<Data> implements SagaStep<Data> {
   private final Map<String, BiConsumer<Data, Object>> actionReplyHandlers;
@@ -35,12 +36,12 @@ public class ParticipantInvocationStep<Data> implements SagaStep<Data> {
     return participantInvocation;
   }
 
-  public boolean hasCompensation() {
-    return compensation.isPresent();
+  public boolean hasAction(Data data) {
+    return participantInvocation.isPresent() && participantInvocation.map(p -> p.isInvocable(data)).orElse(true);
   }
 
-  public boolean hasAction() {
-    return participantInvocation.isPresent();
+  public boolean hasCompensation(Data data) {
+    return compensation.isPresent() && compensation.map(p -> p.isInvocable(data)).orElse(true);
   }
 
   public Optional<BiConsumer<Data, Object>> getReplyHandler(String replyType, boolean compensating) {
