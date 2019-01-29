@@ -1,9 +1,7 @@
 apply plugin: PublicModulePlugin
 
 buildscript {
-    ext {
-        springBootVersion = "1.4.1.RELEASE"
-    }
+
     repositories {
         mavenCentral()
     }
@@ -22,6 +20,7 @@ dependencies {
     compile "commons-lang:commons-lang:2.6"
 
     testCompile "org.springframework.boot:spring-boot-starter-test:$springBootVersion"
+
     testCompile project(":eventuate-tram-sagas-in-memory")
 
 

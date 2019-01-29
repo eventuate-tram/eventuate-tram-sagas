@@ -6,5 +6,4 @@ public interface SagaInstanceRepository {
   SagaInstance find(String sagaType, String sagaId);
   void update(SagaInstance sagaInstance);
 
-  <Data> SagaInstanceData<Data> findWithData(String sagaType, String sagaId);
 }

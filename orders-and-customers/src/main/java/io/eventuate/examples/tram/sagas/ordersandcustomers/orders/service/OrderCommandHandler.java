@@ -26,14 +26,14 @@ public class OrderCommandHandler {
 
   public Message approve(CommandMessage<ApproveOrderCommand> cm) {
     long orderId = cm.getCommand().getOrderId();
-    Order order = orderRepository.findOne(orderId);
+    Order order = orderRepository.findById(orderId).get();
     order.noteCreditReserved();
     return withSuccess();
   }
 
   public Message reject(CommandMessage<RejectOrderCommand> cm) {
     long orderId = cm.getCommand().getOrderId();
-    Order order = orderRepository.findOne(orderId);
+    Order order = orderRepository.findById(orderId).get();
     order.noteCreditReservationFailed();
     return withSuccess();
   }

@@ -4,11 +4,13 @@ import io.eventuate.javaclient.commonimpl.JSonMapper;
 import io.eventuate.javaclient.spring.jdbc.IdGeneratorImpl;
 import io.eventuate.tram.commands.common.*;
 import io.eventuate.tram.commands.producer.CommandProducerImpl;
+import io.eventuate.tram.events.common.DomainEvent;
+import io.eventuate.tram.events.publisher.DomainEventPublisher;
 import io.eventuate.tram.messaging.common.Message;
+import io.eventuate.tram.messaging.consumer.MessageConsumer;
 import io.eventuate.tram.messaging.producer.MessageBuilder;
 import io.eventuate.tram.sagas.orchestration.*;
-import io.eventuate.tram.sagas.simpledsl.SimpleSaga;
-import org.mockito.Mockito;
+import io.eventuate.tram.sagas.participant.SagaLockManager;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -16,14 +18,16 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import static java.util.Collections.emptyList;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Provides a DSL for writing unit tests for saga orchestrators
  */
 public class SagaUnitTestSupport {
 
-  private final IdGeneratorImpl idGenerator = new IdGeneratorImpl();
   private SagaManagerImpl sagaManager;
   private Command expectedCommand;
 
@@ -34,15 +38,22 @@ public class SagaUnitTestSupport {
     return new SagaUnitTestSupport();
   }
 
-  public <T> SagaUnitTestSupport saga(SimpleSaga<T> saga, T sagaData) {
-    sagaManager = new SagaManagerImpl<>(saga);
-    sagaManager.setSagaInstanceRepository(new SagaInstanceRepository() {
+  public static final String SAGA_ID = "1";
+  
+  private int counter = 2;
+  
+  private String genId() {
+    return Integer.toString(counter++);  
+  }
+  
+  public <T> SagaUnitTestSupport saga(Saga<T> saga, T sagaData) {
+    SagaInstanceRepository sagaInstanceRepository = new SagaInstanceRepository() {
 
       private SagaInstance sagaInstance;
 
       @Override
       public void save(SagaInstance sagaInstance) {
-        sagaInstance.setId(idGenerator.genId().asString());
+        sagaInstance.setId(SAGA_ID);
         this.sagaInstance = sagaInstance;
       }
 
@@ -56,23 +67,22 @@ public class SagaUnitTestSupport {
         this.sagaInstance = sagaInstance;
       }
 
-      @Override
-      public <Data> SagaInstanceData<Data> findWithData(String sagaType, String sagaId) {
-        SagaInstance sagaInstance = find(sagaType, sagaId);
-        Data sagaData = SagaDataSerde.deserializeSagaData(sagaInstance.getSerializedSagaData());
-        return new SagaInstanceData<>(sagaInstance, sagaData);
-      }
-    });
-    sagaManager.setIdGenerator(idGenerator);
+    };
 
     CommandProducerImpl commandProducer = new CommandProducerImpl((destination, message) -> {
-      String id = idGenerator.genId().asString();
+      String id = genId();
       message.getHeaders().put(Message.ID, id);
       sentCommands.add(new MessageWithDestination(destination, message));
     }, new DefaultChannelMapping(Collections.emptyMap()));
 
-    sagaManager.setCommandProducer(commandProducer);
-    sagaManager.setSagaCommandProducer(new SagaCommandProducer(commandProducer));
+    SagaCommandProducer sagaCommandProducer = new SagaCommandProducer(commandProducer);
+
+    MessageConsumer messageConsumer = null;
+    SagaLockManager sagaLockManager = null;
+
+    sagaManager = new SagaManagerImpl<>(saga, sagaInstanceRepository, commandProducer, messageConsumer, new DefaultChannelMapping(Collections.emptyMap()),
+            sagaLockManager, sagaCommandProducer);
+
 
     sagaManager.create(sagaData);
     return this;
@@ -117,7 +127,7 @@ public class SagaUnitTestSupport {
     Success reply = new Success();
     CommandReplyOutcome outcome = CommandReplyOutcome.SUCCESS;
     Message message = replyMessage(reply, outcome);
-    String id = idGenerator.genId().asString();
+    String id = genId();
     message.getHeaders().put(Message.ID, id);
     sagaManager.handleMessage(message);
     return this;
@@ -127,7 +137,7 @@ public class SagaUnitTestSupport {
     Failure reply = new Failure();
     CommandReplyOutcome outcome = CommandReplyOutcome.FAILURE;
     Message message = replyMessage(reply, outcome);
-    String id = idGenerator.genId().asString();
+    String id = genId();
     message.getHeaders().put(Message.ID, id);
     sagaManager.handleMessage(message);
     return this;
@@ -141,4 +151,15 @@ public class SagaUnitTestSupport {
             .withExtraHeaders("", correlationHeaders(sentCommand.getMessage().getHeaders()))
             .build();
   }
+
+  public SagaUnitTestSupport expectCompletedSuccessfully() {
+    assertEquals(emptyList(), sentCommands);
+    return this;
+  }
+
+  public SagaUnitTestSupport expectRolledBack() {
+    assertEquals(emptyList(), sentCommands);
+    return this;
+  }
+
 }

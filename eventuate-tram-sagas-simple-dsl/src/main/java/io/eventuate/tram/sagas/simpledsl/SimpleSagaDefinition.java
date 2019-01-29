@@ -2,30 +2,17 @@ package io.eventuate.tram.sagas.simpledsl;
 
 import io.eventuate.javaclient.commonimpl.JSonMapper;
 import io.eventuate.tram.commands.common.ReplyMessageHeaders;
-import io.eventuate.tram.events.common.DomainEvent;
 import io.eventuate.tram.messaging.common.Message;
-import io.eventuate.tram.commands.consumer.CommandWithDestination;
-import io.eventuate.tram.sagas.orchestration.EnlistedAggregate;
-import io.eventuate.tram.sagas.orchestration.EventClassAndAggregateId;
-import io.eventuate.tram.sagas.orchestration.EventToPublish;
-import io.eventuate.tram.sagas.orchestration.NewSagaActions;
 import io.eventuate.tram.sagas.orchestration.RawSagaStateMachineAction;
 import io.eventuate.tram.sagas.orchestration.ReplyClassAndHandler;
-import io.eventuate.tram.sagas.orchestration.Saga;
 import io.eventuate.tram.sagas.orchestration.SagaActions;
 import io.eventuate.tram.sagas.orchestration.SagaDefinition;
-import io.eventuate.tram.sagas.orchestration.SagaEventHandler;
-import io.eventuate.tram.sagas.orchestration.SagaInstance;
 import io.eventuate.tram.sagas.orchestration.StartingHandler;
 
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 import java.util.function.BiConsumer;
-
-import static java.util.Collections.emptyList;
-import static java.util.Collections.emptySet;
 
 public class SimpleSagaDefinition<Data> implements SagaDefinition<Data> {
   private List<SagaStep<Data>> sagaSteps;
@@ -35,54 +22,54 @@ public class SimpleSagaDefinition<Data> implements SagaDefinition<Data> {
   }
 
   @Override
+  public SagaActions<Data> start(Data sagaData) {
+    return getStartingHandler().get().apply(sagaData);
+  }
+
+  @Override
+  public SagaActions<Data> handleReply(String currentState, Data sagaData, Message message) {
+    Optional<ReplyClassAndHandler> replyHandler = this.findReplyHandler(currentState, sagaData, message);
+
+//    if (!replyHandler.isPresent()) {
+//      logger.error("No handler for {}", message);
+//      return;
+//    }
+    ReplyClassAndHandler m = replyHandler.get();
+
+    Object param = JSonMapper.fromJson(message.getPayload(), m.getReplyClass());
+
+    return (SagaActions<Data>) m.getReplyHandler().apply(sagaData, param);
+  }
+
   public Optional<StartingHandler<Data>> getStartingHandler() {
     return Optional.of(this::startingHandler);
   }
 
-  private NewSagaActions startingHandler(Data data) {
+  private SagaActions startingHandler(Data data) {
     SagaExecutionState currentState = new SagaExecutionState(-1, false);
 
-    StepsToExecute<Data> stepsToExecute = nextStepsToExecute(currentState);
+    StepsToExecute<Data> stepsToExecute = nextStepsToExecute(currentState, data);
     SagaExecutionState newState = currentState.nextState(stepsToExecute.size());
 
     return makeSagaActions(data, stepsToExecute, currentState, newState);
   }
 
-  private NewSagaActions makeSagaActions(final Data data, final StepsToExecute<Data> stepsToExecute, SagaExecutionState currentState, SagaExecutionState newState) {
+  private SagaActions makeSagaActions(final Data data, final StepsToExecute<Data> stepsToExecute, SagaExecutionState currentState, SagaExecutionState newState) {
     stepsToExecute.executeLocalSteps(data, currentState.isCompensating());
     // TODO What to do if the above fails
 
-    return new NewSagaActions<Data>() {
-      @Override
-      public List<CommandWithDestination> getCommands() {
-        return stepsToExecute.makeCommandsToSend(data, currentState.isCompensating());
-      }
+    return SagaActions.builder()
+            .withCommands(stepsToExecute.makeCommandsToSend(data, currentState.isCompensating()))
+            .withUpdatedSagaData(data)
+            .withUpdatedState(encodeState(newState))
+            .withIsEndState(newState.isEndState())
+            .withIsCompensating(currentState.isCompensating())
+            .build();
 
-
-      @Override
-      public Optional<Data> getUpdatedSagaData() {
-        return Optional.of(data);
-      }
-
-      @Override
-      public Optional<String> getUpdatedState() {
-        return Optional.of(encodeState(newState));
-      }
-
-      @Override
-      public Set<EnlistedAggregate> getEnlistedAggregates() {
-        return emptySet();
-      }
-
-      @Override
-      public Set<EventToPublish> getEventsToPublish() {
-        return emptySet();
-      }
-    };
   }
 
 
-  private StepsToExecute<Data> nextStepsToExecute(SagaExecutionState state) {
+  private StepsToExecute<Data> nextStepsToExecute(SagaExecutionState state, Data data) {
     List<LocalStep<Data>> localSteps = new LinkedList<>();
 
     int skipped = 0;
@@ -92,7 +79,7 @@ public class SimpleSagaDefinition<Data> implements SagaDefinition<Data> {
         SagaStep<Data> step = sagaSteps.get(i--);
         if (step instanceof LocalStep) {
           localSteps.add((LocalStep<Data>) step);
-        } else if (step instanceof ParticipantInvocationStep && ((ParticipantInvocationStep)step).hasCompensation()) {
+        } else if (step instanceof ParticipantInvocationStep && ((ParticipantInvocationStep)step).hasCompensation(data)) {
           return new StepsToExecute<>(localSteps, Optional.of((ParticipantInvocationStep) step), skipped);
         } else
           skipped++;
@@ -105,7 +92,7 @@ public class SimpleSagaDefinition<Data> implements SagaDefinition<Data> {
         SagaStep<Data> step = sagaSteps.get(i++);
         if (step instanceof LocalStep) {
           localSteps.add((LocalStep<Data>) step);
-        } else if (step instanceof ParticipantInvocationStep && ((ParticipantInvocationStep)step).hasAction()) {
+        } else if (step instanceof ParticipantInvocationStep && ((ParticipantInvocationStep)step).hasAction(data)) {
           return new StepsToExecute<>(localSteps, Optional.of((ParticipantInvocationStep) step), skipped);
         } else
           skipped++;
@@ -114,8 +101,7 @@ public class SimpleSagaDefinition<Data> implements SagaDefinition<Data> {
     }
   }
 
-  @Override
-  public Optional<ReplyClassAndHandler> findReplyHandler(Saga<Data> saga, SagaInstance si, String currentState, Data data, String requestId, Message message) {
+  public Optional<ReplyClassAndHandler> findReplyHandler(String currentState, Data data, Message message) {
     SagaExecutionState state = decodeState(currentState);
     ParticipantInvocationStep<Data> participantInvocationStep = participantInvocationStepFor(state);
     String replyType = message.getRequiredHeader(ReplyMessageHeaders.REPLY_TYPE);
@@ -143,14 +129,18 @@ public class SimpleSagaDefinition<Data> implements SagaDefinition<Data> {
   }
 
   private Optional<ReplyClassAndHandler> figureOutNextStepsAndState(final Data data, final String messageType, final SagaExecutionState state, Optional<BiConsumer<Data, Object>> possibleReplyHandler) {
-    StepsToExecute<Data> stepsToExecute = nextStepsToExecute(state);
+    StepsToExecute<Data> stepsToExecute = nextStepsToExecute(state, data);
     return Optional.of(new ReplyClassAndHandler() {
       @Override
       public RawSagaStateMachineAction getReplyHandler() {
         return (rawSagaData, reply) -> {
           possibleReplyHandler.ifPresent(handler -> handler.accept(data, reply));
           if (stepsToExecute.isEmpty()) {
-            return new FinalStateSagaActions<Data>();
+            return SagaActions.builder()
+                    .withUpdatedState(encodeState(SagaExecutionState.makeEndState()))
+                    .withIsEndState(true)
+                    .withIsCompensating(state.isCompensating())
+                    .build();
           } else {
             // do something
             return makeSagaActions(data, stepsToExecute, state, state.nextState(stepsToExecute.size()));
@@ -170,59 +160,6 @@ public class SimpleSagaDefinition<Data> implements SagaDefinition<Data> {
   }
 
 
-  @Override
-  public boolean isEndState(String state) {
-    return decodeState(state).isEndState();
-  }
 
 
-  @Override
-  public List<EventClassAndAggregateId> findEventHandlers(Saga<Data> saga, String currentState, Data data) {
-    return emptyList();
-  }
-
-
-  @Override
-  public Optional<SagaEventHandler<Data>> findEventHandler(Saga<Data> saga, String currentState, Data data, String aggregateType, long aggregateId, String eventType) {
-    return Optional.empty();
-  }
-
-  @Override
-  public Set<Class<DomainEvent>> getTriggeringEvents() {
-    return emptySet();
-  }
-
-  @Override
-  public Set<Class<DomainEvent>> getHandledEvents() {
-    return emptySet();
-  }
-
-
-  private static class FinalStateSagaActions<Data> implements SagaActions<Data> {
-
-    @Override
-    public List<CommandWithDestination> getCommands() {
-      return emptyList();
-    }
-
-    @Override
-    public Optional<Data> getUpdatedSagaData() {
-      return Optional.empty();
-    }
-
-    @Override
-    public Optional<String> getUpdatedState() {
-      return Optional.of(encodeState(SagaExecutionState.makeEndState()));
-    }
-
-    @Override
-    public Set<EnlistedAggregate> getEnlistedAggregates() {
-      return emptySet();
-    }
-
-    @Override
-    public Set<EventToPublish> getEventsToPublish() {
-      return emptySet();
-    }
-  }
 }
