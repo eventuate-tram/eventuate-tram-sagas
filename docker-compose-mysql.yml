@@ -1,5 +1,5 @@
 zookeeper:
-  image: eventuateio/eventuateio-local-zookeeper:0.30.0.M6
+  image: eventuateio/eventuateio-local-zookeeper:0.30.0.M12
   ports:
     - 2181:2181
     - 2888:2888
@@ -7,7 +7,7 @@ zookeeper:
 
 
 kafka:
-  image: eventuateio/eventuateio-local-kafka:0.30.0.M6
+  image: eventuateio/eventuateio-local-kafka:0.30.0.M12
   ports:
     - 9092:9092
   links:
@@ -28,7 +28,7 @@ mysql:
     - MYSQL_PASSWORD=mysqlpw
 
 cdcservice:
-  image: eventuateio/eventuate-tram-cdc-mysql-service:0.20.0.M5
+  image: eventuateio/eventuate-tram-cdc-mysql-service:0.20.0.M9
   ports:
     - "8099:8080"
   links:
@@ -46,3 +46,5 @@ cdcservice:
     EVENTUATELOCAL_CDC_DB_USER_NAME: root
     EVENTUATELOCAL_CDC_DB_PASSWORD: rootpassword
     EVENTUATELOCAL_CDC_BINLOG_CLIENT_ID: 1234567890
+    EVENTUATELOCAL_CDC_MY_SQL_BIN_LOG_CLIENT_NAME: 1234567890
+    EVENTUATELOCAL_CDC_OLD_DEBEZIUM_DB_OFFSET_STORAGE_TOPIC_NAME: none
