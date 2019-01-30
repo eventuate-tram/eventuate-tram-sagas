@@ -9,8 +9,10 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
+import java.util.function.Predicate;
 
-public class InvokeParticipantStepBuilder<Data> {
+public class InvokeParticipantStepBuilder<Data> implements WithCompensationBuilder<Data> {
+
   private final SimpleSagaDefinitionBuilder<Data> parent;
   private Optional<ParticipantInvocation<Data>> action = Optional.empty();
   private Optional<ParticipantInvocation<Data>> compensation = Optional.empty();
@@ -21,23 +23,37 @@ public class InvokeParticipantStepBuilder<Data> {
     this.parent = parent;
   }
 
-
-  public InvokeParticipantStepBuilder<Data> withAction(Function<Data, CommandWithDestination> action) {
-    this.action = Optional.of(new ParticipantInvocationImpl<>(action));
-    return this;
-  }
-  public <C extends Command> InvokeParticipantStepBuilder<Data> withAction(CommandEndpoint<C> commandEndpoint, Function<Data, C> commandProvider) {
-    this.action = Optional.of(new ParticipantEndpointInvocationImpl<>(commandEndpoint, commandProvider));
+  InvokeParticipantStepBuilder<Data> withAction(Optional<Predicate<Data>> participantInvocationPredicate, Function<Data, CommandWithDestination> action) {
+    this.action = Optional.of(new ParticipantInvocationImpl<>(participantInvocationPredicate, action));
     return this;
   }
 
+  <C extends Command> InvokeParticipantStepBuilder<Data> withAction(Optional<Predicate<Data>> participantInvocationPredicate, CommandEndpoint<C> commandEndpoint, Function<Data, C> commandProvider) {
+    this.action = Optional.of(new ParticipantEndpointInvocationImpl<>(participantInvocationPredicate, commandEndpoint, commandProvider));
+    return this;
+  }
+
+  @Override
   public InvokeParticipantStepBuilder<Data> withCompensation(Function<Data, CommandWithDestination> compensation) {
-    this.compensation = Optional.of(new ParticipantInvocationImpl<>(compensation));
+    this.compensation = Optional.of(new ParticipantInvocationImpl<>(Optional.empty(), compensation));
     return this;
   }
 
+  @Override
+  public InvokeParticipantStepBuilder<Data> withCompensation(Predicate<Data> compensationPredicate, Function<Data, CommandWithDestination> compensation) {
+    this.compensation = Optional.of(new ParticipantInvocationImpl<>(Optional.of(compensationPredicate), compensation));
+    return this;
+  }
+
+  @Override
   public <C extends Command> InvokeParticipantStepBuilder<Data> withCompensation(CommandEndpoint<C> commandEndpoint, Function<Data, C> commandProvider) {
-    this.compensation = Optional.of(new ParticipantEndpointInvocationImpl<>(commandEndpoint, commandProvider));
+    this.compensation = Optional.of(new ParticipantEndpointInvocationImpl<>(Optional.empty(), commandEndpoint, commandProvider));
+    return this;
+  }
+
+  @Override
+  public <C extends Command> InvokeParticipantStepBuilder<Data> withCompensation(Predicate<Data> compensationPredicate, CommandEndpoint<C> commandEndpoint, Function<Data, C> commandProvider) {
+    this.compensation = Optional.of(new ParticipantEndpointInvocationImpl<>(Optional.of(compensationPredicate), commandEndpoint, commandProvider));
     return this;
   }
 
@@ -50,14 +66,18 @@ public class InvokeParticipantStepBuilder<Data> {
   }
 
   public StepBuilder<Data> step() {
-    parent.addStep(new ParticipantInvocationStep<>(action, compensation, actionReplyHandlers, compensationReplyHandlers));
+    addStep();
     return new StepBuilder<>(parent);
   }
 
   public SagaDefinition<Data> build() {
     // TODO see comment in local step
-    parent.addStep(new ParticipantInvocationStep<>(action, compensation, actionReplyHandlers, compensationReplyHandlers));
+    addStep();
     return parent.build();
+  }
+
+  private void addStep() {
+    parent.addStep(new ParticipantInvocationStep<>(action, compensation, actionReplyHandlers, compensationReplyHandlers));
   }
 
 }
