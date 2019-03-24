@@ -28,7 +28,7 @@ mysql:
     - MYSQL_PASSWORD=mysqlpw
 
 cdcservice:
-  image: eventuateio/eventuate-tram-cdc-mysql-service:0.6.0.RELEASE
+  image: eventuateio/eventuate-tram-cdc-mysql-service:0.13.4.RELEASE
   ports:
     - "8099:8080"
   links:
