@@ -1,11 +1,11 @@
 package io.eventuate.tram.sagas.simpledsl;
 
+import io.eventuate.tram.commands.common.ReplyMessageHeaders;
+import io.eventuate.tram.messaging.common.Message;
 import org.springframework.util.Assert;
 
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.function.BiConsumer;
-import java.util.function.Predicate;
 
 public class ParticipantInvocationStep<Data> implements SagaStep<Data> {
   private final Map<String, BiConsumer<Data, Object>> actionReplyHandlers;
@@ -24,16 +24,8 @@ public class ParticipantInvocationStep<Data> implements SagaStep<Data> {
     this.compensation = compensation;
   }
 
-  public ParticipantInvocation<Data> getParticipantInvocation(boolean compensating) {
-    return compensating ? compensation.get() : participantInvocation.get();
-  }
-
-  public Optional<ParticipantInvocation<Data>> getCompensatingParticipantInvocation() {
-    return compensation;
-  }
-
-  public Optional<ParticipantInvocation<Data>> getAction() {
-    return participantInvocation;
+  private Optional<ParticipantInvocation<Data>> getParticipantInvocation(boolean compensating) {
+    return compensating ? compensation : participantInvocation;
   }
 
   public boolean hasAction(Data data) {
@@ -44,7 +36,23 @@ public class ParticipantInvocationStep<Data> implements SagaStep<Data> {
     return compensation.isPresent() && compensation.map(p -> p.isInvocable(data)).orElse(true);
   }
 
-  public Optional<BiConsumer<Data, Object>> getReplyHandler(String replyType, boolean compensating) {
+  public Optional<BiConsumer<Data, Object>> getReplyHandler(Message message, boolean compensating) {
+    String replyType = message.getRequiredHeader(ReplyMessageHeaders.REPLY_TYPE);
     return Optional.ofNullable((compensating ? compensationReplyHandlers : actionReplyHandlers).get(replyType));
   }
+
+  @Override
+  public boolean isSuccessfulReply(boolean compensating, Message message) {
+    return getParticipantInvocation(compensating).get().isSuccessfulReply(message);
+  }
+
+  @Override
+  public StepOutcome makeStepOutcome(Data data, boolean compensating) {
+    return StepOutcome.makeRemoteStepOutcome(getParticipantInvocation(compensating)
+            .map(x -> x.makeCommandToSend(data))
+            .map(Collections::singletonList)
+            .orElseGet(Collections::emptyList));
+  }
+
+
 }

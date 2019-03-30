@@ -12,16 +12,11 @@ import io.eventuate.tram.messaging.producer.MessageBuilder;
 import io.eventuate.tram.sagas.orchestration.*;
 import io.eventuate.tram.sagas.participant.SagaLockManager;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static java.util.Collections.emptyList;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 /**
  * Provides a DSL for writing unit tests for saga orchestrators
@@ -33,6 +28,7 @@ public class SagaUnitTestSupport {
 
   private List<MessageWithDestination> sentCommands = new ArrayList<>();
   private MessageWithDestination sentCommand;
+  private Optional<Exception> createException = Optional.empty();
 
   public static SagaUnitTestSupport given() {
     return new SagaUnitTestSupport();
@@ -84,11 +80,16 @@ public class SagaUnitTestSupport {
             sagaLockManager, sagaCommandProducer);
 
 
-    sagaManager.create(sagaData);
+    try {
+      sagaManager.create(sagaData);
+    } catch (Exception e) {
+      createException = Optional.of(e);
+    }
     return this;
   }
 
   public SagaUnitTestSupport expect() {
+    assertFalse(createException.isPresent());
     return this;
   }
 
@@ -98,7 +99,7 @@ public class SagaUnitTestSupport {
   }
 
   public SagaUnitTestSupport to(String commandChannel) {
-    assertEquals(1, sentCommands.size());
+    assertEquals("Expected a command", 1, sentCommands.size());
     sentCommand = sentCommands.get(0);
     assertEquals(commandChannel, sentCommand.getDestination());
     assertEquals(expectedCommand.getClass().getName(), sentCommand.getMessage().getRequiredHeader(CommandMessageHeaders.COMMAND_TYPE));
@@ -162,4 +163,7 @@ public class SagaUnitTestSupport {
     return this;
   }
 
+  public void expectException(Exception expectedCreateException) {
+    assertEquals(expectedCreateException, createException.get());
+  }
 }

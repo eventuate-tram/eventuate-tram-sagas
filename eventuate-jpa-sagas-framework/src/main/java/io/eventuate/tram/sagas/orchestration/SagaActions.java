@@ -5,9 +5,7 @@ import io.eventuate.tram.commands.consumer.CommandWithDestination;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
-
-import static java.util.Collections.singletonList;
+import java.util.function.Consumer;
 
 public class SagaActions<Data> {
 
@@ -17,13 +15,19 @@ public class SagaActions<Data> {
   private final Optional<String> updatedState;
   private boolean endState;
   private boolean compensating;
+  private boolean local;
+  private Optional<RuntimeException> localException;
 
-  public SagaActions(List<CommandWithDestination> commands, Optional<Data> updatedSagaData, Optional<String> updatedState, boolean endState, boolean compensating) {
+  public SagaActions(List<CommandWithDestination> commands,
+                     Optional<Data> updatedSagaData,
+                     Optional<String> updatedState, boolean endState, boolean compensating, boolean local, Optional<RuntimeException> localException) {
     this.commands = commands;
     this.updatedSagaData = updatedSagaData;
     this.updatedState = updatedState;
     this.endState = endState;
     this.compensating = compensating;
+    this.local = local;
+    this.localException = localException;
   }
 
   List<CommandWithDestination> getCommands() {
@@ -46,8 +50,12 @@ public class SagaActions<Data> {
     return compensating;
   }
 
-  public void setCompensating(boolean compensating) {
-    this.compensating = compensating;
+  public boolean isLocal() {
+    return local;
+  }
+
+  public Optional<RuntimeException> getLocalException() {
+    return localException;
   }
 
   public static class Builder<Data> {
@@ -56,12 +64,14 @@ public class SagaActions<Data> {
     private Optional<String> updatedState = Optional.empty();
     private boolean endState;
     private boolean compensating;
+    private boolean local;
+    private Optional<RuntimeException> localException = Optional.empty();
 
     public Builder() {
     }
 
     public SagaActions<Data> build() {
-      return new SagaActions<>(commands, updatedSagaData, updatedState, endState, compensating);
+      return new SagaActions<>(commands, updatedSagaData, updatedState, endState, compensating, local, localException);
     }
 
     public Builder<Data> withCommand(CommandWithDestination command) {
@@ -95,6 +105,11 @@ public class SagaActions<Data> {
     }
 
 
+    public Builder<Data> withIsLocal(Optional<RuntimeException> localException) {
+      this.localException = localException;
+      this.local = true;
+      return this;
+    }
   }
 
 
