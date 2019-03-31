@@ -67,6 +67,8 @@ public class LocalSagaTest {
             expect().
             command(new Undo2Command()).
             to("participant2").
+            andGiven().
+            successReply().
             expectRolledBack()
     ;
   }

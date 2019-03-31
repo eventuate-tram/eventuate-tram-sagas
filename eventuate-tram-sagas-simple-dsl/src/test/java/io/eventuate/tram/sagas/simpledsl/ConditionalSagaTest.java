@@ -42,6 +42,7 @@ public class ConditionalSagaTest {
       command(new Undo1Command()).
       to("participant1").
     andGiven().
+      successReply().
       expectRolledBack()
     ;
   }
@@ -71,4 +72,19 @@ public class ConditionalSagaTest {
     expectRolledBack()
     ;
   }
+
+
+  @Test
+  public void shouldFailOnFirstStep() {
+    given().
+       saga(new ConditionalSaga(), new ConditionalSagaData(true)).
+    expect().
+       command(new Do1Command()).
+       to("participant1").
+    andGiven().
+       failureReply().
+       expectRolledBack()
+    ;
+  }
+
 }

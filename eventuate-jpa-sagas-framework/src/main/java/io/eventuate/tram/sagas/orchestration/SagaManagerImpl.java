@@ -114,6 +114,8 @@ public class SagaManagerImpl<Data>
 
     String sagaId = sagaInstance.getId();
 
+    saga.onStarting(sagaId, sagaData);
+
     resource.ifPresent(r -> Assert.isTrue(sagaLockManager.claimLock(getSagaType(), sagaId, r), "Cannot claim lock for resource"));
 
     SagaActions<Data> actions = getStateDefinition().start(sagaData);
@@ -227,7 +229,7 @@ public class SagaManagerImpl<Data>
         String lastRequestId = sagaCommandProducer.sendCommands(this.getSagaType(), sagaId, actions.getCommands(), this.makeSagaReplyChannel());
         sagaInstance.setLastRequestId(lastRequestId);
 
-        actions.getUpdatedState().ifPresent(sagaInstance::setStateName);
+        updateState(sagaInstance, actions);
 
         sagaInstance.setSerializedSagaData(SagaDataSerde.serializeSagaData(actions.getUpdatedSagaData().orElse(sagaData)));
 
@@ -247,6 +249,14 @@ public class SagaManagerImpl<Data>
                 .build());
       }
     }
+  }
+
+  private void updateState(SagaInstance sagaInstance, SagaActions<Data> actions) {
+    actions.getUpdatedState().ifPresent(stateName -> {
+      sagaInstance.setStateName(stateName);
+      sagaInstance.setEndState(actions.isEndState());
+      sagaInstance.setCompensating(actions.isCompensating());
+    });
   }
 
 

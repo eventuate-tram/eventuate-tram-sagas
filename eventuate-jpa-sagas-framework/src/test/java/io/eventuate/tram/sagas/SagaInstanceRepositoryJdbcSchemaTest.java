@@ -1,5 +1,6 @@
 package io.eventuate.tram.sagas;
 
+import io.eventuate.javaclient.spring.jdbc.EventuateSchema;
 import io.eventuate.tram.sagas.orchestration.SagaInstanceRepositoryJdbc;
 import org.junit.Assert;
 import org.junit.Test;
@@ -32,9 +33,25 @@ public abstract class SagaInstanceRepositoryJdbcSchemaTest {
 
   protected abstract SagaInstanceRepositoryJdbc getSagaInstanceRepositoryJdbc();
 
-  protected abstract String getExpectedInsertIntoSagaInstance();
-  protected abstract String getExpectedInsertIntoSagaInstanceParticipants();
-  protected abstract String getExpectedSelectFromSagaInstance();
-  protected abstract String getExpectedSelectFromSagaInstanceParticipants();
-  protected abstract String getExpectedUpdateSagaInstance();
+  private String getExpectedInsertIntoSagaInstance() {
+    return String.format("INSERT INTO %ssaga_instance(saga_type, saga_id, state_name, last_request_id, saga_data_type, saga_data_json, end_state, compensating) VALUES(?, ?, ?, ?, ?, ?, ?, ?)", getExpectedPrefix());
+  }
+
+  private String getExpectedInsertIntoSagaInstanceParticipants() {
+    return String.format("INSERT INTO %ssaga_instance_participants(saga_type, saga_id, destination, resource) values(?,?,?,?)", getExpectedPrefix());
+  }
+
+  private String getExpectedSelectFromSagaInstance() {
+    return String.format("SELECT * FROM %ssaga_instance WHERE saga_type = ? AND saga_id = ?", getExpectedPrefix());
+  }
+
+  private String getExpectedSelectFromSagaInstanceParticipants() {
+    return String.format("SELECT destination, resource FROM %ssaga_instance_participants WHERE saga_type = ? AND saga_id = ?", getExpectedPrefix());
+  }
+
+  private String getExpectedUpdateSagaInstance() {
+    return String.format("UPDATE %ssaga_instance SET state_name = ?, last_request_id = ?, saga_data_type = ?, saga_data_json = ?, end_state = ?, compensating = ? where saga_type = ? AND saga_id = ?", getExpectedPrefix());
+  }
+
+  protected abstract String getExpectedPrefix();
 }

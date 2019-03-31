@@ -1,11 +1,8 @@
 package io.eventuate.tram.sagas.testing;
 
 import io.eventuate.javaclient.commonimpl.JSonMapper;
-import io.eventuate.javaclient.spring.jdbc.IdGeneratorImpl;
 import io.eventuate.tram.commands.common.*;
 import io.eventuate.tram.commands.producer.CommandProducerImpl;
-import io.eventuate.tram.events.common.DomainEvent;
-import io.eventuate.tram.events.publisher.DomainEventPublisher;
 import io.eventuate.tram.messaging.common.Message;
 import io.eventuate.tram.messaging.consumer.MessageConsumer;
 import io.eventuate.tram.messaging.producer.MessageBuilder;
@@ -41,16 +38,17 @@ public class SagaUnitTestSupport {
   private String genId() {
     return Integer.toString(counter++);  
   }
-  
+
+  private SagaInstance sagaInstance;
+
   public <T> SagaUnitTestSupport saga(Saga<T> saga, T sagaData) {
     SagaInstanceRepository sagaInstanceRepository = new SagaInstanceRepository() {
 
-      private SagaInstance sagaInstance;
 
       @Override
       public void save(SagaInstance sagaInstance) {
         sagaInstance.setId(SAGA_ID);
-        this.sagaInstance = sagaInstance;
+        SagaUnitTestSupport.this.sagaInstance = sagaInstance;
       }
 
       @Override
@@ -60,7 +58,7 @@ public class SagaUnitTestSupport {
 
       @Override
       public void update(SagaInstance sagaInstance) {
-        this.sagaInstance = sagaInstance;
+        SagaUnitTestSupport.this.sagaInstance = sagaInstance;
       }
 
     };
@@ -127,39 +125,44 @@ public class SagaUnitTestSupport {
   public SagaUnitTestSupport successReply() {
     Success reply = new Success();
     CommandReplyOutcome outcome = CommandReplyOutcome.SUCCESS;
-    Message message = replyMessage(reply, outcome);
-    String id = genId();
-    message.getHeaders().put(Message.ID, id);
-    sagaManager.handleMessage(message);
+    sendReply(reply, outcome);
     return this;
   }
 
   public SagaUnitTestSupport failureReply() {
     Failure reply = new Failure();
     CommandReplyOutcome outcome = CommandReplyOutcome.FAILURE;
-    Message message = replyMessage(reply, outcome);
+    sendReply(reply, outcome);
+    return this;
+  }
+
+  private void sendReply(Outcome reply, CommandReplyOutcome outcome) {
+    Message message = MessageBuilder
+            .withPayload(JSonMapper.toJson(reply))
+            .withHeader(ReplyMessageHeaders.REPLY_OUTCOME, outcome.name())
+            .withHeader(ReplyMessageHeaders.REPLY_TYPE, ((Object) reply).getClass().getName())
+            .withExtraHeaders("", correlationHeaders(sentCommand.getMessage().getHeaders()))
+            .build();
     String id = genId();
     message.getHeaders().put(Message.ID, id);
     sagaManager.handleMessage(message);
-    return this;
-  }
-
-  private Message replyMessage(Object reply, CommandReplyOutcome outcome) {
-    return MessageBuilder
-            .withPayload(JSonMapper.toJson(reply))
-            .withHeader(ReplyMessageHeaders.REPLY_OUTCOME, outcome.name())
-            .withHeader(ReplyMessageHeaders.REPLY_TYPE, reply.getClass().getName())
-            .withExtraHeaders("", correlationHeaders(sentCommand.getMessage().getHeaders()))
-            .build();
   }
 
   public SagaUnitTestSupport expectCompletedSuccessfully() {
-    assertEquals(emptyList(), sentCommands);
+    assertNoCommands();
+    assertTrue(sagaInstance.isEndState());
+    assertFalse(sagaInstance.isCompensating());
     return this;
   }
 
-  public SagaUnitTestSupport expectRolledBack() {
+  private void assertNoCommands() {
     assertEquals(emptyList(), sentCommands);
+  }
+
+  public SagaUnitTestSupport expectRolledBack() {
+    assertNoCommands();
+    assertTrue(sagaInstance.isEndState());
+    assertTrue(sagaInstance.isCompensating());
     return this;
   }
 
