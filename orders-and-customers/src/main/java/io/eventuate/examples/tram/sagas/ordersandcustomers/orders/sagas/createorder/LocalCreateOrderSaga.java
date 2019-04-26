@@ -20,13 +20,13 @@ import static io.eventuate.tram.commands.consumer.CommandWithDestinationBuilder.
 public class LocalCreateOrderSaga implements SimpleSaga<LocalCreateOrderSagaData> {
 
   private DomainEventPublisher domainEventPublisher;
-
-  public LocalCreateOrderSaga(DomainEventPublisher domainEventPublisher) {
-    this.domainEventPublisher = domainEventPublisher;
-  }
-
-  @Autowired
   private OrderRepository orderRepository;
+
+  public LocalCreateOrderSaga(DomainEventPublisher domainEventPublisher,
+                              OrderRepository orderRepository) {
+    this.domainEventPublisher = domainEventPublisher;
+    this.orderRepository = orderRepository;
+  }
 
   private SagaDefinition<LocalCreateOrderSagaData> sagaDefinition =
           step()
@@ -38,17 +38,17 @@ public class LocalCreateOrderSaga implements SimpleSaga<LocalCreateOrderSagaData
             .invokeLocal(this::approve)
           .build();
 
+  @Override
+  public SagaDefinition<LocalCreateOrderSagaData> getSagaDefinition() {
+    return this.sagaDefinition;
+  }
+
+
   private void create(LocalCreateOrderSagaData data) {
     ResultWithEvents<Order> oe = Order.createOrder(data.getOrderDetails());
     Order order = oe.result;
     orderRepository.save(order);
     data.setOrderId(order.getId());
-  }
-
-
-  @Override
-  public SagaDefinition<LocalCreateOrderSagaData> getSagaDefinition() {
-    return this.sagaDefinition;
   }
 
 
