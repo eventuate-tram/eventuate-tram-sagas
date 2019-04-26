@@ -4,9 +4,12 @@ buildscript {
     }
     dependencies {
         classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.7.3'
+        classpath "com.avast.gradle:gradle-docker-compose-plugin:0.9.2"
     }
 }
 
+
+apply plugin: 'docker-compose'
 
 task wrapper(type: Wrapper) {
     gradleVersion = '3.5'
@@ -85,3 +88,26 @@ gradle.projectsEvaluated {
 }
 
 
+dockerCompose {
+    environment.put "EVENTUATE_TRAM_VERSION", eventuateTramVersion
+    environment.put "EVENTUATE_LOCAL_VERSION", eventuateLocalVersion
+
+    mysqlInfrastructure {
+        projectName = null
+        useComposeFiles = ["docker-compose-mysql.yml"]
+        startedServices = ["mysql", "zookeeper", "kafka"]
+    }
+    mysqlAll {
+        projectName = null
+        useComposeFiles = ["docker-compose-mysql.yml"]
+    }
+    postgresInfrastructure {
+        projectName = null
+        useComposeFiles = ["docker-compose-postgres.yml"]
+        startedServices = ["postgres", "zookeeper", "kafka"]
+    }
+    postgresAll {
+        projectName = null
+        useComposeFiles = ["docker-compose-postgres.yml"]
+    }
+}

@@ -6,14 +6,16 @@ set -e
 
 ./gradlew testClasses
 
-docker-compose -f docker-compose-postgres.yml down -v
+./gradlew postgresAllComposeDown
 
-docker-compose -f docker-compose-postgres.yml up -d --build zookeeper postgres kafka
+./gradlew postgresInfrastructureComposeBuild
+
+./gradlew postgresInfrastructureComposeUp
 
 ./wait-for-postgres.sh
 
-docker-compose -f docker-compose-postgres.yml up -d --build
+./gradlew postgresAllComposeUp
 
 ./gradlew :orders-and-customers:cleanTest build
 
-docker-compose -f docker-compose-postgres.yml down -v
+./gradlew postgresAllComposeDown

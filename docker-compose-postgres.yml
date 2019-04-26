@@ -1,53 +1,59 @@
-zookeeper:
-  image: eventuateio/eventuateio-local-zookeeper:0.30.0.M12
-  ports:
-    - 2181:2181
-    - 2888:2888
-    - 3888:3888
+version: "3"
+services:
+  zookeeper:
+    image: eventuateio/eventuateio-local-zookeeper:$EVENTUATE_LOCAL_VERSION
+    ports:
+      - 2181:2181
 
 
-kafka:
-  image: eventuateio/eventuateio-local-kafka:0.30.0.M12
-  ports:
-    - 9092:9092
-  links:
-    - zookeeper
-  environment:
-    - ADVERTISED_HOST_NAME=${DOCKER_HOST_IP}
-    - KAFKA_HEAP_OPTS=-Xmx320m -Xms320m
-    - ZOOKEEPER_SERVERS=zookeeper:2181
+  kafka:
+    image: eventuateio/eventuateio-local-kafka:$EVENTUATE_LOCAL_VERSION
+    ports:
+      - 9092:9092
+    depends_on:
+      - zookeeper
+    environment:
+      - ADVERTISED_HOST_NAME=${DOCKER_HOST_IP}
+      - KAFKA_HEAP_OPTS=-Xmx320m -Xms320m
+      - ZOOKEEPER_SERVERS=zookeeper:2181
 
+  postgres:
+    build:
+      context: ./postgres
+      args:
+        EVENTUATE_TRAM_VERSION: "$EVENTUATE_TRAM_VERSION"
+        EVENTUATE_LOCAL_VERSION: "$EVENTUATE_LOCAL_VERSION"
+    ports:
+      - 5432:5432
+    environment:
+      POSTGRES_USER: eventuate
+      POSTGRES_PASSWORD: eventuate
 
-postgres:
-  build: ./postgres
-  ports:
-    - 5432:5432
-  environment:
-    POSTGRES_USER: eventuate
-    POSTGRES_PASSWORD: eventuate
-
-cdcservice:
-  image: eventuateio/eventuate-tram-cdc-mysql-service:0.20.0.M9
-  ports:
-    - "8099:8080"
-  links:
-    - postgres
-    - kafka
-    - zookeeper
-  environment:
-    SPRING_DATASOURCE_URL: jdbc:postgresql://postgres/eventuate
-    SPRING_DATASOURCE_USERNAME: eventuate
-    SPRING_DATASOURCE_PASSWORD: eventuate
-    SPRING_DATASOURCE_TEST_ON_BORROW: "true"
-    SPRING_DATASOURCE_VALIDATION_QUERY: SELECT 1
-    SPRING_DATASOURCE_DRIVER_CLASS_NAME: org.postgresql.Driver
-    EVENTUATE_CURRENT_TIME_IN_MILLISECONDS_SQL: ${EVENTUATE_CURRENT_TIME_IN_MILLISECONDS_SQL}
-    EVENTUATELOCAL_CDC_POLLING_INTERVAL_IN_MILLISECONDS: 500
-    EVENTUATELOCAL_CDC_MAX_EVENTS_PER_POLLING: 1000
-    EVENTUATELOCAL_CDC_MAX_ATTEMPTS_FOR_POLLING: 100
-    EVENTUATELOCAL_CDC_POLLING_RETRY_INTERVAL_IN_MILLISECONDS: 500
-    EVENTUATELOCAL_KAFKA_BOOTSTRAP_SERVERS: kafka:9092
-    EVENTUATELOCAL_ZOOKEEPER_CONNECTION_STRING: zookeeper:2181
-    EVENTUATELOCAL_CDC_BINLOG_CLIENT_ID: 1234567890
-    EVENTUATELOCAL_CDC_SOURCE_TABLE_NAME: message
-    SPRING_PROFILES_ACTIVE: EventuatePolling
+  cdcservice:
+    image: eventuateio/eventuate-tram-cdc-mysql-service:$EVENTUATE_TRAM_VERSION
+    ports:
+      - "8099:8080"
+    depends_on:
+      - postgres
+      - kafka
+      - zookeeper
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres/eventuate
+      SPRING_DATASOURCE_USERNAME: eventuate
+      SPRING_DATASOURCE_PASSWORD: eventuate
+      SPRING_DATASOURCE_TEST_ON_BORROW: "true"
+      SPRING_DATASOURCE_VALIDATION_QUERY: SELECT 1
+      SPRING_DATASOURCE_DRIVER_CLASS_NAME: org.postgresql.Driver
+      EVENTUATE_CURRENT_TIME_IN_MILLISECONDS_SQL: ${EVENTUATE_CURRENT_TIME_IN_MILLISECONDS_SQL}
+      EVENTUATELOCAL_CDC_POLLING_INTERVAL_IN_MILLISECONDS: 500
+      EVENTUATELOCAL_CDC_MAX_EVENTS_PER_POLLING: 1000
+      EVENTUATELOCAL_CDC_MAX_ATTEMPTS_FOR_POLLING: 100
+      EVENTUATELOCAL_CDC_POLLING_RETRY_INTERVAL_IN_MILLISECONDS: 500
+      EVENTUATELOCAL_KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+      EVENTUATELOCAL_ZOOKEEPER_CONNECTION_STRING: zookeeper:2181
+      EVENTUATELOCAL_CDC_BINLOG_CLIENT_ID: 1234567890
+      EVENTUATELOCAL_CDC_SOURCE_TABLE_NAME: message
+      SPRING_PROFILES_ACTIVE: EventuatePolling
+      EVENTUATELOCAL_CDC_READ_OLD_DEBEZIUM_DB_OFFSET_STORAGE_TOPIC: "false"
+      EVENTUATELOCAL_CDC_READER_NAME: ClientEventuateTram
+      EVENTUATELOCAL_CDC_MYSQL_BINLOG_CLIENT_UNIQUE_ID: 2
