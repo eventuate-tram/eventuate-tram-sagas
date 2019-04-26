@@ -19,4 +19,12 @@ public class CommandEndpoint<C extends Command> {
   public String getCommandChannel() {
     return commandChannel;
   }
+
+  public Class<C> getCommandClass() {
+    return commandClass;
+  }
+
+  public Set<Class> getReplyClasses() {
+    return replyClasses;
+  }
 }

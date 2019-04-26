@@ -9,6 +9,7 @@ public interface Saga<Data> {
     return getClass().getName();
   }
 
+  default void onStarting(String sagaId, Data data) {  }
   default void onSagaCompletedSuccessfully(String sagaId, Data data) {  }
   default void onSagaRolledBack(String sagaId, Data data) {  }
 

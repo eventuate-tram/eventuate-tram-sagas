@@ -25,6 +25,7 @@ dependencies {
     testCompile "io.eventuate.util:eventuate-util-test:$eventuateUtilVersion"
 
     testCompile project(":eventuate-tram-sagas-testing-support")
+    testCompile project(":eventuate-tram-sagas-in-memory")
 
 }
 

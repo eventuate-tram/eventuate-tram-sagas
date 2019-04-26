@@ -11,27 +11,8 @@ public class SagaInstanceRepositoryJdbcEmptySchemaTest extends SagaInstanceRepos
   }
 
   @Override
-  protected String getExpectedInsertIntoSagaInstance() {
-    return "INSERT INTO saga_instance(saga_type, saga_id, state_name, last_request_id, saga_data_type, saga_data_json) VALUES(?, ?, ?,?,?,?)";
+  protected String getExpectedPrefix() {
+    return "";
   }
 
-  @Override
-  protected String getExpectedInsertIntoSagaInstanceParticipants() {
-    return "INSERT INTO saga_instance_participants(saga_type, saga_id, destination, resource) values(?,?,?,?)";
-  }
-
-  @Override
-  protected String getExpectedSelectFromSagaInstance() {
-    return "SELECT * FROM saga_instance WHERE saga_type = ? AND saga_id = ?";
-  }
-
-  @Override
-  protected String getExpectedSelectFromSagaInstanceParticipants() {
-    return "SELECT destination, resource FROM saga_instance_participants WHERE saga_type = ? AND saga_id = ?";
-  }
-
-  @Override
-  protected String getExpectedUpdateSagaInstance() {
-    return "UPDATE saga_instance SET state_name = ?, last_request_id = ?, saga_data_type = ?, saga_data_json = ? where saga_type = ? AND saga_id = ?";
-  }
 }

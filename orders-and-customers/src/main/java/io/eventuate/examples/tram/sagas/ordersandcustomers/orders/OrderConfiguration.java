@@ -1,7 +1,10 @@
 package io.eventuate.examples.tram.sagas.ordersandcustomers.orders;
 
+import io.eventuate.examples.tram.sagas.ordersandcustomers.orders.domain.OrderRepository;
 import io.eventuate.examples.tram.sagas.ordersandcustomers.orders.sagas.createorder.CreateOrderSaga;
 import io.eventuate.examples.tram.sagas.ordersandcustomers.orders.sagas.createorder.CreateOrderSagaData;
+import io.eventuate.examples.tram.sagas.ordersandcustomers.orders.sagas.createorder.LocalCreateOrderSaga;
+import io.eventuate.examples.tram.sagas.ordersandcustomers.orders.sagas.createorder.LocalCreateOrderSagaData;
 import io.eventuate.examples.tram.sagas.ordersandcustomers.orders.service.OrderCommandHandler;
 import io.eventuate.examples.tram.sagas.ordersandcustomers.orders.service.OrderService;
 import io.eventuate.tram.commands.consumer.CommandDispatcher;
@@ -31,10 +34,20 @@ public class OrderConfiguration {
     return new SagaManagerImpl<>(saga);
   }
 
+  @Bean
+  public SagaManager<LocalCreateOrderSagaData> localCreateOrderSagaManager(Saga<LocalCreateOrderSagaData> saga) {
+    return new SagaManagerImpl<>(saga);
+  }
+
 
   @Bean
   public CreateOrderSaga createOrderSaga(DomainEventPublisher domainEventPublisher) {
     return new CreateOrderSaga(domainEventPublisher);
+  }
+
+  @Bean
+  public LocalCreateOrderSaga localCreateOrderSaga(DomainEventPublisher domainEventPublisher, OrderRepository orderRepository) {
+    return new LocalCreateOrderSaga(domainEventPublisher, orderRepository);
   }
 
   @Bean

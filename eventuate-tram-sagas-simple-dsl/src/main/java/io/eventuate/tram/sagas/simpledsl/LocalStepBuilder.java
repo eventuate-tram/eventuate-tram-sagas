@@ -8,7 +8,7 @@ import java.util.function.Consumer;
 public class LocalStepBuilder<Data>  {
   private final SimpleSagaDefinitionBuilder<Data> parent;
   private final Consumer<Data> localFunction;
-  private Optional<Consumer<Data>> compensation;
+  private Optional<Consumer<Data>> compensation = Optional.empty();
 
   public LocalStepBuilder(SimpleSagaDefinitionBuilder<Data> parent, Consumer<Data> localFunction) {
     this.parent = parent;

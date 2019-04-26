@@ -10,6 +10,8 @@ public class SagaInstance {
   private SerializedSagaData serializedSagaData;
   private String stateName;
   private Set<DestinationAndResource> destinationsAndResources;
+  private Boolean endState = false;
+  private Boolean compensating = false;
 
   public void setSagaType(String sagaType) {
     this.sagaType = sagaType;
@@ -67,5 +69,21 @@ public class SagaInstance {
 
   public Set<DestinationAndResource> getDestinationsAndResources() {
     return destinationsAndResources;
+  }
+
+  public void setEndState(Boolean endState) {
+    this.endState = endState;
+  }
+
+  public Boolean isEndState() {
+    return endState;
+  }
+
+  public void setCompensating(Boolean compensating) {
+    this.compensating = compensating;
+  }
+
+  public Boolean isCompensating() {
+    return compensating;
   }
 }

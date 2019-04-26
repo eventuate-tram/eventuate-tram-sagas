@@ -39,13 +39,13 @@ public class SagaInstanceRepositoryJdbc implements SagaInstanceRepository {
     String sagaInstanceTable = eventuateSchema.qualifyTable("saga_instance");
     String sagaInstanceParticipantsTable = eventuateSchema.qualifyTable("saga_instance_participants");
 
-    insertIntoSagaInstanceSql = String.format("INSERT INTO %s(saga_type, saga_id, state_name, last_request_id, saga_data_type, saga_data_json) VALUES(?, ?, ?,?,?,?)", sagaInstanceTable);
+    insertIntoSagaInstanceSql = String.format("INSERT INTO %s(saga_type, saga_id, state_name, last_request_id, saga_data_type, saga_data_json, end_state, compensating) VALUES(?, ?, ?, ?, ?, ?, ?, ?)", sagaInstanceTable);
     insertIntoSagaInstanceParticipantsSql = String.format("INSERT INTO %s(saga_type, saga_id, destination, resource) values(?,?,?,?)", sagaInstanceParticipantsTable);
 
     selectFromSagaInstanceSql = String.format("SELECT * FROM %s WHERE saga_type = ? AND saga_id = ?", sagaInstanceTable);
     selectFromSagaInstanceParticipantsSql = String.format("SELECT destination, resource FROM %s WHERE saga_type = ? AND saga_id = ?", sagaInstanceParticipantsTable);
 
-    updateSagaInstanceSql = String.format("UPDATE %s SET state_name = ?, last_request_id = ?, saga_data_type = ?, saga_data_json = ? where saga_type = ? AND saga_id = ?", sagaInstanceTable);
+    updateSagaInstanceSql = String.format("UPDATE %s SET state_name = ?, last_request_id = ?, saga_data_type = ?, saga_data_json = ?, end_state = ?, compensating = ? where saga_type = ? AND saga_id = ?", sagaInstanceTable);
   }
 
   public String getInsertIntoSagaInstanceSql() {
@@ -98,7 +98,9 @@ public class SagaInstanceRepositoryJdbc implements SagaInstanceRepository {
             sagaInstance.getStateName(),
             sagaInstance.getLastRequestId(),
             sagaInstance.getSerializedSagaData().getSagaDataType(),
-            sagaInstance.getSerializedSagaData().getSagaDataJSON());
+            sagaInstance.getSerializedSagaData().getSagaDataJSON(),
+            sagaInstance.isEndState(),
+            sagaInstance.isCompensating());
 
     saveDestinationsAndResources(sagaInstance);
   }
@@ -148,6 +150,7 @@ public class SagaInstanceRepositoryJdbc implements SagaInstanceRepository {
             sagaInstance.getLastRequestId(),
             sagaInstance.getSerializedSagaData().getSagaDataType(),
             sagaInstance.getSerializedSagaData().getSagaDataJSON(),
+            sagaInstance.isEndState(), sagaInstance.isCompensating(),
             sagaInstance.getSagaType(), sagaInstance.getId());
     Assert.isTrue(count == 1, "Should be 1 : " + count);
     saveDestinationsAndResources(sagaInstance);

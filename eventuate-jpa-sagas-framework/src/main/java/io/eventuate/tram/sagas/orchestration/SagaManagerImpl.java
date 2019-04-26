@@ -1,10 +1,11 @@
 package io.eventuate.tram.sagas.orchestration;
 
-import io.eventuate.tram.commands.common.ChannelMapping;
-import io.eventuate.tram.commands.common.CommandMessageHeaders;
+import io.eventuate.javaclient.commonimpl.JSonMapper;
+import io.eventuate.tram.commands.common.*;
 import io.eventuate.tram.commands.producer.CommandProducer;
 import io.eventuate.tram.messaging.common.Message;
 import io.eventuate.tram.messaging.consumer.MessageConsumer;
+import io.eventuate.tram.messaging.producer.MessageBuilder;
 import io.eventuate.tram.sagas.common.*;
 import io.eventuate.tram.sagas.participant.SagaLockManager;
 import org.slf4j.Logger;
@@ -56,7 +57,6 @@ public class SagaManagerImpl<Data>
   }
 
 
-
   @Autowired
   private SagaLockManager sagaLockManager;
 
@@ -67,7 +67,6 @@ public class SagaManagerImpl<Data>
 
   @Autowired
   private SagaCommandProducer sagaCommandProducer;
-
 
 
   public void setSagaInstanceRepository(SagaInstanceRepository sagaInstanceRepository) {
@@ -115,15 +114,20 @@ public class SagaManagerImpl<Data>
 
     String sagaId = sagaInstance.getId();
 
-    resource.ifPresent( r -> Assert.isTrue(sagaLockManager.claimLock(getSagaType(), sagaId, r), "Cannot claim lock for resource"));
+    saga.onStarting(sagaId, sagaData);
+
+    resource.ifPresent(r -> Assert.isTrue(sagaLockManager.claimLock(getSagaType(), sagaId, r), "Cannot claim lock for resource"));
 
     SagaActions<Data> actions = getStateDefinition().start(sagaData);
+
+    actions.getLocalException().ifPresent(e -> {
+      throw e;
+    });
 
     processActions(sagaId, sagaInstance, sagaData, actions);
 
     return sagaInstance;
   }
-
 
 
   private void performEndStateActions(String sagaId, SagaInstance sagaInstance, boolean compensating, Data sagaData) {
@@ -167,7 +171,7 @@ public class SagaManagerImpl<Data>
     logger.debug("handle message invoked {}", message);
     if (message.hasHeader(SagaReplyHeaders.REPLY_SAGA_ID)) {
       handleReply(message);
-    }  else {
+    } else {
       logger.warn("Handle message doesn't know what to do with: {} ", message);
     }
   }
@@ -195,28 +199,64 @@ public class SagaManagerImpl<Data>
     String currentState = sagaInstance.getStateName();
 
     logger.info("Current state={}", currentState);
+
     SagaActions<Data> actions = getStateDefinition().handleReply(currentState, sagaData, message);
 
     logger.info("Handled reply. Sending commands {}", actions.getCommands());
 
     processActions(sagaId, sagaInstance, sagaData, actions);
 
+
   }
 
   private void processActions(String sagaId, SagaInstance sagaInstance, Data sagaData, SagaActions<Data> actions) {
 
-    String lastRequestId = sagaCommandProducer.sendCommands(this.getSagaType(), sagaId, actions.getCommands(), this.makeSagaReplyChannel());
-    sagaInstance.setLastRequestId(lastRequestId);
 
-    actions.getUpdatedState().ifPresent(sagaInstance::setStateName);
+    while (true) {
 
-    sagaInstance.setSerializedSagaData(SagaDataSerde.serializeSagaData(actions.getUpdatedSagaData().orElse(sagaData)));
+      if (actions.getLocalException().isPresent()) {
 
-    if (actions.isEndState()) {
-      performEndStateActions(sagaId, sagaInstance, actions.isCompensating(), sagaData);
+        actions = getStateDefinition().handleReply(actions.getUpdatedState().get(), actions.getUpdatedSagaData().get(), MessageBuilder
+                .withPayload("{}")
+                .withHeader(ReplyMessageHeaders.REPLY_OUTCOME, CommandReplyOutcome.FAILURE.name())
+                .withHeader(ReplyMessageHeaders.REPLY_TYPE, Failure.class.getName())
+                .build());
+
+
+      } else {
+        // only do this if successful
+
+        String lastRequestId = sagaCommandProducer.sendCommands(this.getSagaType(), sagaId, actions.getCommands(), this.makeSagaReplyChannel());
+        sagaInstance.setLastRequestId(lastRequestId);
+
+        updateState(sagaInstance, actions);
+
+        sagaInstance.setSerializedSagaData(SagaDataSerde.serializeSagaData(actions.getUpdatedSagaData().orElse(sagaData)));
+
+        if (actions.isEndState()) {
+          performEndStateActions(sagaId, sagaInstance, actions.isCompensating(), sagaData);
+        }
+
+        sagaInstanceRepository.update(sagaInstance);
+
+        if (!actions.isLocal())
+          break;
+
+        actions = getStateDefinition().handleReply(actions.getUpdatedState().get(), actions.getUpdatedSagaData().get(), MessageBuilder
+                .withPayload("{}")
+                .withHeader(ReplyMessageHeaders.REPLY_OUTCOME, CommandReplyOutcome.SUCCESS.name())
+                .withHeader(ReplyMessageHeaders.REPLY_TYPE, Success.class.getName())
+                .build());
+      }
     }
+  }
 
-    sagaInstanceRepository.update(sagaInstance);
+  private void updateState(SagaInstance sagaInstance, SagaActions<Data> actions) {
+    actions.getUpdatedState().ifPresent(stateName -> {
+      sagaInstance.setStateName(stateName);
+      sagaInstance.setEndState(actions.isEndState());
+      sagaInstance.setCompensating(actions.isCompensating());
+    });
   }
 
 

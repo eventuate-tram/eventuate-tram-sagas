@@ -20,10 +20,10 @@ import static org.junit.Assert.assertEquals;
 public abstract class AbstractOrdersAndCustomersIntegrationTest {
 
   @Autowired
-  private CustomerService customerService;
+  protected CustomerService customerService;
 
   @Autowired
-  private OrderService orderService;
+  protected OrderService orderService;
 
   @Autowired
   private OrderRepository orderRepository;
@@ -36,34 +36,46 @@ public abstract class AbstractOrdersAndCustomersIntegrationTest {
 
   @Test
   public void shouldApproveOrder() {
-    Money creditLimit = new Money("15.00");
+    Money creditLimit = new Money("200.00");
     Customer customer = customerService.createCustomer("Fred", creditLimit);
-    Order order = orderService.createOrder(new OrderDetails(customer.getId(), new Money("12.34")));
+    Order order = createOrder(customer);
 
     assertOrderState(order.getId(), OrderState.APPROVED);
 
+    assertCreateOrderSagaCompletedSuccesfully(order);
+
+  }
+
+  protected void assertCreateOrderSagaCompletedSuccesfully(Order order) {
     Eventually.eventually(() -> {
       sagaEventsConsumer.assertEventReceived(CreateOrderSagaCompletedSuccesfully.class, event -> {
         assertEquals(order.getId(), (Long)event.getOrderId());
       });
     });
+  }
 
+  protected Order createOrder(Customer customer) {
+    return orderService.createOrder(new OrderDetails(customer.getId(), new Money("123.40")));
   }
 
   @Test
   public void shouldRejectOrder()  {
     Money creditLimit = new Money("15.00");
     Customer customer = customerService.createCustomer("Fred", creditLimit);
-    Order order = orderService.createOrder(new OrderDetails(customer.getId(), new Money("123.40")));
+    Order order = createOrder(customer);
 
     assertOrderState(order.getId(), OrderState.REJECTED);
 
+    assertCreateOrderSagaRolledBack(order);
+
+  }
+
+  protected void assertCreateOrderSagaRolledBack(Order order) {
     Eventually.eventually(() -> {
       sagaEventsConsumer.assertEventReceived(CreateOrderSagaRolledBack.class, event -> {
         assertEquals(order.getId(), (Long)event.getOrderId());
       });
     });
-
   }
 
   private void assertOrderState(Long id, OrderState expectedState) {
