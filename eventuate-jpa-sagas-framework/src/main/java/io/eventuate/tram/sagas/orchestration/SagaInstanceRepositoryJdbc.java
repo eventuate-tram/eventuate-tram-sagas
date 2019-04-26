@@ -31,10 +31,6 @@ public class SagaInstanceRepositoryJdbc implements SagaInstanceRepository {
 
   private String updateSagaInstanceSql;
 
-  public SagaInstanceRepositoryJdbc() {
-    this(new EventuateSchema());
-  }
-
   public SagaInstanceRepositoryJdbc(EventuateSchema eventuateSchema) {
     String sagaInstanceTable = eventuateSchema.qualifyTable("saga_instance");
     String sagaInstanceParticipantsTable = eventuateSchema.qualifyTable("saga_instance_participants");

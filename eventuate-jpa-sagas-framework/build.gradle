@@ -14,6 +14,7 @@ buildscript {
 dependencies {
     compile "io.eventuate.tram.core:eventuate-tram-commands:$eventuateTramVersion"
     compile "io.eventuate.tram.core:eventuate-tram-events:$eventuateTramVersion"
+    compile "io.eventuate.tram.core:eventuate-tram-jdbc:$eventuateTramVersion"
     compile "io.eventuate.client.java:eventuate-client-java-jdbc-common:$eventuateClientVersion"
 
     compile "org.springframework.boot:spring-boot-starter-jdbc:$springBootVersion"
