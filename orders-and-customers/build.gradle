@@ -1,18 +1,6 @@
-buildscript {
-
-    repositories {
-        mavenCentral()
-    }
-    dependencies {
-        classpath "org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}"
-    }
-}
-
-/// apply plugin: "spring-boot"
-
-
 dependencies {
-    compile project(":eventuate-jpa-sagas-framework")
+    compile project(":eventuate-tram-sagas-participant")
+    compile project(":eventuate-tram-sagas-orchestration")
     compile project(":eventuate-tram-sagas-simple-dsl")
 
 

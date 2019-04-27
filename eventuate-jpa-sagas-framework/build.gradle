@@ -1,29 +1,11 @@
 apply plugin: PublicModulePlugin
 
-buildscript {
-
-    repositories {
-        mavenCentral()
-    }
-    dependencies {
-        classpath "org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}"
-    }
-}
 
 
 dependencies {
-    compile "io.eventuate.tram.core:eventuate-tram-commands:$eventuateTramVersion"
-    compile "io.eventuate.tram.core:eventuate-tram-events:$eventuateTramVersion"
-    compile "io.eventuate.tram.core:eventuate-tram-jdbc:$eventuateTramVersion"
-    compile "io.eventuate.client.java:eventuate-client-java-jdbc-common:$eventuateClientVersion"
 
-    compile "org.springframework.boot:spring-boot-starter-jdbc:$springBootVersion"
-    compile "commons-lang:commons-lang:2.6"
-
-    testCompile "org.springframework.boot:spring-boot-starter-test:$springBootVersion"
-
-    testCompile project(":eventuate-tram-sagas-in-memory")
-
-
+    compile project(":eventuate-tram-sagas-common")
+    compile project(":eventuate-tram-sagas-orchestration")
+    compile project(":eventuate-tram-sagas-participant")
 
 }

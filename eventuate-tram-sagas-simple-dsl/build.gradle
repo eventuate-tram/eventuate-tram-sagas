@@ -1,7 +1,7 @@
 apply plugin: PublicModulePlugin
 
 dependencies {
-    compile project(":eventuate-jpa-sagas-framework")
+    compile project(":eventuate-tram-sagas-orchestration")
 
     testCompile project(":eventuate-tram-sagas-testing-support")
 }

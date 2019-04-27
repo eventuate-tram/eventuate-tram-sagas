@@ -1,4 +1,6 @@
-// include 'eventuate-jpa-sagas'
+include 'eventuate-tram-sagas-common'
+include 'eventuate-tram-sagas-orchestration'
+include 'eventuate-tram-sagas-participant'
 
 include 'eventuate-jpa-sagas-framework'
 include 'eventuate-tram-sagas-simple-dsl'

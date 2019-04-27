@@ -7,7 +7,7 @@ import io.eventuate.tram.messaging.common.Message;
 import io.eventuate.tram.messaging.consumer.MessageConsumer;
 import io.eventuate.tram.messaging.producer.MessageBuilder;
 import io.eventuate.tram.sagas.orchestration.*;
-import io.eventuate.tram.sagas.participant.SagaLockManager;
+import io.eventuate.tram.sagas.common.SagaLockManager;
 
 import java.util.*;
 import java.util.stream.Collectors;
