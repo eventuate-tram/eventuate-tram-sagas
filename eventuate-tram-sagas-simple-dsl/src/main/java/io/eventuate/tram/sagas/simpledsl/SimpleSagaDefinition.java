@@ -36,13 +36,16 @@ public class SimpleSagaDefinition<Data> implements SagaDefinition<Data> {
     SagaStep<Data> currentStep = sagaSteps.get(state.getCurrentlyExecuting());
     boolean compensating = state.isCompensating();
 
-    Optional<BiConsumer<Data, Object>> possibleReplyHandler = currentStep.getReplyHandler(message, compensating);
+    currentStep.getReplyHandler(message, compensating).ifPresent(handler -> {
+      invokeReplyHandler(message, sagaData, handler);
+    });
+
     if (currentStep.isSuccessfulReply(compensating, message)) {
-      return handleReplyAndExecuteNextStep(message, sagaData, state, possibleReplyHandler);
+      return executeNextStep(sagaData, state);
     } else if (compensating) {
       throw new UnsupportedOperationException("Failure when compensating");
     } else {
-      return handleReplyAndExecuteNextStep(message, sagaData, state.startCompensating(), possibleReplyHandler);
+      return executeNextStep(sagaData, state.startCompensating());
     }
   }
 
@@ -62,25 +65,25 @@ public class SimpleSagaDefinition<Data> implements SagaDefinition<Data> {
     return new StepToExecute<>(Optional.empty(), skipped, compensating);
   }
 
-  private SagaActions<Data> handleReplyAndExecuteNextStep(Message message, Data data,
-                                                          SagaExecutionState state,
-                                                          Optional<BiConsumer<Data, Object>> possibleReplyHandler) {
+  private SagaActions<Data> executeNextStep(Data data, SagaExecutionState state) {
     StepToExecute<Data> stepToExecute = nextStepToExecute(state, data);
     if (stepToExecute.isEmpty()) {
       return makeEndStateSagaActions(state);
     } else {
-        Class m;
-        try {
-          m = Class.forName(message.getRequiredHeader(ReplyMessageHeaders.REPLY_TYPE));
-        } catch (ClassNotFoundException e) {
-          throw new RuntimeException(e);
-        }
-
-        Object reply = JSonMapper.fromJson(message.getPayload(), m);
-        possibleReplyHandler.ifPresent(handler -> handler.accept(data, reply));
-        // do something
-        return stepToExecute.executeStep(data, state);
+      // do something
+      return stepToExecute.executeStep(data, state);
     }
+  }
+
+  private void invokeReplyHandler(Message message, Data data, BiConsumer<Data, Object> handler) {
+    Class m;
+    try {
+      m = Class.forName(message.getRequiredHeader(ReplyMessageHeaders.REPLY_TYPE));
+    } catch (ClassNotFoundException e) {
+      throw new RuntimeException(e);
+    }
+    Object reply = JSonMapper.fromJson(message.getPayload(), m);
+    handler.accept(data, reply);
   }
 
   private SagaActions<Data> makeEndStateSagaActions(SagaExecutionState state) {
