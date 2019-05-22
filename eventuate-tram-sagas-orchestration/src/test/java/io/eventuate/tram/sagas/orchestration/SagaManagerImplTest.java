@@ -1,7 +1,6 @@
 package io.eventuate.tram.sagas.orchestration;
 
 import io.eventuate.Int128;
-import io.eventuate.tram.commands.common.ChannelMapping;
 import io.eventuate.tram.commands.common.CommandReplyOutcome;
 import io.eventuate.tram.commands.common.ReplyMessageHeaders;
 import io.eventuate.tram.commands.consumer.CommandWithDestination;
@@ -10,8 +9,8 @@ import io.eventuate.tram.messaging.common.Message;
 import io.eventuate.tram.messaging.consumer.MessageConsumer;
 import io.eventuate.tram.messaging.consumer.MessageHandler;
 import io.eventuate.tram.messaging.producer.MessageBuilder;
-import io.eventuate.tram.sagas.common.SagaReplyHeaders;
 import io.eventuate.tram.sagas.common.SagaLockManager;
+import io.eventuate.tram.sagas.common.SagaReplyHeaders;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -25,7 +24,6 @@ import org.mockito.junit.MockitoRule;
 import java.util.Collections;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertSame;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.*;
 
@@ -43,9 +41,6 @@ public class SagaManagerImplTest {
 
   @Mock
   private MessageConsumer messageConsumer;
-
-  @Mock
-  private ChannelMapping channelMapping;
 
   @Mock
   private SagaLockManager sagaLockManager;
@@ -100,7 +95,7 @@ public class SagaManagerImplTest {
   public void setUp() {
 
     sm = new SagaManagerImpl<>(testSaga, sagaInstanceRepository,
-            commandProducer, messageConsumer, channelMapping,
+            commandProducer, messageConsumer,
             sagaLockManager, sagaCommandProducer);
 
     initialSagaData = new TestSagaData("initialSagaData");
@@ -109,8 +104,6 @@ public class SagaManagerImplTest {
 
     when(testSaga.getSagaType()).thenReturn(sagaType);
     when(testSaga.getSagaDefinition()).thenReturn(sagaDefinition);
-
-    when(channelMapping.transform(anyString())).thenAnswer(invocation -> invocation.getArgument(0));
 
   }
 

@@ -3,7 +3,6 @@ package io.eventuate.examples.tram.sagas.ordersandcustomers.integrationtests;
 import io.eventuate.examples.tram.sagas.ordersandcustomers.orders.sagas.createorder.CreateOrderSaga;
 import io.eventuate.examples.tram.sagas.ordersandcustomers.orders.sagas.createorder.CreateOrderSagaCompletedSuccesfully;
 import io.eventuate.examples.tram.sagas.ordersandcustomers.orders.sagas.createorder.CreateOrderSagaRolledBack;
-import io.eventuate.tram.commands.common.ChannelMapping;
 import io.eventuate.tram.events.common.DomainEvent;
 import io.eventuate.tram.events.subscriber.DomainEventEnvelope;
 import io.eventuate.tram.events.subscriber.DomainEventHandlers;

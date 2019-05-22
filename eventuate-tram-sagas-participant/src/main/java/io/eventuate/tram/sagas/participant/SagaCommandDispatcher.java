@@ -1,12 +1,12 @@
 package io.eventuate.tram.sagas.participant;
 
-import io.eventuate.tram.commands.common.ChannelMapping;
 import io.eventuate.tram.commands.common.CommandMessageHeaders;
 import io.eventuate.tram.commands.consumer.CommandDispatcher;
 import io.eventuate.tram.commands.consumer.CommandHandler;
 import io.eventuate.tram.commands.consumer.CommandHandlers;
 import io.eventuate.tram.commands.consumer.CommandMessage;
 import io.eventuate.tram.commands.consumer.PathVariables;
+import io.eventuate.tram.messaging.common.ChannelMapping;
 import io.eventuate.tram.messaging.common.Message;
 import io.eventuate.tram.messaging.consumer.MessageConsumer;
 import io.eventuate.tram.messaging.producer.MessageBuilder;
@@ -25,14 +25,10 @@ public class SagaCommandDispatcher extends CommandDispatcher {
   @Autowired
   private SagaLockManager sagaLockManager;
 
-  public SagaCommandDispatcher(String commandDispatcherId, CommandHandlers target, ChannelMapping channelMapping,
+  public SagaCommandDispatcher(String commandDispatcherId, CommandHandlers target,
                                MessageConsumer messageConsumer, MessageProducer messageProducer, SagaLockManager sagaLockManager) {
-    super(commandDispatcherId, target, channelMapping, messageConsumer, messageProducer);
+    super(commandDispatcherId, target, messageConsumer, messageProducer);
     this.sagaLockManager = sagaLockManager;
-  }
-
-  public SagaCommandDispatcher(String commandDispatcherId, CommandHandlers target) {
-    super(commandDispatcherId, target);
   }
 
   @Override

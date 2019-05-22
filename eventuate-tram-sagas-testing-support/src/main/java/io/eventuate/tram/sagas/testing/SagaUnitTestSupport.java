@@ -67,14 +67,14 @@ public class SagaUnitTestSupport {
       String id = genId();
       message.getHeaders().put(Message.ID, id);
       sentCommands.add(new MessageWithDestination(destination, message));
-    }, new DefaultChannelMapping(Collections.emptyMap()));
+    });
 
     SagaCommandProducer sagaCommandProducer = new SagaCommandProducer(commandProducer);
 
     MessageConsumer messageConsumer = null;
     SagaLockManager sagaLockManager = null;
 
-    sagaManager = new SagaManagerImpl<>(saga, sagaInstanceRepository, commandProducer, messageConsumer, new DefaultChannelMapping(Collections.emptyMap()),
+    sagaManager = new SagaManagerImpl<>(saga, sagaInstanceRepository, commandProducer, messageConsumer,
             sagaLockManager, sagaCommandProducer);
 
 

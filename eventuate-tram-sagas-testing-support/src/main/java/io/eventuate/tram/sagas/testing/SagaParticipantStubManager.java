@@ -1,7 +1,6 @@
 package io.eventuate.tram.sagas.testing;
 
 import io.eventuate.javaclient.commonimpl.JSonMapper;
-import io.eventuate.tram.commands.common.ChannelMapping;
 import io.eventuate.tram.commands.common.Command;
 import io.eventuate.tram.commands.consumer.CommandMessage;
 import io.eventuate.tram.messaging.common.Message;
@@ -12,7 +11,6 @@ import io.eventuate.tram.sagas.testing.commandhandling.ReconfigurableCommandHand
 import io.eventuate.tram.sagas.testing.commandhandling.UnhandledMessageTrackingCommandDispatcher;
 
 import javax.annotation.PostConstruct;
-import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.function.Predicate;
@@ -31,12 +29,11 @@ public class SagaParticipantStubManager {
   private String currentCommandChannel;
 
 
-  public SagaParticipantStubManager(SagaParticipantChannels sagaParticipantChannels, ChannelMapping channelMapping, MessageConsumer messageConsumer, MessageProducer messageProducer) {
+  public SagaParticipantStubManager(SagaParticipantChannels sagaParticipantChannels, MessageConsumer messageConsumer, MessageProducer messageProducer) {
     this.commandChannels = sagaParticipantChannels.getChannels();
     this.commandHandlers = new ReconfigurableCommandHandlers(this.commandChannels);
     this.commandDispatcher = new UnhandledMessageTrackingCommandDispatcher("SagaParticipantStubManager-command-dispatcher-" + System.currentTimeMillis(),
             commandHandlers,
-            channelMapping,
             messageConsumer,
             messageProducer);
 

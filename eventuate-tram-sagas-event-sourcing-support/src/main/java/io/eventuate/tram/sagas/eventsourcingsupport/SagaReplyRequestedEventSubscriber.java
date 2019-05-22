@@ -4,7 +4,6 @@ import io.eventuate.DispatchedEvent;
 import io.eventuate.Event;
 import io.eventuate.SubscriberOptions;
 import io.eventuate.sync.EventuateAggregateStore;
-import io.eventuate.tram.commands.common.ChannelMapping;
 import io.eventuate.tram.commands.common.CommandMessageHeaders;
 import io.eventuate.tram.commands.consumer.CommandHandlerReplyBuilder;
 import io.eventuate.tram.messaging.common.Message;
@@ -22,9 +21,6 @@ import static java.util.Collections.singleton;
 import static java.util.stream.Collectors.toMap;
 
 public class SagaReplyRequestedEventSubscriber {
-
-  @Autowired
-  private ChannelMapping channelMapping;
 
   @Autowired
   private MessageProducer messageProducer;
@@ -53,7 +49,7 @@ public class SagaReplyRequestedEventSubscriber {
   public CompletableFuture<Object> sendReply(DispatchedEvent<Event> de) {
     SagaReplyRequestedEvent event = (SagaReplyRequestedEvent) de.getEvent();
     Message reply = CommandHandlerReplyBuilder.withSuccess();
-    messageProducer.send(channelMapping.transform(event.getCorrelationHeaders().get(CommandMessageHeaders.inReply(CommandMessageHeaders.REPLY_TO))),
+    messageProducer.send(event.getCorrelationHeaders().get(CommandMessageHeaders.inReply(CommandMessageHeaders.REPLY_TO)),
             MessageBuilder
                     .withMessage(reply)
                     .withExtraHeaders("", event.getCorrelationHeaders())

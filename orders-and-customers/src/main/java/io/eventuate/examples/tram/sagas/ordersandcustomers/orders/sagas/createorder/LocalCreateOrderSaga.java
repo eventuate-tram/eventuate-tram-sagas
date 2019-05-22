@@ -7,8 +7,8 @@ import io.eventuate.examples.tram.sagas.ordersandcustomers.orders.sagas.particip
 import io.eventuate.examples.tram.sagas.ordersandcustomers.orders.sagas.participants.ReserveCreditCommand;
 import io.eventuate.examples.tram.sagas.ordersandcustomers.orders.service.RejectOrderCommand;
 import io.eventuate.tram.commands.consumer.CommandWithDestination;
-import io.eventuate.tram.events.ResultWithEvents;
 import io.eventuate.tram.events.publisher.DomainEventPublisher;
+import io.eventuate.tram.events.publisher.ResultWithEvents;
 import io.eventuate.tram.sagas.orchestration.SagaDefinition;
 import io.eventuate.tram.sagas.simpledsl.SimpleSaga;
 import org.springframework.beans.factory.annotation.Autowired;
