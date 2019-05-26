@@ -5,6 +5,7 @@ import io.eventuate.examples.tram.sagas.ordersandcustomers.orders.OrderConfigura
 import io.eventuate.examples.tram.sagas.ordersandcustomers.orders.sagas.createorder.CreateOrderSaga;
 import io.eventuate.tram.events.subscriber.DomainEventDispatcher;
 import io.eventuate.tram.events.subscriber.DomainEventDispatcherFactory;
+import io.eventuate.tram.events.subscriber.TramEventSubscriberConfiguration;
 import io.eventuate.tram.messaging.common.ChannelMapping;
 import io.eventuate.tram.messaging.common.DefaultChannelMapping;
 import io.eventuate.tram.messaging.consumer.MessageConsumer;
@@ -24,6 +25,7 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
         OrderConfiguration.class,
         CustomerConfiguration.class,
         TramEventsPublisherConfiguration.class,
+        TramEventSubscriberConfiguration.class,
         TramCommandProducerConfiguration.class,
         SagaOrchestratorConfiguration.class
 

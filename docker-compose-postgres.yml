@@ -1,13 +1,13 @@
 version: "3"
 services:
   zookeeper:
-    image: eventuateio/eventuateio-local-zookeeper:$EVENTUATE_LOCAL_VERSION
+    image: eventuateio/eventuateio-local-zookeeper:$EVENTUATE_LOCAL_IMAGE_VERSION
     ports:
       - 2181:2181
 
 
   kafka:
-    image: eventuateio/eventuateio-local-kafka:$EVENTUATE_LOCAL_VERSION
+    image: eventuateio/eventuateio-local-kafka:$EVENTUATE_LOCAL_IMAGE_VERSION
     ports:
       - 9092:9092
     depends_on:
@@ -21,8 +21,8 @@ services:
     build:
       context: ./postgres
       args:
-        EVENTUATE_TRAM_VERSION: "$EVENTUATE_TRAM_VERSION"
-        EVENTUATE_LOCAL_VERSION: "$EVENTUATE_LOCAL_VERSION"
+        EVENTUATE_TRAM_IMAGE_VERSION: "$EVENTUATE_TRAM_IMAGE_VERSION"
+        EVENTUATE_LOCAL_IMAGE_VERSION: "$EVENTUATE_LOCAL_IMAGE_VERSION"
     ports:
       - 5432:5432
     environment:
@@ -30,7 +30,7 @@ services:
       POSTGRES_PASSWORD: eventuate
 
   cdcservice:
-    image: eventuateio/eventuate-tram-cdc-mysql-service:$EVENTUATE_TRAM_VERSION
+    image: eventuateio/eventuate-tram-cdc-mysql-service:$EVENTUATE_TRAM_IMAGE_VERSION
     ports:
       - "8099:8080"
     depends_on:
