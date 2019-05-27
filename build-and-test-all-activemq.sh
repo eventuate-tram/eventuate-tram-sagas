@@ -5,19 +5,7 @@ set -e
 . ./set-env-mysql.sh
 
 export SPRING_PROFILES_ACTIVE=ActiveMQ
+export database=mysql
+export target=activemq
 
-./gradlew testClasses
-
-./gradlew mysqlAllComposeDown
-
-./gradlew activemqInfrastructureComposeBuild
-
-./gradlew activemqInfrastructureComposeUp
-
-./wait-for-mysql.sh
-
-./gradlew mysqlAllComposeUp
-
-./gradlew :orders-and-customers:cleanTest build
-
-./gradlew mysqlAllComposeDown
+./_build-and-test-all.sh

@@ -4,18 +4,7 @@ set -e
 
 . ./set-env-mysql.sh
 
-./gradlew testClasses
+export database=mysql
+export target=mysql
 
-./gradlew mysqlAllComposeDown
-
-./gradlew mysqlInfrastructureComposeBuild
-
-./gradlew mysqlInfrastructureComposeUp
-
-./wait-for-mysql.sh
-
-./gradlew mysqlAllComposeUp
-
-./gradlew :orders-and-customers:cleanTest build
-
-./gradlew mysqlAllComposeDown
+./_build-and-test-all.sh
