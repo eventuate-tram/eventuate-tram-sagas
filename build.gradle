@@ -92,6 +92,11 @@ dockerCompose {
     environment.put "EVENTUATE_TRAM_VERSION", eventuateTramVersion
     environment.put "EVENTUATE_LOCAL_VERSION", eventuateLocalVersion
 
+    activemqInfrastructure {
+        projectName = null
+        useComposeFiles = ["docker-compose-mysql.yml"]
+        startedServices = ["mysql", "activemq"]
+    }
     mysqlInfrastructure {
         projectName = null
         useComposeFiles = ["docker-compose-mysql.yml"]

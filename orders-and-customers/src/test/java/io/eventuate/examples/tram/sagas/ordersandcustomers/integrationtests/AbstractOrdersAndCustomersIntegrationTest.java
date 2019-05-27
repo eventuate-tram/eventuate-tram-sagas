@@ -15,6 +15,8 @@ import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.support.TransactionTemplate;
 
+import java.util.concurrent.TimeUnit;
+
 import static org.junit.Assert.assertEquals;
 
 public abstract class AbstractOrdersAndCustomersIntegrationTest {
@@ -80,7 +82,7 @@ public abstract class AbstractOrdersAndCustomersIntegrationTest {
 
   private void assertOrderState(Long id, OrderState expectedState) {
 
-    Eventually.eventually(() -> {
+    Eventually.eventually(120, 500, TimeUnit.MILLISECONDS, () -> {
       Order order = transactionTemplate.execute(s -> orderRepository.findById(id).get());
       assertEquals(expectedState, order.getState());
     });

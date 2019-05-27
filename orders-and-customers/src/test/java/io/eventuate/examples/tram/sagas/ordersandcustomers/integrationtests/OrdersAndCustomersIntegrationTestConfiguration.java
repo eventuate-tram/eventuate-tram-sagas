@@ -5,6 +5,6 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 
 @Configuration
-@Import({OrdersAndCustomersIntegrationCommonIntegrationTestConfiguration.class, TramJdbcKafkaConfiguration.class})
+@Import({OrdersAndCustomersIntegrationCommonIntegrationTestConfiguration.class, KafkaConfiguration.class, ActiveMQConfiguration.class})
 public class OrdersAndCustomersIntegrationTestConfiguration {
 }
