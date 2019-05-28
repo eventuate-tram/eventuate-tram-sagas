@@ -30,7 +30,7 @@ services:
     build:
       context: ./mysql
       args:
-        EVENTUATE_TRAM_VERSION: "0.20.0.RELEASE"
+        EVENTUATE_TRAM_VERSION: "$EVENTUATE_TRAM_VERSION"
         EVENTUATE_LOCAL_VERSION: "$EVENTUATE_LOCAL_VERSION"
     ports:
       - 3306:3306
@@ -40,7 +40,7 @@ services:
       - MYSQL_PASSWORD=mysqlpw
 
   cdcservice:
-    image: eventuateio/eventuate-tram-cdc-mysql-service:0.20.0.RELEASE
+    image: eventuateio/eventuate-tram-cdc-mysql-service:$EVENTUATE_TRAM_VERSION
     ports:
       - "8099:8080"
     depends_on:

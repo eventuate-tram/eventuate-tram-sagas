@@ -21,7 +21,7 @@ services:
     build:
       context: ./postgres
       args:
-        EVENTUATE_TRAM_VERSION: "0.20.0.RELEASE"
+        EVENTUATE_TRAM_VERSION: "$EVENTUATE_TRAM_VERSION"
         EVENTUATE_LOCAL_VERSION: "$EVENTUATE_LOCAL_VERSION"
     ports:
       - 5432:5432
@@ -30,7 +30,7 @@ services:
       POSTGRES_PASSWORD: eventuate
 
   cdcservice:
-    image: eventuateio/eventuate-tram-cdc-mysql-service:0.20.0.RELEASE
+    image: eventuateio/eventuate-tram-cdc-mysql-service:$EVENTUATE_TRAM_VERSION
     ports:
       - "8099:8080"
     depends_on:
