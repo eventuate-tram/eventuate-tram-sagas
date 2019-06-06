@@ -1,6 +1,6 @@
 package io.eventuate.tram.sagas.simpledsl;
 
-import io.eventuate.javaclient.commonimpl.JSonMapper;
+import io.eventuate.common.json.mapper.JSonMapper;
 
 public class SagaExecutionStateJsonSerde {
   static SagaExecutionState decodeState(String currentState) {

@@ -3,11 +3,12 @@ package io.eventuate.examples.tram.sagas.ordersandcustomers.integrationtests;
 import io.eventuate.examples.tram.sagas.ordersandcustomers.customers.CustomerConfiguration;
 import io.eventuate.examples.tram.sagas.ordersandcustomers.orders.OrderConfiguration;
 import io.eventuate.examples.tram.sagas.ordersandcustomers.orders.sagas.createorder.CreateOrderSaga;
+import io.eventuate.tram.events.common.DefaultDomainEventNameMapping;
 import io.eventuate.tram.events.subscriber.DomainEventDispatcher;
+import io.eventuate.tram.messaging.common.ChannelMapping;
+import io.eventuate.tram.messaging.common.DefaultChannelMapping;
 import io.eventuate.tram.messaging.consumer.MessageConsumer;
 import io.eventuate.tram.sagas.orchestration.SagaOrchestratorConfiguration;
-import io.eventuate.tram.commands.common.ChannelMapping;
-import io.eventuate.tram.commands.common.DefaultChannelMapping;
 import io.eventuate.tram.commands.producer.TramCommandProducerConfiguration;
 import io.eventuate.tram.events.publisher.TramEventsPublisherConfiguration;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
@@ -53,7 +54,8 @@ public class OrdersAndCustomersIntegrationCommonIntegrationTestConfiguration {
   public DomainEventDispatcher domainEventDispatcher(TramCommandsAndEventsIntegrationData tramCommandsAndEventsIntegrationData, SagaEventsConsumer sagaEventsConsumer, MessageConsumer messageConsumer) {
     return new DomainEventDispatcher(tramCommandsAndEventsIntegrationData.getEventDispatcherId(),
             sagaEventsConsumer.domainEventHandlers(),
-            messageConsumer);
+            messageConsumer,
+            new DefaultDomainEventNameMapping());
   }
 
 }

@@ -9,6 +9,9 @@ import io.eventuate.examples.tram.sagas.ordersandcustomers.orders.service.OrderC
 import io.eventuate.examples.tram.sagas.ordersandcustomers.orders.service.OrderService;
 import io.eventuate.tram.commands.consumer.CommandDispatcher;
 import io.eventuate.tram.events.publisher.DomainEventPublisher;
+import io.eventuate.tram.messaging.consumer.MessageConsumer;
+import io.eventuate.tram.messaging.producer.MessageProducer;
+import io.eventuate.tram.sagas.common.SagaLockManager;
 import io.eventuate.tram.sagas.orchestration.Saga;
 import io.eventuate.tram.sagas.orchestration.SagaManager;
 import io.eventuate.tram.sagas.orchestration.SagaManagerImpl;
@@ -56,8 +59,15 @@ public class OrderConfiguration {
   }
 
   @Bean
-  public CommandDispatcher orderCommandDispatcher(OrderCommandHandler target) {
-    return new SagaCommandDispatcher("orderCommandDispatcher", target.commandHandlerDefinitions());
+  public CommandDispatcher orderCommandDispatcher(OrderCommandHandler target,
+                                                  MessageConsumer messageConsumer,
+                                                  MessageProducer messageProducer,
+                                                  SagaLockManager sagaLockManager) {
+    return new SagaCommandDispatcher("orderCommandDispatcher",
+            target.commandHandlerDefinitions(),
+            messageConsumer,
+            messageProducer,
+            sagaLockManager);
   }
 
 }

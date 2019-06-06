@@ -1,7 +1,7 @@
 package io.eventuate.tram.sagas.orchestration;
 
-import io.eventuate.javaclient.spring.jdbc.EventuateSchema;
-import io.eventuate.javaclient.spring.jdbc.IdGenerator;
+import io.eventuate.common.id.IdGenerator;
+import io.eventuate.common.jdbc.EventuateSchema;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

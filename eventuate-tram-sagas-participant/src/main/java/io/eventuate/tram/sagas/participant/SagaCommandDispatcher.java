@@ -1,6 +1,5 @@
 package io.eventuate.tram.sagas.participant;
 
-import io.eventuate.tram.commands.common.ChannelMapping;
 import io.eventuate.tram.commands.common.CommandMessageHeaders;
 import io.eventuate.tram.commands.consumer.CommandDispatcher;
 import io.eventuate.tram.commands.consumer.CommandHandler;
@@ -22,17 +21,15 @@ import java.util.stream.Collectors;
 
 public class SagaCommandDispatcher extends CommandDispatcher {
 
-  @Autowired
   private SagaLockManager sagaLockManager;
 
-  public SagaCommandDispatcher(String commandDispatcherId, CommandHandlers target, ChannelMapping channelMapping,
-                               MessageConsumer messageConsumer, MessageProducer messageProducer, SagaLockManager sagaLockManager) {
-    super(commandDispatcherId, target, channelMapping, messageConsumer, messageProducer);
+  public SagaCommandDispatcher(String commandDispatcherId,
+                               CommandHandlers target,
+                               MessageConsumer messageConsumer,
+                               MessageProducer messageProducer,
+                               SagaLockManager sagaLockManager) {
+    super(commandDispatcherId, target, messageConsumer, messageProducer);
     this.sagaLockManager = sagaLockManager;
-  }
-
-  public SagaCommandDispatcher(String commandDispatcherId, CommandHandlers target) {
-    super(commandDispatcherId, target);
   }
 
   @Override

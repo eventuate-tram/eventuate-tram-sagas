@@ -2,6 +2,7 @@ package io.eventuate.tram.sagas.orchestration;
 
 import io.eventuate.tram.commands.common.*;
 import io.eventuate.tram.commands.producer.CommandProducer;
+import io.eventuate.tram.messaging.common.ChannelMapping;
 import io.eventuate.tram.messaging.common.Message;
 import io.eventuate.tram.messaging.consumer.MessageConsumer;
 import io.eventuate.tram.messaging.producer.MessageBuilder;

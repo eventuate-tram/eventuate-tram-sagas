@@ -1,6 +1,6 @@
 package io.eventuate.tram.sagas.orchestration;
 
-import io.eventuate.javaclient.spring.jdbc.EventuateSchema;
+import io.eventuate.common.jdbc.EventuateSchema;
 import io.eventuate.tram.commands.producer.CommandProducer;
 import io.eventuate.tram.commands.producer.TramCommandProducerConfiguration;
 import io.eventuate.tram.jdbc.CommonJdbcMessagingConfiguration;
