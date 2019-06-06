@@ -75,7 +75,7 @@ public class SagaUnitTestSupport {
     MessageConsumer messageConsumer = null;
     SagaLockManager sagaLockManager = null;
 
-    sagaManager = new SagaManagerImpl<>(saga, sagaInstanceRepository, commandProducer, messageConsumer, new DefaultChannelMapping(Collections.emptyMap()),
+    sagaManager = new SagaManagerImpl<>(saga, sagaInstanceRepository, commandProducer, messageConsumer,
             sagaLockManager, sagaCommandProducer);
 
 

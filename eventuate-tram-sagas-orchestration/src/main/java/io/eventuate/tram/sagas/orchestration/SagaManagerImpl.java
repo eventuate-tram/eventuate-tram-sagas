@@ -37,9 +37,6 @@ public class SagaManagerImpl<Data>
   private MessageConsumer messageConsumer;
 
 
-  @Autowired
-  private ChannelMapping channelMapping;
-
   private Saga<Data> saga;
 
   public SagaManagerImpl(Saga<Data> saga) {
@@ -47,13 +44,12 @@ public class SagaManagerImpl<Data>
   }
 
   public SagaManagerImpl(Saga<Data> saga, SagaInstanceRepository sagaInstanceRepository, CommandProducer
-          commandProducer, MessageConsumer messageConsumer, ChannelMapping channelMapping,
+          commandProducer, MessageConsumer messageConsumer,
                          SagaLockManager sagaLockManager, SagaCommandProducer sagaCommandProducer) {
     this.saga = saga;
     this.sagaInstanceRepository = sagaInstanceRepository;
     this.commandProducer = commandProducer;
     this.messageConsumer = messageConsumer;
-    this.channelMapping = channelMapping;
     this.sagaLockManager = sagaLockManager;
     this.sagaCommandProducer = sagaCommandProducer;
   }
@@ -83,10 +79,6 @@ public class SagaManagerImpl<Data>
     this.messageConsumer = messageConsumer;
   }
 
-
-  public void setChannelMapping(ChannelMapping channelMapping) {
-    this.channelMapping = channelMapping;
-  }
 
   public void setSagaLockManager(SagaLockManager sagaLockManager) {
     this.sagaLockManager = sagaLockManager;
@@ -160,7 +152,7 @@ public class SagaManagerImpl<Data>
 
   @PostConstruct
   public void subscribeToReplyChannel() {
-    messageConsumer.subscribe(saga.getSagaType() + "-consumer", singleton(channelMapping.transform(makeSagaReplyChannel())),
+    messageConsumer.subscribe(saga.getSagaType() + "-consumer", singleton(makeSagaReplyChannel()),
             this::handleMessage);
   }
 

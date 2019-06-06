@@ -3,10 +3,9 @@ package io.eventuate.examples.tram.sagas.ordersandcustomers.customers;
 import io.eventuate.examples.tram.sagas.ordersandcustomers.customers.service.CustomerCommandHandler;
 import io.eventuate.examples.tram.sagas.ordersandcustomers.customers.service.CustomerService;
 import io.eventuate.tram.commands.consumer.CommandDispatcher;
-import io.eventuate.tram.messaging.consumer.MessageConsumer;
-import io.eventuate.tram.messaging.producer.MessageProducer;
 import io.eventuate.tram.sagas.participant.SagaCommandDispatcher;
 import io.eventuate.tram.sagas.common.SagaLockManager;
+import io.eventuate.tram.sagas.participant.SagaCommandDispatcherFactory;
 import io.eventuate.tram.sagas.participant.SagaParticipantConfiguration;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.context.annotation.Bean;
@@ -34,15 +33,9 @@ public class CustomerConfiguration {
 
   @Bean
   public CommandDispatcher consumerCommandDispatcher(CustomerCommandHandler target,
-                                                     SagaLockManager sagaLockManager,
-                                                     MessageConsumer messageConsumer,
-                                                     MessageProducer messageProducer) {
+                                                     SagaLockManager sagaLockManager, SagaCommandDispatcherFactory sagaCommandDispatcherFactory) {
 
-    return new SagaCommandDispatcher("customerCommandDispatcher",
-            target.commandHandlerDefinitions(),
-            messageConsumer,
-            messageProducer,
-            sagaLockManager);
+    return sagaCommandDispatcherFactory.make("customerCommandDispatcher", target.commandHandlerDefinitions());
   }
 
 }

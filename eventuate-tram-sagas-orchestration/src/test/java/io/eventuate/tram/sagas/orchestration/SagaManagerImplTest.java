@@ -99,7 +99,7 @@ public class SagaManagerImplTest {
   public void setUp() {
 
     sm = new SagaManagerImpl<>(testSaga, sagaInstanceRepository,
-            commandProducer, messageConsumer, channelMapping,
+            commandProducer, messageConsumer,
             sagaLockManager, sagaCommandProducer);
 
     initialSagaData = new TestSagaData("initialSagaData");
