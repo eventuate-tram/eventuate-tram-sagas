@@ -90,8 +90,8 @@ gradle.projectsEvaluated {
 
 
 dockerCompose {
-    environment.put "EVENTUATE_TRAM_IMAGE_VERSION", eventuateTramImageVersion
-    environment.put "EVENTUATE_LOCAL_IMAGE_VERSION", eventuateLocalImageVersion
+    environment.put "EVENTUATE_COMMON_VERSION", eventuateCommonImageVersion
+    environment.put "EVENTUATE_KAFKA_VERSION", eventuateMessagingKafkaImageVersion
 
     activemqInfrastructure {
         projectName = null

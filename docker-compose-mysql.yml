@@ -1,13 +1,13 @@
 version: "3"
 services:
   zookeeper:
-    image: test-eventuate-zookeeper
+    image: eventuateio/eventuate-zookeeper:$EVENTUATE_COMMON_VERSION
     ports:
       - 2181:2181
 
 
   kafka:
-    image: test-eventuate-kafka
+    image: eventuateio/eventuate-kafka:$EVENTUATE_KAFKA_VERSION
     ports:
       - 9092:9092
     depends_on:
@@ -30,8 +30,7 @@ services:
     build:
       context: ./mysql
       args:
-        EVENTUATE_TRAM_VERSION: "$EVENTUATE_TRAM_VERSION"
-        EVENTUATE_LOCAL_VERSION: "$EVENTUATE_LOCAL_VERSION"
+        EVENTUATE_COMMON_VERSION: "$EVENTUATE_COMMON_VERSION"
     ports:
       - 3306:3306
     environment:
@@ -40,7 +39,7 @@ services:
       - MYSQL_PASSWORD=mysqlpw
 
   cdcservice:
-    image: test-eventuate-cdc-service
+    image: eventuateio/eventuate-cdc-service:0.2.0.RELEASE
     ports:
       - "8099:8080"
     depends_on:
