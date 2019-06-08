@@ -34,6 +34,7 @@ subprojects {
         maven {
             url  "https://dl.bintray.com/eventuateio-oss/eventuate-maven-release"
         }
+        maven { url "https://repo.spring.io/milestone" }
         eventuateMavenRepoUrl.split(',').each { repoUrl -> maven { url repoUrl } }
     }
 
@@ -89,9 +90,14 @@ gradle.projectsEvaluated {
 
 
 dockerCompose {
-    environment.put "EVENTUATE_TRAM_VERSION", eventuateTramVersion
-    environment.put "EVENTUATE_LOCAL_VERSION", eventuateLocalVersion
+    environment.put "EVENTUATE_COMMON_VERSION", eventuateCommonImageVersion
+    environment.put "EVENTUATE_KAFKA_VERSION", eventuateMessagingKafkaImageVersion
 
+    activemqInfrastructure {
+        projectName = null
+        useComposeFiles = ["docker-compose-mysql.yml"]
+        startedServices = ["mysql", "activemq"]
+    }
     mysqlInfrastructure {
         projectName = null
         useComposeFiles = ["docker-compose-mysql.yml"]

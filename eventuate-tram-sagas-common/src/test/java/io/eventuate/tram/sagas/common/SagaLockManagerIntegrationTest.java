@@ -1,6 +1,6 @@
 package io.eventuate.tram.sagas.common;
 
-import io.eventuate.javaclient.spring.jdbc.IdGenerator;
+import io.eventuate.common.id.IdGenerator;
 import io.eventuate.tram.messaging.common.Message;
 import io.eventuate.tram.messaging.producer.MessageBuilder;
 import org.junit.Test;

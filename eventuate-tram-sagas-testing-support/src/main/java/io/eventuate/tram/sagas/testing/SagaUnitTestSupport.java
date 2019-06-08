@@ -1,8 +1,9 @@
 package io.eventuate.tram.sagas.testing;
 
-import io.eventuate.javaclient.commonimpl.JSonMapper;
+import io.eventuate.common.json.mapper.JSonMapper;
 import io.eventuate.tram.commands.common.*;
 import io.eventuate.tram.commands.producer.CommandProducerImpl;
+import io.eventuate.tram.messaging.common.DefaultChannelMapping;
 import io.eventuate.tram.messaging.common.Message;
 import io.eventuate.tram.messaging.consumer.MessageConsumer;
 import io.eventuate.tram.messaging.producer.MessageBuilder;
@@ -67,14 +68,14 @@ public class SagaUnitTestSupport {
       String id = genId();
       message.getHeaders().put(Message.ID, id);
       sentCommands.add(new MessageWithDestination(destination, message));
-    }, new DefaultChannelMapping(Collections.emptyMap()));
+    });
 
     SagaCommandProducer sagaCommandProducer = new SagaCommandProducer(commandProducer);
 
     MessageConsumer messageConsumer = null;
     SagaLockManager sagaLockManager = null;
 
-    sagaManager = new SagaManagerImpl<>(saga, sagaInstanceRepository, commandProducer, messageConsumer, new DefaultChannelMapping(Collections.emptyMap()),
+    sagaManager = new SagaManagerImpl<>(saga, sagaInstanceRepository, commandProducer, messageConsumer,
             sagaLockManager, sagaCommandProducer);
 
 

@@ -1,6 +1,5 @@
 package io.eventuate.tram.sagas.testing;
 
-import io.eventuate.tram.commands.common.ChannelMapping;
 import io.eventuate.tram.commands.producer.TramCommandProducerConfiguration;
 import io.eventuate.tram.events.publisher.TramEventsPublisherConfiguration;
 import io.eventuate.tram.messaging.consumer.MessageConsumer;
@@ -14,8 +13,8 @@ import org.springframework.context.annotation.Import;
 public class SagaParticipantStubManagerConfiguration {
 
   @Bean
-  public SagaParticipantStubManager sagaParticipantStubManager(SagaParticipantChannels sagaParticipantChannels, ChannelMapping channelMapping, MessageConsumer messageConsumer, MessageProducer messageProducer) {
-    return new SagaParticipantStubManager(sagaParticipantChannels, channelMapping, messageConsumer, messageProducer);
+  public SagaParticipantStubManager sagaParticipantStubManager(SagaParticipantChannels sagaParticipantChannels, MessageConsumer messageConsumer, MessageProducer messageProducer) {
+    return new SagaParticipantStubManager(sagaParticipantChannels, messageConsumer, messageProducer);
   }
 
 }

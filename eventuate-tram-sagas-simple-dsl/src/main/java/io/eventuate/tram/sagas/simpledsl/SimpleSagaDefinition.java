@@ -1,6 +1,6 @@
 package io.eventuate.tram.sagas.simpledsl;
 
-import io.eventuate.javaclient.commonimpl.JSonMapper;
+import io.eventuate.common.json.mapper.JSonMapper;
 import io.eventuate.tram.commands.common.ReplyMessageHeaders;
 import io.eventuate.tram.messaging.common.Message;
 import io.eventuate.tram.sagas.orchestration.SagaActions;

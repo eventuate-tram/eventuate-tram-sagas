@@ -4,18 +4,7 @@ set -e
 
 . ./set-env-postgres.sh
 
-./gradlew testClasses
+export database=postgres
+export target=postgres
 
-./gradlew postgresAllComposeDown
-
-./gradlew postgresInfrastructureComposeBuild
-
-./gradlew postgresInfrastructureComposeUp
-
-./wait-for-postgres.sh
-
-./gradlew postgresAllComposeUp
-
-./gradlew :orders-and-customers:cleanTest build
-
-./gradlew postgresAllComposeDown
+./_build-and-test-all.sh

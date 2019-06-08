@@ -1,7 +1,7 @@
 package io.eventuate.tram.sagas.orchestration;
 
 
-import io.eventuate.javaclient.commonimpl.JSonMapper;
+import io.eventuate.common.json.mapper.JSonMapper;
 
 public class SagaDataSerde {
 

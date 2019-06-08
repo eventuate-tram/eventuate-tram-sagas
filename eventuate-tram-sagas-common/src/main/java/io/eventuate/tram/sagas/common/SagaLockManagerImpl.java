@@ -1,7 +1,7 @@
 package io.eventuate.tram.sagas.common;
 
-import io.eventuate.javaclient.commonimpl.JSonMapper;
-import io.eventuate.javaclient.spring.jdbc.EventuateSchema;
+import io.eventuate.common.jdbc.EventuateSchema;
+import io.eventuate.common.json.mapper.JSonMapper;
 import io.eventuate.tram.messaging.common.Message;
 import io.eventuate.tram.messaging.producer.MessageBuilder;
 import org.slf4j.Logger;

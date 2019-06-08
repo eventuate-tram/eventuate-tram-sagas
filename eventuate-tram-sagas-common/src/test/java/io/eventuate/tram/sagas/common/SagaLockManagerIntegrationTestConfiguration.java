@@ -1,9 +1,7 @@
 package io.eventuate.tram.sagas.common;
 
-import io.eventuate.javaclient.spring.jdbc.IdGenerator;
-import io.eventuate.javaclient.spring.jdbc.IdGeneratorImpl;
-import io.eventuate.tram.sagas.common.SagaLockManager;
-import io.eventuate.tram.sagas.common.SagaLockManagerImpl;
+import io.eventuate.common.id.IdGenerator;
+import io.eventuate.common.id.IdGeneratorImpl;
 import io.eventuate.tram.sagas.inmemory.TramSagaInMemoryConfiguration;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.context.annotation.Bean;

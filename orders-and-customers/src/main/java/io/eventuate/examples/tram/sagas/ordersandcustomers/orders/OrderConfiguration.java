@@ -8,19 +8,24 @@ import io.eventuate.examples.tram.sagas.ordersandcustomers.orders.sagas.createor
 import io.eventuate.examples.tram.sagas.ordersandcustomers.orders.service.OrderCommandHandler;
 import io.eventuate.examples.tram.sagas.ordersandcustomers.orders.service.OrderService;
 import io.eventuate.tram.commands.consumer.CommandDispatcher;
+import io.eventuate.tram.commands.consumer.TramCommandConsumerConfiguration;
 import io.eventuate.tram.events.publisher.DomainEventPublisher;
 import io.eventuate.tram.sagas.orchestration.Saga;
 import io.eventuate.tram.sagas.orchestration.SagaManager;
 import io.eventuate.tram.sagas.orchestration.SagaManagerImpl;
 import io.eventuate.tram.sagas.participant.SagaCommandDispatcher;
+import io.eventuate.tram.sagas.participant.SagaCommandDispatcherFactory;
+import io.eventuate.tram.sagas.participant.SagaParticipantConfiguration;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Import;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
 @Configuration
 @EnableJpaRepositories
 @EnableAutoConfiguration
+@Import({TramCommandConsumerConfiguration.class, SagaParticipantConfiguration.class})
 public class OrderConfiguration {
 
   @Bean
@@ -56,8 +61,8 @@ public class OrderConfiguration {
   }
 
   @Bean
-  public CommandDispatcher orderCommandDispatcher(OrderCommandHandler target) {
-    return new SagaCommandDispatcher("orderCommandDispatcher", target.commandHandlerDefinitions());
+  public CommandDispatcher orderCommandDispatcher(OrderCommandHandler target, SagaCommandDispatcherFactory sagaCommandDispatcherFactory) {
+    return sagaCommandDispatcherFactory.make("orderCommandDispatcher", target.commandHandlerDefinitions());
   }
 
 }

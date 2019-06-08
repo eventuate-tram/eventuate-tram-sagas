@@ -1,13 +1,13 @@
 version: "3"
 services:
   zookeeper:
-    image: eventuateio/eventuateio-local-zookeeper:$EVENTUATE_LOCAL_VERSION
+    image: eventuateio/eventuate-zookeeper:$EVENTUATE_COMMON_VERSION
     ports:
       - 2181:2181
 
 
   kafka:
-    image: eventuateio/eventuateio-local-kafka:$EVENTUATE_LOCAL_VERSION
+    image: eventuateio/eventuate-kafka:$EVENTUATE_KAFKA_VERSION
     ports:
       - 9092:9092
     depends_on:
@@ -17,13 +17,20 @@ services:
       - KAFKA_HEAP_OPTS=-Xmx320m -Xms320m
       - ZOOKEEPER_SERVERS=zookeeper:2181
 
+  activemq:
+    image: webcenter/activemq:5.14.3
+    ports:
+      - 8161:8161
+      - 61616:61616
+      - 61613:61613
+      - 1883:1883
+      - 61614:61614
 
   mysql:
     build:
       context: ./mysql
       args:
-        EVENTUATE_TRAM_VERSION: "$EVENTUATE_TRAM_VERSION"
-        EVENTUATE_LOCAL_VERSION: "$EVENTUATE_LOCAL_VERSION"
+        EVENTUATE_COMMON_VERSION: "$EVENTUATE_COMMON_VERSION"
     ports:
       - 3306:3306
     environment:
@@ -32,12 +39,13 @@ services:
       - MYSQL_PASSWORD=mysqlpw
 
   cdcservice:
-    image: eventuateio/eventuate-tram-cdc-mysql-service:$EVENTUATE_TRAM_VERSION
+    image: eventuateio/eventuate-cdc-service:0.2.0.RELEASE
     ports:
       - "8099:8080"
     depends_on:
       - mysql
       - kafka
+      - activemq
       - zookeeper
     environment:
       SPRING_DATASOURCE_URL: jdbc:mysql://mysql/eventuate
@@ -54,3 +62,5 @@ services:
       EVENTUATELOCAL_CDC_READ_OLD_DEBEZIUM_DB_OFFSET_STORAGE_TOPIC: "false"
       EVENTUATELOCAL_CDC_READER_NAME: ClientEventuateTram
       EVENTUATELOCAL_CDC_MYSQL_BINLOG_CLIENT_UNIQUE_ID: 2
+      ACTIVEMQ_URL: tcp://activemq:61616
+      SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE}

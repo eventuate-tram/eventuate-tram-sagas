@@ -1,7 +1,5 @@
 package io.eventuate.tram.sagas.orchestration;
 
-import io.eventuate.javaclient.spring.jdbc.EventuateSchema;
-import io.eventuate.tram.sagas.orchestration.SagaInstanceRepositoryJdbc;
 import org.junit.Assert;
 import org.junit.Test;
 
