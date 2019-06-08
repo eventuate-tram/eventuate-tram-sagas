@@ -6,7 +6,9 @@ jobs:
     steps:
       - checkout
       - restore_cache:
-          key: eventuate-tram-sagas-{{ checksum "gradle.properties" }}
+          keys:
+            - eventuate-tram-sagas-{{ checksum "gradle.properties" }}
+            - eventuate-tram-sagas-
       - run: TERM=dumb ./gradlew testClasses
       - save_cache:
           paths:
