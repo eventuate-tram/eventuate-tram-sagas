@@ -6,7 +6,7 @@ public class SagaLockManagerImplDefaultSchemaTest extends SagaLockManagerImplSch
 
   @Override
   protected SagaLockManagerImpl getSagaLockManager() {
-    return new SagaLockManagerImpl();
+    return new SagaLockManagerImpl(new EventuateSchema());
   }
 
   @Override

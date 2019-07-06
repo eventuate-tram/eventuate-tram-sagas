@@ -31,10 +31,6 @@ public class SagaLockManagerImpl implements SagaLockManager {
   private String deleteFromSagaLockTableSql;
   private String deleteFromSagaStashTableSql;
 
-  public SagaLockManagerImpl() {
-    this(new EventuateSchema());
-  }
-
   public SagaLockManagerImpl(EventuateSchema eventuateSchema) {
     String sagaLockTable = eventuateSchema.qualifyTable("saga_lock_table");
     String sagaStashTable = eventuateSchema.qualifyTable("saga_stash_table");

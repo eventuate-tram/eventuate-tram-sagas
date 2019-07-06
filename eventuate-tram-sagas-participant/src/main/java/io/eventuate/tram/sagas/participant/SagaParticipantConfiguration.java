@@ -1,5 +1,6 @@
 package io.eventuate.tram.sagas.participant;
 
+import io.eventuate.common.jdbc.EventuateSchema;
 import io.eventuate.tram.messaging.consumer.MessageConsumer;
 import io.eventuate.tram.messaging.producer.MessageProducer;
 import io.eventuate.tram.sagas.common.SagaLockManager;
@@ -11,8 +12,8 @@ import org.springframework.context.annotation.Configuration;
 public class SagaParticipantConfiguration {
 
   @Bean
-  public SagaLockManager sagaLockManager() {
-    return new SagaLockManagerImpl();
+  public SagaLockManager sagaLockManager(EventuateSchema eventuateSchema) {
+    return new SagaLockManagerImpl(eventuateSchema);
   }
 
   @Bean
