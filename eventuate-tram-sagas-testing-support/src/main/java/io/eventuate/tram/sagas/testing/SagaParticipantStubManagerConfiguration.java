@@ -1,7 +1,7 @@
 package io.eventuate.tram.sagas.testing;
 
-import io.eventuate.tram.commands.producer.TramCommandProducerConfiguration;
-import io.eventuate.tram.events.publisher.TramEventsPublisherConfiguration;
+import io.eventuate.tram.commands.spring.producer.TramCommandProducerConfiguration;
+import io.eventuate.tram.events.spring.publisher.TramEventsPublisherConfiguration;
 import io.eventuate.tram.messaging.consumer.MessageConsumer;
 import io.eventuate.tram.messaging.producer.MessageProducer;
 import org.springframework.context.annotation.Bean;

@@ -8,12 +8,11 @@ import io.eventuate.examples.tram.sagas.ordersandcustomers.orders.sagas.createor
 import io.eventuate.examples.tram.sagas.ordersandcustomers.orders.service.OrderCommandHandler;
 import io.eventuate.examples.tram.sagas.ordersandcustomers.orders.service.OrderService;
 import io.eventuate.tram.commands.consumer.CommandDispatcher;
-import io.eventuate.tram.commands.consumer.TramCommandConsumerConfiguration;
+import io.eventuate.tram.commands.spring.consumer.TramCommandConsumerConfiguration;
 import io.eventuate.tram.events.publisher.DomainEventPublisher;
 import io.eventuate.tram.sagas.orchestration.Saga;
 import io.eventuate.tram.sagas.orchestration.SagaManager;
 import io.eventuate.tram.sagas.orchestration.SagaManagerImpl;
-import io.eventuate.tram.sagas.participant.SagaCommandDispatcher;
 import io.eventuate.tram.sagas.participant.SagaCommandDispatcherFactory;
 import io.eventuate.tram.sagas.participant.SagaParticipantConfiguration;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
