@@ -1,0 +1,40 @@
+plugins {
+    id "io.spring.dependency-management" version "1.0.6.RELEASE"
+}
+
+apply plugin: PublicModulePlugin
+
+repositories {
+    mavenCentral()
+    maven { url "https://jcenter.bintray.com" }
+}
+
+dependencyManagement {
+    imports {
+        mavenBom 'io.micronaut:micronaut-bom:1.2.0'
+    }
+}
+
+dependencies {
+    testCompile "io.eventuate.common:eventuate-common-jdbc-micronaut:$eventuateCommonVersion"
+    testCompile "io.eventuate.tram.core:eventuate-tram-jdbc-micronaut:$eventuateTramVersion"
+    testCompile project(":eventuate-tram-sagas-common")
+    testCompile project(":eventuate-tram-sagas-in-memory-micronaut")
+
+    testAnnotationProcessor "io.micronaut:micronaut-inject-java"
+    testAnnotationProcessor "io.micronaut:micronaut-validation"
+    testAnnotationProcessor "io.micronaut.configuration:micronaut-openapi"
+    testCompile "io.micronaut:micronaut-inject"
+    testCompile "io.micronaut:micronaut-validation"
+    testCompile "io.micronaut:micronaut-runtime"
+    testAnnotationProcessor "io.micronaut:micronaut-inject-java"
+    testCompile "org.junit.jupiter:junit-jupiter-api"
+    testCompile "io.micronaut.test:micronaut-test-junit5"
+    testRuntime "org.junit.jupiter:junit-jupiter-engine"
+    testRuntime 'io.micronaut.configuration:micronaut-jdbc-hikari'
+}
+
+// use JUnit 5 platform
+test {
+    useJUnitPlatform()
+}

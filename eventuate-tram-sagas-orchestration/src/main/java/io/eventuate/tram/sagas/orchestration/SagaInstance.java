@@ -59,7 +59,7 @@ public class SagaInstance {
     return lastRequestId;
   }
 
-  void setLastRequestId(String requestId) {
+  public void setLastRequestId(String requestId) {
     this.lastRequestId = requestId;
   }
 

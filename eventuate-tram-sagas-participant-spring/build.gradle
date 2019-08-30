@@ -1,0 +1,8 @@
+apply plugin: PublicModulePlugin
+
+dependencies {
+
+    compile project(":eventuate-tram-sagas-participant")
+
+    compile "io.eventuate.tram.core:eventuate-tram-jdbc-spring:$eventuateTramVersion"
+}

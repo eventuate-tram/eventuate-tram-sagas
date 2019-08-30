@@ -4,7 +4,6 @@ import io.eventuate.tram.commands.common.Command;
 import io.eventuate.tram.commands.consumer.CommandWithDestination;
 import io.eventuate.tram.commands.producer.CommandProducer;
 import io.eventuate.tram.sagas.common.SagaCommandHeaders;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.HashMap;
 import java.util.List;
@@ -12,17 +11,11 @@ import java.util.Map;
 
 public class SagaCommandProducer {
 
-  @Autowired
   private CommandProducer commandProducer;
-
-  public SagaCommandProducer() {
-  }
 
   public SagaCommandProducer(CommandProducer commandProducer) {
     this.commandProducer = commandProducer;
   }
-
-
 
   public String sendCommand(String sagaType, String sagaId, String destinationChannel, String resource, Command command, String replyTo) {
     Map<String, String> headers = new HashMap<>();

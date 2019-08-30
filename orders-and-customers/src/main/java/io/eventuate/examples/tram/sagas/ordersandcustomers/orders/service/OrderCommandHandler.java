@@ -1,20 +1,22 @@
 package io.eventuate.examples.tram.sagas.ordersandcustomers.orders.service;
 
 import io.eventuate.examples.tram.sagas.ordersandcustomers.orders.domain.Order;
-import io.eventuate.examples.tram.sagas.ordersandcustomers.orders.domain.OrderRepository;
+import io.eventuate.examples.tram.sagas.ordersandcustomers.orders.domain.OrderDao;
 import io.eventuate.examples.tram.sagas.ordersandcustomers.orders.sagas.participants.ApproveOrderCommand;
 import io.eventuate.tram.commands.consumer.CommandHandlers;
 import io.eventuate.tram.commands.consumer.CommandMessage;
 import io.eventuate.tram.messaging.common.Message;
 import io.eventuate.tram.sagas.participant.SagaCommandHandlersBuilder;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import static io.eventuate.tram.commands.consumer.CommandHandlerReplyBuilder.withSuccess;
 
 public class OrderCommandHandler {
 
-  @Autowired
-  private OrderRepository orderRepository;
+  private OrderDao orderDao;
+
+  public OrderCommandHandler(OrderDao orderDao) {
+    this.orderDao = orderDao;
+  }
 
   public CommandHandlers commandHandlerDefinitions() {
     return SagaCommandHandlersBuilder
@@ -26,14 +28,14 @@ public class OrderCommandHandler {
 
   public Message approve(CommandMessage<ApproveOrderCommand> cm) {
     long orderId = cm.getCommand().getOrderId();
-    Order order = orderRepository.findById(orderId).get();
+    Order order = orderDao.findById(orderId);
     order.noteCreditReserved();
     return withSuccess();
   }
 
   public Message reject(CommandMessage<RejectOrderCommand> cm) {
     long orderId = cm.getCommand().getOrderId();
-    Order order = orderRepository.findById(orderId).get();
+    Order order = orderDao.findById(orderId);
     order.noteCreditReservationFailed();
     return withSuccess();
   }

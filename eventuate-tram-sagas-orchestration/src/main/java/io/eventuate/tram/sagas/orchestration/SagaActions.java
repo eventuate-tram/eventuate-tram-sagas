@@ -30,15 +30,15 @@ public class SagaActions<Data> {
     this.localException = localException;
   }
 
-  List<CommandWithDestination> getCommands() {
+  public List<CommandWithDestination> getCommands() {
     return commands;
   }
 
-  Optional<Data> getUpdatedSagaData() {
+  public Optional<Data> getUpdatedSagaData() {
     return updatedSagaData;
   }
 
-  Optional<String> getUpdatedState() {
+  public Optional<String> getUpdatedState() {
     return updatedState;
   }
 

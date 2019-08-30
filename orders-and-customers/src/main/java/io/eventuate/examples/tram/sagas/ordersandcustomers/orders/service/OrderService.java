@@ -1,39 +1,47 @@
 package io.eventuate.examples.tram.sagas.ordersandcustomers.orders.service;
 
 import io.eventuate.examples.tram.sagas.ordersandcustomers.orders.domain.Order;
-import io.eventuate.examples.tram.sagas.ordersandcustomers.orders.domain.OrderRepository;
+import io.eventuate.examples.tram.sagas.ordersandcustomers.orders.domain.OrderDao;
 import io.eventuate.examples.tram.sagas.ordersandcustomers.orders.sagas.createorder.CreateOrderSagaData;
 import io.eventuate.examples.tram.sagas.ordersandcustomers.orders.sagas.createorder.LocalCreateOrderSagaData;
 import io.eventuate.tram.events.publisher.ResultWithEvents;
 import io.eventuate.tram.sagas.orchestration.SagaManager;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionTemplate;
 
 public class OrderService {
 
-  @Autowired
   private SagaManager<CreateOrderSagaData> createOrderSagaManager;
-  @Autowired
   private SagaManager<LocalCreateOrderSagaData> localCreateOrderSagaManager;
+  private OrderDao orderRepository;
+  private TransactionTemplate transactionTemplate;
 
-  @Autowired
-  private OrderRepository orderRepository;
-
-  @Transactional
-  public Order createOrder(OrderDetails orderDetails) {
-    ResultWithEvents<Order> oe = Order.createOrder(orderDetails);
-    Order order = oe.result;
-    orderRepository.save(order);
-    CreateOrderSagaData data = new CreateOrderSagaData(order.getId(), orderDetails);
-    createOrderSagaManager.create(data, Order.class, order.getId());
-    return order;
+  public OrderService(SagaManager<CreateOrderSagaData> createOrderSagaManager,
+                      SagaManager<LocalCreateOrderSagaData> localCreateOrderSagaManager,
+                      OrderDao orderDao,
+                      TransactionTemplate transactionTemplate) {
+    this.createOrderSagaManager = createOrderSagaManager;
+    this.localCreateOrderSagaManager = localCreateOrderSagaManager;
+    this.orderRepository = orderDao;
+    this.transactionTemplate = transactionTemplate;
   }
 
-  @Transactional
+  public Order createOrder(OrderDetails orderDetails) {
+    return transactionTemplate.execute(status -> {
+      ResultWithEvents<Order> oe = Order.createOrder(orderDetails);
+      Order order = oe.result;
+      orderRepository.save(order);
+      CreateOrderSagaData data = new CreateOrderSagaData(order.getId(), orderDetails);
+      createOrderSagaManager.create(data, Order.class, order.getId());
+      return order;
+    });
+  }
+
   public Order localCreateOrder(OrderDetails orderDetails) {
-    LocalCreateOrderSagaData data = new LocalCreateOrderSagaData(orderDetails);
-    localCreateOrderSagaManager.create(data);
-    return orderRepository.findById(data.getOrderId()).get();
+    return transactionTemplate.execute(status -> {
+      LocalCreateOrderSagaData data = new LocalCreateOrderSagaData(orderDetails);
+      localCreateOrderSagaManager.create(data);
+      return orderRepository.findById(data.getOrderId());
+    });
   }
 
 }

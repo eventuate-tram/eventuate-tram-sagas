@@ -2,19 +2,6 @@ dependencies {
     compile project(":eventuate-tram-sagas-participant")
     compile project(":eventuate-tram-sagas-orchestration")
     compile project(":eventuate-tram-sagas-simple-dsl")
-
-
-    compile "org.springframework.boot:spring-boot-starter-data-jpa:$springBootVersion"
-    compile 'javax.el:javax.el-api:2.2.5'
-
-    testCompile "io.eventuate.tram.core:eventuate-tram-jdbc-kafka-spring:$eventuateTramVersion"
-    testCompile "io.eventuate.tram.core:eventuate-tram-jdbc-activemq:$eventuateTramVersion"
-    testCompile "io.eventuate.tram.core:eventuate-tram-in-memory:$eventuateTramVersion"
-    testCompile "org.springframework.boot:spring-boot-starter-test:${springBootVersion}"
-    testCompile "io.eventuate.util:eventuate-util-test:$eventuateUtilVersion"
-
-    testCompile project(":eventuate-tram-sagas-testing-support")
-    testCompile project(":eventuate-tram-sagas-in-memory")
-
+    compile 'javax.persistence:javax.persistence-api:2.2'
 }
 

@@ -6,7 +6,6 @@ import io.eventuate.tram.messaging.common.Message;
 import io.eventuate.tram.messaging.producer.MessageBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.dao.support.DataAccessUtils;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -20,7 +19,6 @@ public class SagaLockManagerImpl implements SagaLockManager {
 
   private Logger logger = LoggerFactory.getLogger(getClass());
 
-  @Autowired
   private JdbcTemplate jdbcTemplate;
 
   private String insertIntoSagaLockTableSql;
@@ -31,7 +29,9 @@ public class SagaLockManagerImpl implements SagaLockManager {
   private String deleteFromSagaLockTableSql;
   private String deleteFromSagaStashTableSql;
 
-  public SagaLockManagerImpl(EventuateSchema eventuateSchema) {
+  public SagaLockManagerImpl(JdbcTemplate jdbcTemplate, EventuateSchema eventuateSchema) {
+    this.jdbcTemplate = jdbcTemplate;
+
     String sagaLockTable = eventuateSchema.qualifyTable("saga_lock_table");
     String sagaStashTable = eventuateSchema.qualifyTable("saga_stash_table");
 

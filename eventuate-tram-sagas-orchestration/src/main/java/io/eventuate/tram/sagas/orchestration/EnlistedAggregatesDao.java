@@ -1,7 +1,5 @@
 package io.eventuate.tram.sagas.orchestration;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DataAccessException;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.util.ClassUtils;
@@ -11,8 +9,11 @@ import java.util.Set;
 
 public class EnlistedAggregatesDao {
 
-  @Autowired
   private JdbcTemplate jdbcTemplate;
+
+  public EnlistedAggregatesDao(JdbcTemplate jdbcTemplate) {
+      this.jdbcTemplate = jdbcTemplate;
+  }
 
   public void save(String sagaId, Set<EnlistedAggregate> enlistedAggregates) {
     for (EnlistedAggregate ela : enlistedAggregates) {

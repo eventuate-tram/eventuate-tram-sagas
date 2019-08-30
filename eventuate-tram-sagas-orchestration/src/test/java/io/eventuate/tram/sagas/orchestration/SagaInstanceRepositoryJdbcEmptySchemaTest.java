@@ -6,7 +6,7 @@ public class SagaInstanceRepositoryJdbcEmptySchemaTest extends SagaInstanceRepos
 
   @Override
   protected SagaInstanceRepositoryJdbc getSagaInstanceRepositoryJdbc() {
-    return new SagaInstanceRepositoryJdbc(new EventuateSchema(EventuateSchema.EMPTY_SCHEMA));
+    return new SagaInstanceRepositoryJdbc(null, null, new EventuateSchema(EventuateSchema.EMPTY_SCHEMA));
   }
 
   @Override

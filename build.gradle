@@ -11,10 +11,6 @@ buildscript {
 
 apply plugin: 'docker-compose'
 
-task wrapper(type: Wrapper) {
-    gradleVersion = '3.5'
-}
-
 allprojects {
     group = "io.eventuate.tram.sagas"
 }

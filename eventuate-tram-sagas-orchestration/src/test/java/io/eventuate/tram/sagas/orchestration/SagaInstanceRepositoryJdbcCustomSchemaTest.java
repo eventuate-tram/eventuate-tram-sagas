@@ -8,7 +8,7 @@ public class SagaInstanceRepositoryJdbcCustomSchemaTest extends SagaInstanceRepo
 
   @Override
   protected SagaInstanceRepositoryJdbc getSagaInstanceRepositoryJdbc() {
-    return new SagaInstanceRepositoryJdbc(new EventuateSchema(custom));
+    return new SagaInstanceRepositoryJdbc(null, null, new EventuateSchema(custom));
   }
 
   @Override

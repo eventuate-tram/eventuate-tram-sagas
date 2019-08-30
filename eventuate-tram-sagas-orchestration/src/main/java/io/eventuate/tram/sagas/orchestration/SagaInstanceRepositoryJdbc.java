@@ -4,7 +4,6 @@ import io.eventuate.common.id.IdGenerator;
 import io.eventuate.common.jdbc.EventuateSchema;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.dao.support.DataAccessUtils;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -17,10 +16,7 @@ public class SagaInstanceRepositoryJdbc implements SagaInstanceRepository {
 
   private Logger logger = LoggerFactory.getLogger(getClass());
 
-  @Autowired
   private JdbcTemplate jdbcTemplate;
-
-  @Autowired
   private IdGenerator idGenerator;
 
   private String insertIntoSagaInstanceSql;
@@ -31,7 +27,12 @@ public class SagaInstanceRepositoryJdbc implements SagaInstanceRepository {
 
   private String updateSagaInstanceSql;
 
-  public SagaInstanceRepositoryJdbc(EventuateSchema eventuateSchema) {
+  public SagaInstanceRepositoryJdbc(JdbcTemplate jdbcTemplate,
+                                    IdGenerator idGenerator,
+                                    EventuateSchema eventuateSchema) {
+    this.jdbcTemplate = jdbcTemplate;
+    this.idGenerator = idGenerator;
+
     String sagaInstanceTable = eventuateSchema.qualifyTable("saga_instance");
     String sagaInstanceParticipantsTable = eventuateSchema.qualifyTable("saga_instance_participants");
 

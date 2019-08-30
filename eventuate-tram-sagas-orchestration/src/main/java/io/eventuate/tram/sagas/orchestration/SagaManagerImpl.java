@@ -2,15 +2,12 @@ package io.eventuate.tram.sagas.orchestration;
 
 import io.eventuate.tram.commands.common.*;
 import io.eventuate.tram.commands.producer.CommandProducer;
-import io.eventuate.tram.messaging.common.ChannelMapping;
 import io.eventuate.tram.messaging.common.Message;
 import io.eventuate.tram.messaging.consumer.MessageConsumer;
 import io.eventuate.tram.messaging.producer.MessageBuilder;
 import io.eventuate.tram.sagas.common.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
 
 import javax.annotation.PostConstruct;
@@ -21,31 +18,24 @@ import java.util.Optional;
 
 import static java.util.Collections.singleton;
 
-@Component
 public class SagaManagerImpl<Data>
         implements SagaManager<Data> {
 
   private Logger logger = LoggerFactory.getLogger(getClass());
 
-  @Autowired
-  private SagaInstanceRepository sagaInstanceRepository;
-
-  @Autowired
-  private CommandProducer commandProducer;
-
-  @Autowired
-  private MessageConsumer messageConsumer;
-
-
   private Saga<Data> saga;
+  private SagaInstanceRepository sagaInstanceRepository;
+  private CommandProducer commandProducer;
+  private MessageConsumer messageConsumer;
+  private SagaLockManager sagaLockManager;
+  private SagaCommandProducer sagaCommandProducer;
 
-  public SagaManagerImpl(Saga<Data> saga) {
-    this.saga = saga;
-  }
-
-  public SagaManagerImpl(Saga<Data> saga, SagaInstanceRepository sagaInstanceRepository, CommandProducer
-          commandProducer, MessageConsumer messageConsumer,
-                         SagaLockManager sagaLockManager, SagaCommandProducer sagaCommandProducer) {
+  public SagaManagerImpl(Saga<Data> saga,
+                         SagaInstanceRepository sagaInstanceRepository,
+                         CommandProducer commandProducer,
+                         MessageConsumer messageConsumer,
+                         SagaLockManager sagaLockManager,
+                         SagaCommandProducer sagaCommandProducer) {
     this.saga = saga;
     this.sagaInstanceRepository = sagaInstanceRepository;
     this.commandProducer = commandProducer;
@@ -54,18 +44,9 @@ public class SagaManagerImpl<Data>
     this.sagaCommandProducer = sagaCommandProducer;
   }
 
-
-  @Autowired
-  private SagaLockManager sagaLockManager;
-
-
   public void setSagaCommandProducer(SagaCommandProducer sagaCommandProducer) {
     this.sagaCommandProducer = sagaCommandProducer;
   }
-
-  @Autowired
-  private SagaCommandProducer sagaCommandProducer;
-
 
   public void setSagaInstanceRepository(SagaInstanceRepository sagaInstanceRepository) {
     this.sagaInstanceRepository = sagaInstanceRepository;
@@ -257,6 +238,4 @@ public class SagaManagerImpl<Data>
   private Boolean isReplyForThisSagaType(Message message) {
     return message.getHeader(SagaReplyHeaders.REPLY_SAGA_TYPE).map(x -> x.equals(getSagaType())).orElse(false);
   }
-
-
 }

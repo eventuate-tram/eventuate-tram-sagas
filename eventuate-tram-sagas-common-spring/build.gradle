@@ -1,0 +1,7 @@
+apply plugin: PublicModulePlugin
+
+dependencies {
+    testCompile "org.springframework.boot:spring-boot-starter-test:$springBootVersion"
+    testCompile project(":eventuate-tram-sagas-common")
+    testCompile project(":eventuate-tram-sagas-in-memory-spring")
+}

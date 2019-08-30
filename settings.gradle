@@ -1,11 +1,22 @@
 include 'eventuate-tram-sagas-common'
+include 'eventuate-tram-sagas-common-spring'
+include 'eventuate-tram-sagas-common-micronaut'
 include 'eventuate-tram-sagas-orchestration'
+include 'eventuate-tram-sagas-orchestration-spring'
+include 'eventuate-tram-sagas-orchestration-micronaut'
 include 'eventuate-tram-sagas-participant'
+include 'eventuate-tram-sagas-participant-spring'
+include 'eventuate-tram-sagas-participant-micronaut'
 
 include 'eventuate-jpa-sagas-framework'
 include 'eventuate-tram-sagas-simple-dsl'
-include 'eventuate-tram-sagas-in-memory'
+include 'eventuate-tram-sagas-in-memory-spring'
+include 'eventuate-tram-sagas-in-memory-micronaut'
 include "eventuate-tram-sagas-event-sourcing-support"
 include 'eventuate-tram-sagas-testing-support'
+include 'eventuate-tram-sagas-testing-support-spring'
+include 'eventuate-tram-sagas-testing-support-micronaut'
 
 include 'orders-and-customers'
+include 'orders-and-customers-spring'
+include 'orders-and-customers-micronaut'

@@ -2,7 +2,7 @@ package io.eventuate.examples.tram.sagas.ordersandcustomers.orders.sagas.createo
 
 import io.eventuate.examples.tram.sagas.ordersandcustomers.commondomain.Money;
 import io.eventuate.examples.tram.sagas.ordersandcustomers.orders.domain.Order;
-import io.eventuate.examples.tram.sagas.ordersandcustomers.orders.domain.OrderRepository;
+import io.eventuate.examples.tram.sagas.ordersandcustomers.orders.domain.OrderDao;
 import io.eventuate.examples.tram.sagas.ordersandcustomers.orders.sagas.participants.ReserveCreditCommand;
 import io.eventuate.tram.commands.consumer.CommandWithDestination;
 import io.eventuate.tram.events.publisher.DomainEventPublisher;
@@ -17,12 +17,12 @@ import static io.eventuate.tram.commands.consumer.CommandWithDestinationBuilder.
 public class LocalCreateOrderSaga implements SimpleSaga<LocalCreateOrderSagaData> {
 
   private DomainEventPublisher domainEventPublisher;
-  private OrderRepository orderRepository;
+  private OrderDao orderDao;
 
   public LocalCreateOrderSaga(DomainEventPublisher domainEventPublisher,
-                              OrderRepository orderRepository) {
+                              OrderDao orderDao) {
     this.domainEventPublisher = domainEventPublisher;
-    this.orderRepository = orderRepository;
+    this.orderDao = orderDao;
   }
 
   private SagaDefinition<LocalCreateOrderSagaData> sagaDefinition =
@@ -44,7 +44,7 @@ public class LocalCreateOrderSaga implements SimpleSaga<LocalCreateOrderSagaData
   private void create(LocalCreateOrderSagaData data) {
     ResultWithEvents<Order> oe = Order.createOrder(data.getOrderDetails());
     Order order = oe.result;
-    orderRepository.save(order);
+    orderDao.save(order);
     data.setOrderId(order.getId());
   }
 
@@ -59,11 +59,11 @@ public class LocalCreateOrderSaga implements SimpleSaga<LocalCreateOrderSagaData
   }
 
   public void reject(LocalCreateOrderSagaData data) {
-    orderRepository.findById(data.getOrderId()).get().noteCreditReservationFailed();
+    orderDao.findById(data.getOrderId()).noteCreditReservationFailed();
   }
 
   private void approve(LocalCreateOrderSagaData data) {
-    orderRepository.findById(data.getOrderId()).get().noteCreditReserved();
+    orderDao.findById(data.getOrderId()).noteCreditReserved();
   }
 
   @Override

@@ -1,15 +1,5 @@
 apply plugin: PublicModulePlugin
 
 dependencies {
-
     compile project(":eventuate-tram-sagas-common")
-
-    compile "io.eventuate.tram.core:eventuate-tram-jdbc-spring:$eventuateTramVersion"
-
-    testCompile "org.springframework.boot:spring-boot-starter-test:$springBootVersion"
-
-    testCompile project(":eventuate-tram-sagas-in-memory")
-
-
-
 }
