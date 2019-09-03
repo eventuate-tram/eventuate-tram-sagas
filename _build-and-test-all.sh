@@ -16,6 +16,6 @@ set -e
 
 ./gradlew "${database}AllComposeUp"
 
-./gradlew :orders-and-customers:cleanTest build
+./gradlew :orders-and-customers-spring:cleanTest :orders-and-customers-micronaut:cleanTest build
 
 ./gradlew "${database}AllComposeDown"
