@@ -18,10 +18,8 @@ dependencies {
     compile project(":eventuate-tram-sagas-orchestration-micronaut")
     compile project(":eventuate-tram-sagas-participant-micronaut")
 
-    testCompile "io.eventuate.util:eventuate-util-test:$eventuateUtilVersion"
-    testCompile project(":eventuate-tram-sagas-testing-support")
-    testCompile project(":eventuate-tram-sagas-in-memory-micronaut")
-
+    compile "io.eventuate.util:eventuate-util-test:$eventuateUtilVersion"
+    compile project(":eventuate-tram-sagas-testing-support")
 
     compile "io.eventuate.tram.core:eventuate-tram-producer-jdbc-micronaut:$eventuateTramVersion"
     compile "io.eventuate.tram.core:eventuate-tram-consumer-jdbc-micronaut:$eventuateTramVersion"
@@ -40,10 +38,10 @@ dependencies {
     compile "io.micronaut.configuration:micronaut-hibernate-jpa"
     annotationProcessor "javax.persistence:javax.persistence-api:2.2"
     compile 'io.micronaut.configuration:micronaut-jdbc-hikari'
-    testAnnotationProcessor "io.micronaut:micronaut-inject-java"
-    testCompile "org.junit.jupiter:junit-jupiter-api"
-    testCompile "io.micronaut.test:micronaut-test-junit5"
-    testRuntime "org.junit.jupiter:junit-jupiter-engine"
+    annotationProcessor "io.micronaut:micronaut-inject-java"
+    compile "org.junit.jupiter:junit-jupiter-api"
+    compile "io.micronaut.test:micronaut-test-junit5"
+    runtime "org.junit.jupiter:junit-jupiter-engine"
 }
 
 // use JUnit 5 platform

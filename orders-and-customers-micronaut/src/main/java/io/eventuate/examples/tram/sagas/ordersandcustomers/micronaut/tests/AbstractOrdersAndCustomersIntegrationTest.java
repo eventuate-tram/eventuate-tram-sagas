@@ -1,4 +1,4 @@
-package io.eventuate.examples.tram.sagas.ordersandcustomers.integrationtests.micronaut;
+package io.eventuate.examples.tram.sagas.ordersandcustomers.micronaut.tests;
 
 import io.eventuate.examples.tram.sagas.ordersandcustomers.commondomain.Money;
 import io.eventuate.examples.tram.sagas.ordersandcustomers.customers.domain.Customer;

@@ -1,24 +1,18 @@
 package io.eventuate.tram.sagas.inmemory.micronaut;
 
+import io.eventuate.tram.inmemory.micronaut.EmbeddedSchema;
 import io.micronaut.context.annotation.Factory;
-import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
-import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType;
 
+import javax.inject.Named;
 import javax.inject.Singleton;
-import javax.sql.DataSource;
 
 
 @Factory
 public class TramSagaInMemoryFactory {
 
+  @Named("sagasEmbeddedSchema")
   @Singleton
-  public DataSource dataSource() {
-    EmbeddedDatabaseBuilder builder = new EmbeddedDatabaseBuilder();
-    return builder
-            .setType(EmbeddedDatabaseType.H2)
-            .addScript("eventuate-tram-embedded-schema.sql")
-            .addScript("eventuate-tram-sagas-embedded.sql")
-            .build();
+  public EmbeddedSchema sagaEmbeddedSchema() {
+    return new EmbeddedSchema("eventuate-tram-sagas-embedded.sql");
   }
-
 }

@@ -1,4 +1,4 @@
-package io.eventuate.examples.tram.sagas.ordersandcustomers.integrationtests.micronaut;
+package io.eventuate.examples.tram.sagas.ordersandcustomers.micronaut.tests;
 
 public class TramCommandsAndEventsIntegrationData {
 

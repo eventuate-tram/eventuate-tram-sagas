@@ -8,7 +8,7 @@ dependencies {
 
     testCompile "io.eventuate.tram.core:eventuate-tram-jdbc-kafka-spring:$eventuateTramVersion"
     testCompile "io.eventuate.tram.core:eventuate-tram-jdbc-activemq:$eventuateTramVersion"
-    testCompile "io.eventuate.tram.core:eventuate-tram-in-memory:$eventuateTramVersion"
+    testCompile "io.eventuate.tram.core:eventuate-tram-in-memory-spring:$eventuateTramVersion"
     testCompile "org.springframework.boot:spring-boot-starter-test:${springBootVersion}"
     testCompile "io.eventuate.util:eventuate-util-test:$eventuateUtilVersion"
 

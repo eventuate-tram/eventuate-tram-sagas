@@ -1,4 +1,4 @@
-package io.eventuate.examples.tram.sagas.ordersandcustomers.integrationtests.micronaut;
+package io.eventuate.examples.tram.sagas.ordersandcustomers.micronaut.tests;
 
 import io.eventuate.examples.tram.sagas.ordersandcustomers.orders.sagas.createorder.CreateOrderSaga;
 import io.eventuate.tram.events.subscriber.DomainEventDispatcher;
@@ -10,8 +10,7 @@ import io.micronaut.context.annotation.Factory;
 import javax.inject.Singleton;
 
 @Factory
-public class OrdersAndCustomersIntegrationCommonIntegrationTestFactory {
-
+public class CommonIntegrationTestFactory {
   @Singleton
   public ChannelMapping channelMapping(TramCommandsAndEventsIntegrationData data) {
     return DefaultChannelMapping.builder()

@@ -1,0 +1,17 @@
+datasources:
+  default:
+    url: ${DB_URL}
+    driverClassName: ${DB_DRIVERCLASSNAME}
+    driver-class-name: ${DB_DRIVERCLASSNAME}
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
+jpa:
+  default:
+    packages-to-scan:
+      - 'io.eventuate.examples.tram.sagas.ordersandcustomers'
+    properties:
+      hibernate:
+        hbm2ddl:
+          auto: update
+        show_sql: true
+
