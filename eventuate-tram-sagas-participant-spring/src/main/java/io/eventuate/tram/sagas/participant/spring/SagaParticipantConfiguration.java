@@ -1,7 +1,7 @@
 package io.eventuate.tram.sagas.participant.spring;
 
 import io.eventuate.common.jdbc.EventuateSchema;
-import io.eventuate.tram.jdbc.spring.CommonJdbcMessagingConfiguration;
+import io.eventuate.common.jdbc.spring.EventuateSchemaConfiguration;
 import io.eventuate.tram.messaging.consumer.MessageConsumer;
 import io.eventuate.tram.messaging.producer.MessageProducer;
 import io.eventuate.tram.sagas.common.SagaLockManager;
@@ -13,7 +13,7 @@ import org.springframework.context.annotation.Import;
 import org.springframework.jdbc.core.JdbcTemplate;
 
 @Configuration
-@Import(CommonJdbcMessagingConfiguration.class)
+@Import(EventuateSchemaConfiguration.class)
 public class SagaParticipantConfiguration {
 
   @Bean

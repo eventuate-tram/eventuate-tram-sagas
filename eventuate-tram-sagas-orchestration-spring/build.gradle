@@ -5,7 +5,7 @@ dependencies {
 
     compile "io.eventuate.tram.core:eventuate-tram-commands-spring:$eventuateTramVersion"
     compile "io.eventuate.tram.core:eventuate-tram-events-spring:$eventuateTramVersion"
-    compile "io.eventuate.tram.core:eventuate-tram-jdbc-spring:$eventuateTramVersion"
+    compile "io.eventuate.common:eventuate-common-jdbc-spring:$eventuateCommonVersion"
 
     testCompile "org.springframework.boot:spring-boot-starter-test:$springBootVersion"
     testCompile project(":eventuate-tram-sagas-in-memory-spring")
