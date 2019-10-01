@@ -4,5 +4,5 @@ dependencies {
 
     compile project(":eventuate-tram-sagas-participant")
 
-    compile "io.eventuate.tram.core:eventuate-tram-jdbc-spring:$eventuateTramVersion"
+    compile "io.eventuate.common:eventuate-common-jdbc-spring:$eventuateCommonVersion"
 }

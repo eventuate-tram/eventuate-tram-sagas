@@ -17,7 +17,6 @@ dependencyManagement {
 
 dependencies {
     testCompile "io.eventuate.common:eventuate-common-jdbc-micronaut:$eventuateCommonVersion"
-    testCompile "io.eventuate.tram.core:eventuate-tram-jdbc-micronaut:$eventuateTramVersion"
     testCompile project(":eventuate-tram-sagas-common")
     testCompile project(":eventuate-tram-sagas-in-memory-micronaut")
 
