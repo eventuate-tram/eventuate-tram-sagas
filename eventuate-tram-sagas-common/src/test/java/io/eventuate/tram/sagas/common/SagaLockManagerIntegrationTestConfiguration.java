@@ -1,8 +1,7 @@
 package io.eventuate.tram.sagas.common;
 
-import io.eventuate.common.id.IdGenerator;
-import io.eventuate.common.id.IdGeneratorImpl;
 import io.eventuate.common.jdbc.EventuateSchema;
+import io.eventuate.common.jdbc.EventuateSchemaConfiguration;
 import io.eventuate.tram.sagas.inmemory.TramSagaInMemoryConfiguration;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.context.annotation.Bean;
@@ -11,7 +10,7 @@ import org.springframework.context.annotation.Import;
 
 @Configuration
 @EnableAutoConfiguration
-@Import({TramSagaInMemoryConfiguration.class})
+@Import({TramSagaInMemoryConfiguration.class, EventuateSchemaConfiguration.class})
 public class SagaLockManagerIntegrationTestConfiguration {
 
   @Bean
@@ -19,9 +18,5 @@ public class SagaLockManagerIntegrationTestConfiguration {
     return new SagaLockManagerImpl(eventuateSchema);
   }
 
-  @Bean
-  public IdGenerator idGenerator() {
-    return new IdGeneratorImpl();
-  }
 
 }
