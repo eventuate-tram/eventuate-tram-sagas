@@ -3,8 +3,10 @@ package io.eventuate.examples.tram.sagas.ordersandcustomers.orders.service;
 import io.eventuate.examples.tram.sagas.ordersandcustomers.orders.domain.Order;
 import io.eventuate.examples.tram.sagas.ordersandcustomers.orders.domain.OrderRepository;
 import io.eventuate.examples.tram.sagas.ordersandcustomers.orders.sagas.createorder.CreateOrderSagaData;
+import io.eventuate.examples.tram.sagas.ordersandcustomers.orders.sagas.createorder.LocalCreateOrderSaga;
 import io.eventuate.examples.tram.sagas.ordersandcustomers.orders.sagas.createorder.LocalCreateOrderSagaData;
 import io.eventuate.tram.events.publisher.ResultWithEvents;
+import io.eventuate.tram.sagas.orchestration.SagaInstanceFactory;
 import io.eventuate.tram.sagas.orchestration.SagaManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
@@ -19,6 +21,12 @@ public class OrderService {
   @Autowired
   private OrderRepository orderRepository;
 
+  @Autowired
+  private SagaInstanceFactory sagaInstanceFactory;
+
+  @Autowired
+  private LocalCreateOrderSaga localCreateOrderSaga;
+
   @Transactional
   public Order createOrder(OrderDetails orderDetails) {
     ResultWithEvents<Order> oe = Order.createOrder(orderDetails);
@@ -32,7 +40,7 @@ public class OrderService {
   @Transactional
   public Order localCreateOrder(OrderDetails orderDetails) {
     LocalCreateOrderSagaData data = new LocalCreateOrderSagaData(orderDetails);
-    localCreateOrderSagaManager.create(data);
+    sagaInstanceFactory.create(localCreateOrderSaga, data);
     return orderRepository.findById(data.getOrderId()).get();
   }
 

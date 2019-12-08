@@ -13,6 +13,7 @@ import io.eventuate.tram.events.publisher.DomainEventPublisher;
 import io.eventuate.tram.sagas.orchestration.Saga;
 import io.eventuate.tram.sagas.orchestration.SagaManager;
 import io.eventuate.tram.sagas.orchestration.SagaManagerImpl;
+import io.eventuate.tram.sagas.orchestration.SagaOrchestratorConfiguration;
 import io.eventuate.tram.sagas.participant.SagaCommandDispatcher;
 import io.eventuate.tram.sagas.participant.SagaCommandDispatcherFactory;
 import io.eventuate.tram.sagas.participant.SagaParticipantConfiguration;
@@ -25,7 +26,7 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 @Configuration
 @EnableJpaRepositories
 @EnableAutoConfiguration
-@Import({TramCommandConsumerConfiguration.class, SagaParticipantConfiguration.class})
+@Import({TramCommandConsumerConfiguration.class, SagaOrchestratorConfiguration.class})
 public class OrderConfiguration {
 
   @Bean
