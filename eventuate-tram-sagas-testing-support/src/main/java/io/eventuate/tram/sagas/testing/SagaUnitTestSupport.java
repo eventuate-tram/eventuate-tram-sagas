@@ -11,6 +11,7 @@ import io.eventuate.tram.sagas.orchestration.*;
 import io.eventuate.tram.sagas.common.SagaLockManager;
 
 import java.util.*;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 import static java.util.Collections.emptyList;
@@ -19,7 +20,7 @@ import static org.junit.Assert.*;
 /**
  * Provides a DSL for writing unit tests for saga orchestrators
  */
-public class SagaUnitTestSupport {
+public class SagaUnitTestSupport<T> {
 
   private SagaManagerImpl sagaManager;
   private Command expectedCommand;
@@ -28,21 +29,22 @@ public class SagaUnitTestSupport {
   private MessageWithDestination sentCommand;
   private Optional<Exception> createException = Optional.empty();
 
-  public static SagaUnitTestSupport given() {
-    return new SagaUnitTestSupport();
-  }
 
   public static final String SAGA_ID = "1";
-  
+
   private int counter = 2;
-  
+
   private String genId() {
-    return Integer.toString(counter++);  
+    return Integer.toString(counter++);
   }
 
   private SagaInstance sagaInstance;
 
-  public <T> SagaUnitTestSupport saga(Saga<T> saga, T sagaData) {
+  public static SagaUnitTestSupport<?> given() {
+    return new SagaUnitTestSupport<>();
+  }
+
+  public <T> SagaUnitTestSupport<T> saga(Saga<T> saga, T sagaData) {
     SagaInstanceRepository sagaInstanceRepository = new SagaInstanceRepository() {
 
 
@@ -84,20 +86,22 @@ public class SagaUnitTestSupport {
     } catch (Exception e) {
       createException = Optional.of(e);
     }
+    return (SagaUnitTestSupport<T>) this;
+  }
+
+  public SagaUnitTestSupport<T> expect() {
+    createException.ifPresent(e -> {
+      throw new RuntimeException("Saga creation failed: ", e);
+    });
     return this;
   }
 
-  public SagaUnitTestSupport expect() {
-    assertFalse(createException.isPresent());
-    return this;
-  }
-
-  public SagaUnitTestSupport command(Command command) {
+  public SagaUnitTestSupport<T> command(Command command) {
     expectedCommand = command;
     return this;
   }
 
-  public SagaUnitTestSupport to(String commandChannel) {
+  public SagaUnitTestSupport<T> to(String commandChannel) {
     assertEquals("Expected a command", 1, sentCommands.size());
     sentCommand = sentCommands.get(0);
     assertEquals(commandChannel, sentCommand.getDestination());
@@ -107,7 +111,7 @@ public class SagaUnitTestSupport {
     return this;
   }
 
-  public SagaUnitTestSupport andGiven() {
+  public SagaUnitTestSupport<T> andGiven() {
     return this;
   }
 
@@ -123,21 +127,29 @@ public class SagaUnitTestSupport {
   }
 
 
-  public SagaUnitTestSupport successReply() {
+  public SagaUnitTestSupport<T> successReply() {
     Success reply = new Success();
+    return successReply(reply);
+  }
+
+  public SagaUnitTestSupport<T> successReply(Object reply) {
     CommandReplyOutcome outcome = CommandReplyOutcome.SUCCESS;
     sendReply(reply, outcome);
     return this;
   }
 
-  public SagaUnitTestSupport failureReply() {
+  public SagaUnitTestSupport<T> failureReply() {
     Failure reply = new Failure();
+    return failureReply(reply);
+  }
+
+  public SagaUnitTestSupport<T> failureReply(Object reply) {
     CommandReplyOutcome outcome = CommandReplyOutcome.FAILURE;
     sendReply(reply, outcome);
     return this;
   }
 
-  private void sendReply(Outcome reply, CommandReplyOutcome outcome) {
+  private void sendReply(Object reply, CommandReplyOutcome outcome) {
     Message message = MessageBuilder
             .withPayload(JSonMapper.toJson(reply))
             .withHeader(ReplyMessageHeaders.REPLY_OUTCOME, outcome.name())
@@ -149,7 +161,7 @@ public class SagaUnitTestSupport {
     sagaManager.handleMessage(message);
   }
 
-  public SagaUnitTestSupport expectCompletedSuccessfully() {
+  public SagaUnitTestSupport<T> expectCompletedSuccessfully() {
     assertNoCommands();
     assertTrue(sagaInstance.isEndState());
     assertFalse(sagaInstance.isCompensating());
@@ -160,7 +172,7 @@ public class SagaUnitTestSupport {
     assertEquals(emptyList(), sentCommands);
   }
 
-  public SagaUnitTestSupport expectRolledBack() {
+  public SagaUnitTestSupport<T> expectRolledBack() {
     assertNoCommands();
     assertTrue(sagaInstance.isEndState());
     assertTrue(sagaInstance.isCompensating());
@@ -169,5 +181,10 @@ public class SagaUnitTestSupport {
 
   public void expectException(Exception expectedCreateException) {
     assertEquals(expectedCreateException, createException.get());
+  }
+
+  public SagaUnitTestSupport<T> assertSagaData(Consumer<T> sagaDataConsumer) {
+    sagaDataConsumer.accept(SagaDataSerde.deserializeSagaData(sagaInstance.getSerializedSagaData()));
+    return this;
   }
 }
