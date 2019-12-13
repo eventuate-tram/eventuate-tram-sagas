@@ -4,25 +4,31 @@ import io.eventuate.common.jdbc.EventuateTransactionTemplate;
 import io.eventuate.examples.tram.sagas.ordersandcustomers.orders.domain.Order;
 import io.eventuate.examples.tram.sagas.ordersandcustomers.orders.domain.OrderDao;
 import io.eventuate.examples.tram.sagas.ordersandcustomers.orders.sagas.createorder.CreateOrderSagaData;
+import io.eventuate.examples.tram.sagas.ordersandcustomers.orders.sagas.createorder.LocalCreateOrderSaga;
 import io.eventuate.examples.tram.sagas.ordersandcustomers.orders.sagas.createorder.LocalCreateOrderSagaData;
 import io.eventuate.tram.events.publisher.ResultWithEvents;
+import io.eventuate.tram.sagas.orchestration.SagaInstanceFactory;
 import io.eventuate.tram.sagas.orchestration.SagaManager;
 
 public class OrderService {
 
   private SagaManager<CreateOrderSagaData> createOrderSagaManager;
-  private SagaManager<LocalCreateOrderSagaData> localCreateOrderSagaManager;
   private OrderDao orderRepository;
   private EventuateTransactionTemplate eventuateTransactionTemplate;
+  private SagaInstanceFactory sagaInstanceFactory;
+  private LocalCreateOrderSaga localCreateOrderSaga;
 
   public OrderService(SagaManager<CreateOrderSagaData> createOrderSagaManager,
-                      SagaManager<LocalCreateOrderSagaData> localCreateOrderSagaManager,
                       OrderDao orderDao,
-                      EventuateTransactionTemplate eventuateTransactionTemplate) {
+                      EventuateTransactionTemplate eventuateTransactionTemplate,
+                      SagaInstanceFactory sagaInstanceFactory,
+                      LocalCreateOrderSaga localCreateOrderSaga) {
+
     this.createOrderSagaManager = createOrderSagaManager;
-    this.localCreateOrderSagaManager = localCreateOrderSagaManager;
     this.orderRepository = orderDao;
     this.eventuateTransactionTemplate = eventuateTransactionTemplate;
+    this.sagaInstanceFactory = sagaInstanceFactory;
+    this.localCreateOrderSaga = localCreateOrderSaga;
   }
 
   public Order createOrder(OrderDetails orderDetails) {
@@ -39,7 +45,7 @@ public class OrderService {
   public Order localCreateOrder(OrderDetails orderDetails) {
     return eventuateTransactionTemplate.executeInTransaction(() -> {
       LocalCreateOrderSagaData data = new LocalCreateOrderSagaData(orderDetails);
-      localCreateOrderSagaManager.create(data);
+      sagaInstanceFactory.create(localCreateOrderSaga, data);
       return orderRepository.findById(data.getOrderId());
     });
   }

@@ -2,6 +2,7 @@ apply plugin: PublicModulePlugin
 
 dependencies {
     compile project(":eventuate-tram-sagas-orchestration")
+    compile project(":eventuate-tram-sagas-common-spring")
 
     compile "io.eventuate.tram.core:eventuate-tram-commands-spring:$eventuateTramVersion"
     compile "io.eventuate.tram.core:eventuate-tram-events-spring:$eventuateTramVersion"

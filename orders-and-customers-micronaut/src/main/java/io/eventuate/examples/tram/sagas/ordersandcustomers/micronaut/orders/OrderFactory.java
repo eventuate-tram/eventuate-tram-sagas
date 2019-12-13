@@ -27,8 +27,10 @@ public class OrderFactory {
   public OrderService orderService(@Named("createOrderSagaManager") SagaManager<CreateOrderSagaData> createOrderSagaManager,
                                    @Named("localCreateOrderSagaManager") SagaManager<LocalCreateOrderSagaData> localCreateOrderSagaManager,
                                    OrderDao orderDao,
-                                   EventuateTransactionTemplate eventuateTransactionTemplate) {
-    return new OrderService(createOrderSagaManager, localCreateOrderSagaManager, orderDao, eventuateTransactionTemplate);
+                                   EventuateTransactionTemplate eventuateTransactionTemplate,
+                                   SagaInstanceFactory sagaInstanceFactory,
+                                   @Named("localCreateOrderSaga") LocalCreateOrderSaga localCreateOrderSaga) {
+    return new OrderService(createOrderSagaManager, orderDao, eventuateTransactionTemplate, sagaInstanceFactory, localCreateOrderSaga);
   }
 
 

@@ -39,8 +39,10 @@ public class OrderConfiguration {
   public OrderService orderService(SagaManager<CreateOrderSagaData> createOrderSagaManager,
                                    SagaManager<LocalCreateOrderSagaData> localCreateOrderSagaManager,
                                    OrderDao orderDao,
-                                   EventuateTransactionTemplate eventuateTransactionTemplate) {
-    return new OrderService(createOrderSagaManager, localCreateOrderSagaManager, orderDao, eventuateTransactionTemplate);
+                                   EventuateTransactionTemplate eventuateTransactionTemplate,
+                                   SagaInstanceFactory sagaInstanceFactory,
+                                   LocalCreateOrderSaga localCreateOrderSaga) {
+    return new OrderService(createOrderSagaManager, orderDao, eventuateTransactionTemplate, sagaInstanceFactory, localCreateOrderSaga);
   }
 
 

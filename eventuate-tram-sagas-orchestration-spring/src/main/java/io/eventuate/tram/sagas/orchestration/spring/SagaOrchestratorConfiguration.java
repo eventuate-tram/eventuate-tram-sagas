@@ -3,18 +3,18 @@ package io.eventuate.tram.sagas.orchestration.spring;
 import io.eventuate.common.id.IdGenerator;
 import io.eventuate.common.jdbc.EventuateJdbcStatementExecutor;
 import io.eventuate.common.jdbc.EventuateSchema;
-import io.eventuate.common.jdbc.spring.EventuateSchemaConfiguration;
 import io.eventuate.tram.commands.producer.CommandProducer;
 import io.eventuate.tram.commands.spring.producer.TramCommandProducerConfiguration;
 import io.eventuate.tram.messaging.consumer.MessageConsumer;
 import io.eventuate.tram.sagas.common.SagaLockManager;
+import io.eventuate.tram.sagas.common.spring.EventuateTramSagaCommonConfiguration;
 import io.eventuate.tram.sagas.orchestration.*;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 
 @Configuration
-@Import({TramCommandProducerConfiguration.class, EventuateSchemaConfiguration.class})
+@Import({TramCommandProducerConfiguration.class, EventuateTramSagaCommonConfiguration.class})
 public class SagaOrchestratorConfiguration {
 
 
