@@ -8,7 +8,6 @@ import io.eventuate.tram.messaging.producer.MessageBuilder;
 import io.eventuate.tram.sagas.common.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.util.Assert;
 
 import javax.annotation.PostConstruct;
 import java.util.HashMap;
@@ -91,7 +90,11 @@ public class SagaManagerImpl<Data>
 
     saga.onStarting(sagaId, sagaData);
 
-    resource.ifPresent(r -> Assert.isTrue(sagaLockManager.claimLock(getSagaType(), sagaId, r), "Cannot claim lock for resource"));
+    resource.ifPresent(r -> {
+      if (!sagaLockManager.claimLock(getSagaType(), sagaId, r)) {
+        throw new RuntimeException("Cannot claim lock for resource");
+      }
+    });
 
     SagaActions<Data> actions = getStateDefinition().start(sagaData);
 
@@ -122,7 +125,11 @@ public class SagaManagerImpl<Data>
 
   private SagaDefinition<Data> getStateDefinition() {
     SagaDefinition<Data> sm = saga.getSagaDefinition();
-    Assert.notNull(sm, "state machine cannot be null");
+
+    if (sm == null) {
+      throw new RuntimeException("state machine cannot be null");
+    }
+
     return sm;
   }
 

@@ -2,7 +2,6 @@ package io.eventuate.tram.sagas.simpledsl;
 
 import io.eventuate.tram.commands.common.ReplyMessageHeaders;
 import io.eventuate.tram.messaging.common.Message;
-import org.springframework.util.Assert;
 
 import java.util.*;
 import java.util.function.BiConsumer;
@@ -19,7 +18,6 @@ public class ParticipantInvocationStep<Data> implements SagaStep<Data> {
                                    Map<String, BiConsumer<Data, Object>> compensationReplyHandlers) {
     this.actionReplyHandlers = actionReplyHandlers;
     this.compensationReplyHandlers = compensationReplyHandlers;
-    Assert.notNull(compensation);
     this.participantInvocation = participantInvocation;
     this.compensation = compensation;
   }

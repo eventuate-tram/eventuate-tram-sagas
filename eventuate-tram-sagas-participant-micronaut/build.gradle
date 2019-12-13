@@ -18,6 +18,7 @@ dependencyManagement {
 
 dependencies {
     compile project(":eventuate-tram-sagas-participant")
+    compile project(":eventuate-tram-sagas-common-micronaut")
     compile "io.eventuate.common:eventuate-common-jdbc-micronaut:$eventuateCommonVersion"
 
     annotationProcessor "io.micronaut:micronaut-inject-java"

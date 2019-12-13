@@ -1,5 +1,6 @@
 package io.eventuate.examples.tram.sagas.ordersandcustomers.spring.orders;
 
+import io.eventuate.common.jdbc.EventuateTransactionTemplate;
 import io.eventuate.examples.tram.sagas.ordersandcustomers.orders.domain.OrderDao;
 import io.eventuate.examples.tram.sagas.ordersandcustomers.orders.sagas.createorder.CreateOrderSaga;
 import io.eventuate.examples.tram.sagas.ordersandcustomers.orders.sagas.createorder.CreateOrderSagaData;
@@ -14,6 +15,7 @@ import io.eventuate.tram.events.publisher.DomainEventPublisher;
 import io.eventuate.tram.messaging.consumer.MessageConsumer;
 import io.eventuate.tram.sagas.common.SagaLockManager;
 import io.eventuate.tram.sagas.orchestration.*;
+import io.eventuate.tram.sagas.orchestration.spring.SagaOrchestratorConfiguration;
 import io.eventuate.tram.sagas.participant.SagaCommandDispatcherFactory;
 import io.eventuate.tram.sagas.participant.spring.SagaParticipantConfiguration;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
@@ -30,15 +32,15 @@ import org.springframework.transaction.support.TransactionTemplate;
 @EnableAutoConfiguration
 @EntityScan("io.eventuate.examples.tram.sagas.ordersandcustomers")
 @ComponentScan
-@Import({TramCommandConsumerConfiguration.class, SagaParticipantConfiguration.class})
+@Import({TramCommandConsumerConfiguration.class, SagaOrchestratorConfiguration.class})
 public class OrderConfiguration {
 
   @Bean
   public OrderService orderService(SagaManager<CreateOrderSagaData> createOrderSagaManager,
                                    SagaManager<LocalCreateOrderSagaData> localCreateOrderSagaManager,
                                    OrderDao orderDao,
-                                   TransactionTemplate transactionTemplate) {
-    return new OrderService(createOrderSagaManager, localCreateOrderSagaManager, orderDao, transactionTemplate);
+                                   EventuateTransactionTemplate eventuateTransactionTemplate) {
+    return new OrderService(createOrderSagaManager, localCreateOrderSagaManager, orderDao, eventuateTransactionTemplate);
   }
 
 
