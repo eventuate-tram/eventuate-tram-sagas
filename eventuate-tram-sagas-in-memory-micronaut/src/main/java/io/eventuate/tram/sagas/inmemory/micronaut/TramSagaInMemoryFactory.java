@@ -1,18 +1,18 @@
 package io.eventuate.tram.sagas.inmemory.micronaut;
 
-import io.eventuate.tram.inmemory.micronaut.EmbeddedSchema;
+import io.eventuate.common.inmemorydatabase.EventuateDatabaseScriptSupplier;
 import io.micronaut.context.annotation.Factory;
 
 import javax.inject.Named;
 import javax.inject.Singleton;
+import java.util.Collections;
 
 
 @Factory
 public class TramSagaInMemoryFactory {
-
-  @Named("sagasEmbeddedSchema")
   @Singleton
-  public EmbeddedSchema sagaEmbeddedSchema() {
-    return new EmbeddedSchema("eventuate-tram-sagas-embedded.sql");
+  @Named("TramSagasEventuateDatabaseScriptSupplier")
+  public EventuateDatabaseScriptSupplier eventuateCommonInMemoryScriptSupplierForEventuateTramSagas() {
+    return () -> Collections.singletonList("eventuate-tram-sagas-embedded.sql");
   }
 }
