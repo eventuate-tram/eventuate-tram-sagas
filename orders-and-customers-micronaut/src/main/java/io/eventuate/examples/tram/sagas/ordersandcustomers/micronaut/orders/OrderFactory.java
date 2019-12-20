@@ -1,5 +1,6 @@
 package io.eventuate.examples.tram.sagas.ordersandcustomers.micronaut.orders;
 
+import io.eventuate.common.jdbc.EventuateTransactionTemplate;
 import io.eventuate.examples.tram.sagas.ordersandcustomers.orders.domain.OrderDao;
 import io.eventuate.examples.tram.sagas.ordersandcustomers.orders.sagas.createorder.CreateOrderSaga;
 import io.eventuate.examples.tram.sagas.ordersandcustomers.orders.sagas.createorder.CreateOrderSagaData;
@@ -15,7 +16,6 @@ import io.eventuate.tram.sagas.common.SagaLockManager;
 import io.eventuate.tram.sagas.orchestration.*;
 import io.eventuate.tram.sagas.participant.SagaCommandDispatcherFactory;
 import io.micronaut.context.annotation.Factory;
-import org.springframework.transaction.support.TransactionTemplate;
 
 import javax.inject.Named;
 import javax.inject.Singleton;
@@ -27,8 +27,10 @@ public class OrderFactory {
   public OrderService orderService(@Named("createOrderSagaManager") SagaManager<CreateOrderSagaData> createOrderSagaManager,
                                    @Named("localCreateOrderSagaManager") SagaManager<LocalCreateOrderSagaData> localCreateOrderSagaManager,
                                    OrderDao orderDao,
-                                   TransactionTemplate transactionTemplate) {
-    return new OrderService(createOrderSagaManager, localCreateOrderSagaManager, orderDao, transactionTemplate);
+                                   EventuateTransactionTemplate eventuateTransactionTemplate,
+                                   SagaInstanceFactory sagaInstanceFactory,
+                                   @Named("localCreateOrderSaga") LocalCreateOrderSaga localCreateOrderSaga) {
+    return new OrderService(createOrderSagaManager, orderDao, eventuateTransactionTemplate, sagaInstanceFactory, localCreateOrderSaga);
   }
 
 

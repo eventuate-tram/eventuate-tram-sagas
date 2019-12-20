@@ -11,8 +11,6 @@ import io.eventuate.tram.messaging.consumer.MessageConsumer;
 import io.eventuate.tram.messaging.producer.MessageBuilder;
 import io.eventuate.tram.messaging.producer.MessageProducer;
 import io.eventuate.tram.sagas.common.*;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.util.Assert;
 
 import java.util.List;
 import java.util.Map;
@@ -87,7 +85,11 @@ public class SagaCommandDispatcher extends CommandDispatcher {
         Message message = cm.getMessage();
         String sagaType = getSagaType(message);
         String sagaId = getSagaId(message);
-        Assert.isTrue(sagaLockManager.claimLock(sagaType, sagaId, lt.get().getTarget()));
+
+        if (!sagaLockManager.claimLock(sagaType, sagaId, lt.get().getTarget())) {
+          throw new RuntimeException("Cannot claim lock");
+        }
+
         return addLockedHeader(messages, lt.get().getTarget());
       }
       else

@@ -1,23 +1,20 @@
 package io.eventuate.tram.sagas.inmemory;
 
+import io.eventuate.common.inmemorydatabase.EventuateDatabaseScriptSupplier;
+import io.eventuate.tram.inmemory.spring.TramInMemoryConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
-import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType;
+import org.springframework.context.annotation.Import;
 
-import javax.sql.DataSource;
+import java.util.Collections;
 
 @Configuration
+@Import({TramInMemoryConfiguration.class})
 public class TramSagaInMemoryConfiguration {
 
   @Bean
-  public DataSource dataSource() {
-    EmbeddedDatabaseBuilder builder = new EmbeddedDatabaseBuilder();
-    return builder
-            .setType(EmbeddedDatabaseType.H2)
-            .addScript("eventuate-tram-embedded-schema.sql")
-            .addScript("eventuate-tram-sagas-embedded.sql")
-            .build();
+  public EventuateDatabaseScriptSupplier eventuateCommonInMemoryScriptSupplierForEventuateTramSagas() {
+    return () -> Collections.singletonList("eventuate-tram-sagas-embedded.sql");
   }
 
 }
