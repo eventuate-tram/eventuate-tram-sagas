@@ -18,7 +18,6 @@ dependencyManagement {
 dependencies {
     compile "io.eventuate.common:eventuate-common-jdbc-micronaut:$eventuateCommonVersion"
     compile project(":eventuate-tram-sagas-common")
-    compile project(":eventuate-tram-sagas-in-memory-micronaut")
 
     annotationProcessor "io.micronaut:micronaut-inject-java"
     annotationProcessor "io.micronaut:micronaut-validation"
@@ -26,6 +25,8 @@ dependencies {
     compile "io.micronaut:micronaut-inject"
     compile "io.micronaut:micronaut-validation"
     compile "io.micronaut:micronaut-runtime"
+
+    testCompile project(":eventuate-tram-sagas-in-memory-micronaut")
 
     testAnnotationProcessor "io.micronaut:micronaut-inject-java"
     testAnnotationProcessor "io.micronaut:micronaut-validation"
