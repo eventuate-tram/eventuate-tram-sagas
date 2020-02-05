@@ -1,0 +1,9 @@
+datasources:
+  default:
+    url: ${DB_URL}
+    driverClassName: ${DB_DRIVERCLASSNAME}
+    driver-class-name: ${DB_DRIVERCLASSNAME}
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
+
+

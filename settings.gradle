@@ -7,6 +7,7 @@ include 'eventuate-tram-sagas-orchestration-micronaut'
 include 'eventuate-tram-sagas-participant'
 include 'eventuate-tram-sagas-participant-spring'
 include 'eventuate-tram-sagas-participant-micronaut'
+include 'eventuate-tram-sagas-micronaut-configuration-tests'
 
 include 'eventuate-jpa-sagas-framework'
 include 'eventuate-tram-sagas-simple-dsl'
