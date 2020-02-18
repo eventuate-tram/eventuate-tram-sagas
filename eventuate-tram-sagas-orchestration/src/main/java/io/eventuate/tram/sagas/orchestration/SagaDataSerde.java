@@ -18,7 +18,7 @@ public class SagaDataSerde {
       clasz = SagaDataSerde.class.getClassLoader().loadClass(serializedSagaData.getSagaDataType());
     } catch (ClassNotFoundException e) {
       logger.error("Class not found", e);
-      throw new RuntimeException(e);
+      throw new RuntimeException("Class not found", e);
     }
     Object x = JSonMapper.fromJson(serializedSagaData.getSagaDataJSON(), clasz);
     return (Data)x;

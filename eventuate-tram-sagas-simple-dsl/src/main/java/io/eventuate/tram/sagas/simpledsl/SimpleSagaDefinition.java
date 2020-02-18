@@ -85,7 +85,7 @@ public class SimpleSagaDefinition<Data> implements SagaDefinition<Data> {
       m = Class.forName(message.getRequiredHeader(ReplyMessageHeaders.REPLY_TYPE));
     } catch (ClassNotFoundException e) {
       logger.error("Class not found", e);
-      throw new RuntimeException(e);
+      throw new RuntimeException("Class not found", e);
     }
     Object reply = JSonMapper.fromJson(message.getPayload(), m);
     handler.accept(data, reply);

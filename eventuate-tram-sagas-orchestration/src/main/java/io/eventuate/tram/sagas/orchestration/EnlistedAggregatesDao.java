@@ -40,7 +40,7 @@ public class EnlistedAggregatesDao {
                 return new EnlistedAggregate(ClassUtils.getClass(rs.getString("aggregate_type")), rs.getString("aggregate_id"));
               } catch (ClassNotFoundException e) {
                 logger.error("Class not found", e);
-                throw new RuntimeException();
+                throw new RuntimeException("Class not found", e);
               }
             },
             sagaId));
