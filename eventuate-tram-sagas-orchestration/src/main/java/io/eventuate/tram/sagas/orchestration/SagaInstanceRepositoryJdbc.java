@@ -109,7 +109,11 @@ public class SagaInstanceRepositoryJdbc implements SagaInstanceRepository {
                 dr.getResource()
         );
       } catch (EventuateDuplicateKeyException e) {
-        // do nothing
+        logger.info("key duplicate: sagaType = {}, sagaId = {}, destination = {}, resource = {}",
+                sagaInstance.getSagaType(),
+                sagaInstance.getId(),
+                dr.getDestination(),
+                dr.getResource());
       }
     }
   }

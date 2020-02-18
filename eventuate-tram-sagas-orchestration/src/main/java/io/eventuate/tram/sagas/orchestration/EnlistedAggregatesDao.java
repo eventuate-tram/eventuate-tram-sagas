@@ -3,11 +3,14 @@ package io.eventuate.tram.sagas.orchestration;
 import io.eventuate.common.jdbc.EventuateDuplicateKeyException;
 import io.eventuate.common.jdbc.EventuateJdbcStatementExecutor;
 import org.apache.commons.lang.ClassUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.HashSet;
 import java.util.Set;
 
 public class EnlistedAggregatesDao {
+  private Logger logger = LoggerFactory.getLogger(getClass());
 
   private EventuateJdbcStatementExecutor eventuateJdbcStatementExecutor;
 
@@ -23,6 +26,8 @@ public class EnlistedAggregatesDao {
                 ela.getAggregateClass(),
                 ela.getAggregateId());
       } catch (EventuateDuplicateKeyException e) {
+        logger.info("Cannot save aggregate, key duplicate: sagaId = {}, aggregateClass = {}, aggregateId = {}",
+                sagaId, ela.getAggregateClass(), ela.getAggregateId());
         // ignore
       }
     }
@@ -34,7 +39,8 @@ public class EnlistedAggregatesDao {
               try {
                 return new EnlistedAggregate(ClassUtils.getClass(rs.getString("aggregate_type")), rs.getString("aggregate_id"));
               } catch (ClassNotFoundException e) {
-                throw new RuntimeException();
+                logger.error("Class not found", e);
+                throw new RuntimeException("Class not found", e);
               }
             },
             sagaId));
