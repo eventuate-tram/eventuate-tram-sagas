@@ -4,6 +4,8 @@ import io.eventuate.tram.commands.producer.CommandProducer;
 import io.eventuate.tram.messaging.consumer.MessageConsumer;
 import io.eventuate.tram.sagas.common.SagaLockManager;
 import io.eventuate.tram.sagas.orchestration.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
@@ -11,7 +13,7 @@ import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.ExecutionException;
 
 public class SagaInstanceFactory {
-
+  private Logger logger = LoggerFactory.getLogger(this.getClass());
 
   private ConcurrentMap<Saga<?>, InitializedSagaManager> map = new ConcurrentHashMap<>();
   private SagaManagerFactory sagaManagerFactory;
@@ -47,6 +49,7 @@ public class SagaInstanceFactory {
       try {
         initializationFuture.get();
       } catch (InterruptedException | ExecutionException e) {
+        logger.error("Saga initialization failed", e);
         throw new RuntimeException(e);
       }
     }

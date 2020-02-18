@@ -5,12 +5,16 @@ import io.eventuate.tram.commands.common.ReplyMessageHeaders;
 import io.eventuate.tram.messaging.common.Message;
 import io.eventuate.tram.sagas.orchestration.SagaActions;
 import io.eventuate.tram.sagas.orchestration.SagaDefinition;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.List;
 import java.util.Optional;
 import java.util.function.BiConsumer;
 
 public class SimpleSagaDefinition<Data> implements SagaDefinition<Data> {
+  private Logger logger = LoggerFactory.getLogger(this.getClass());
+
   private List<SagaStep<Data>> sagaSteps;
 
   public SimpleSagaDefinition(List<SagaStep<Data>> sagaSteps) {
@@ -80,6 +84,7 @@ public class SimpleSagaDefinition<Data> implements SagaDefinition<Data> {
     try {
       m = Class.forName(message.getRequiredHeader(ReplyMessageHeaders.REPLY_TYPE));
     } catch (ClassNotFoundException e) {
+      logger.error("Class not found", e);
       throw new RuntimeException(e);
     }
     Object reply = JSonMapper.fromJson(message.getPayload(), m);
