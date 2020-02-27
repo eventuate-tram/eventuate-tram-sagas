@@ -1,0 +1,13 @@
+apply plugin: PublicModulePlugin
+
+dependencies {
+    compile project(":eventuate-tram-sagas-orchestration")
+    compile project(":eventuate-tram-sagas-spring-common")
+
+    compile "io.eventuate.tram.core:eventuate-tram-spring-commands:$eventuateTramVersion"
+    compile "io.eventuate.tram.core:eventuate-tram-spring-events:$eventuateTramVersion"
+    compile "io.eventuate.common:eventuate-common-spring-jdbc:$eventuateCommonVersion"
+
+    testCompile "org.springframework.boot:spring-boot-starter-test:$springBootVersion"
+    testCompile project(":eventuate-tram-sagas-spring-in-memory")
+}

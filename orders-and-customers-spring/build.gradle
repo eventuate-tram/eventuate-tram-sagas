@@ -1,19 +1,19 @@
 dependencies {
-    compile project(":eventuate-tram-sagas-participant-spring")
-    compile project(":eventuate-tram-sagas-orchestration-spring")
+    compile project(":eventuate-tram-sagas-spring-participant")
+    compile project(":eventuate-tram-sagas-spring-orchestration")
     compile project(":eventuate-tram-sagas-simple-dsl")
     compile project(":orders-and-customers")
 
     compile "org.springframework.boot:spring-boot-starter-data-jpa:$springBootVersion"
 
-    testCompile "io.eventuate.tram.core:eventuate-tram-jdbc-kafka-spring:$eventuateTramVersion"
+    testCompile "io.eventuate.tram.core:eventuate-tram-spring-jdbc-kafka:$eventuateTramVersion"
     testCompile "io.eventuate.tram.core:eventuate-tram-jdbc-activemq:$eventuateTramVersion"
-    testCompile "io.eventuate.tram.core:eventuate-tram-in-memory-spring:$eventuateTramVersion"
+    testCompile "io.eventuate.tram.core:eventuate-tram-spring-in-memory:$eventuateTramVersion"
     testCompile "org.springframework.boot:spring-boot-starter-test:${springBootVersion}"
     testCompile "io.eventuate.util:eventuate-util-test:$eventuateUtilVersion"
 
     testCompile project(":eventuate-tram-sagas-testing-support")
-    testCompile project(":eventuate-tram-sagas-in-memory-spring")
+    testCompile project(":eventuate-tram-sagas-spring-in-memory")
 
 }
 

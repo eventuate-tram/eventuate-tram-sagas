@@ -1,0 +1,9 @@
+apply plugin: PublicModulePlugin
+
+dependencies {
+
+    compile project(":eventuate-tram-sagas-spring-common")
+    compile project(":eventuate-tram-sagas-participant")
+
+    compile "io.eventuate.common:eventuate-common-spring-jdbc:$eventuateCommonVersion"
+}

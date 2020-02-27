@@ -15,8 +15,8 @@ dependencyManagement {
 
 dependencies {
     testCompile project(":orders-and-customers-micronaut")
-    testCompile project(":eventuate-tram-sagas-in-memory-micronaut")
-    testCompile "io.eventuate.tram.core:eventuate-tram-in-memory-micronaut:$eventuateTramVersion"
+    testCompile project(":eventuate-tram-sagas-micronaut-in-memory")
+    testCompile "io.eventuate.tram.core:eventuate-tram-micronaut-in-memory:$eventuateTramVersion"
 
     compile "io.micronaut:micronaut-spring"
     annotationProcessor "io.micronaut:micronaut-inject-java"

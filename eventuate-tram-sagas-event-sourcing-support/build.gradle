@@ -1,4 +1,4 @@
 dependencies {
     compile "io.eventuate.client.java:eventuate-client-java:$eventuateClientVersion"
-    compile "io.eventuate.tram.core:eventuate-tram-commands-spring:$eventuateTramVersion"
+    compile "io.eventuate.tram.core:eventuate-tram-spring-commands:$eventuateTramVersion"
 }
