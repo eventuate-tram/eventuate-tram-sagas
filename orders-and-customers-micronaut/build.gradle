@@ -15,18 +15,18 @@ dependencyManagement {
 
 dependencies {
     compile project(":orders-and-customers")
-    compile project(":eventuate-tram-sagas-orchestration-micronaut")
-    compile project(":eventuate-tram-sagas-participant-micronaut")
+    compile project(":eventuate-tram-sagas-micronaut-orchestration")
+    compile project(":eventuate-tram-sagas-micronaut-participant")
 
-    compile "io.eventuate.common:eventuate-common-jdbc-micronaut-spring:$eventuateCommonVersion"
+    compile "io.eventuate.common:eventuate-common-micronaut-spring-jdbc:$eventuateCommonVersion"
     compile "io.eventuate.util:eventuate-util-test:$eventuateUtilVersion"
     compile project(":eventuate-tram-sagas-testing-support")
 
-    compile "io.eventuate.tram.core:eventuate-tram-producer-jdbc-micronaut:$eventuateTramVersion"
-    compile "io.eventuate.tram.core:eventuate-tram-consumer-jdbc-micronaut:$eventuateTramVersion"
-    compile "io.eventuate.tram.core:eventuate-tram-messaging-micronaut:$eventuateTramVersion"
-    compile "io.eventuate.tram.core:eventuate-tram-consumer-kafka-micronaut:$eventuateTramVersion"
-    compile "io.eventuate.tram.core:eventuate-tram-events-micronaut:$eventuateTramVersion"
+    compile "io.eventuate.tram.core:eventuate-tram-micronaut-producer-jdbc:$eventuateTramVersion"
+    compile "io.eventuate.tram.core:eventuate-tram-micronaut-consumer-jdbc:$eventuateTramVersion"
+    compile "io.eventuate.tram.core:eventuate-tram-micronaut-messaging:$eventuateTramVersion"
+    compile "io.eventuate.tram.core:eventuate-tram-micronaut-consumer-kafka:$eventuateTramVersion"
+    compile "io.eventuate.tram.core:eventuate-tram-micronaut-events:$eventuateTramVersion"
 
     compile "io.micronaut:micronaut-spring"
     annotationProcessor "io.micronaut:micronaut-inject-java"

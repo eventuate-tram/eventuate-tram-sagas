@@ -14,21 +14,21 @@ dependencyManagement {
 }
 
 dependencies {
-    testCompile project(":eventuate-tram-sagas-common-micronaut")
+    testCompile project(":eventuate-tram-sagas-micronaut-common")
 
-    compile "io.eventuate.common:eventuate-common-jdbc-micronaut-spring:$eventuateCommonVersion"
+    compile "io.eventuate.common:eventuate-common-micronaut-spring-jdbc:$eventuateCommonVersion"
 
     testCompile project(":eventuate-jpa-sagas-framework")
     testCompile project(":eventuate-tram-sagas-simple-dsl")
-    testCompile project(":eventuate-tram-sagas-participant-micronaut")
-    testCompile project(":eventuate-tram-sagas-orchestration-micronaut")
+    testCompile project(":eventuate-tram-sagas-micronaut-participant")
+    testCompile project(":eventuate-tram-sagas-micronaut-orchestration")
 
-    testCompile "io.eventuate.tram.core:eventuate-tram-events-micronaut:$eventuateTramVersion"
-    testCompile "io.eventuate.tram.core:eventuate-tram-producer-jdbc-micronaut:$eventuateTramVersion"
-    testCompile "io.eventuate.tram.core:eventuate-tram-consumer-jdbc-micronaut:$eventuateTramVersion"
-    testCompile "io.eventuate.tram.core:eventuate-tram-messaging-micronaut:$eventuateTramVersion"
-    testCompile "io.eventuate.tram.core:eventuate-tram-consumer-kafka-micronaut:$eventuateTramVersion"
-    testCompile "io.eventuate.tram.core:eventuate-tram-events-micronaut:$eventuateTramVersion"
+    testCompile "io.eventuate.tram.core:eventuate-tram-micronaut-events:$eventuateTramVersion"
+    testCompile "io.eventuate.tram.core:eventuate-tram-micronaut-producer-jdbc:$eventuateTramVersion"
+    testCompile "io.eventuate.tram.core:eventuate-tram-micronaut-consumer-jdbc:$eventuateTramVersion"
+    testCompile "io.eventuate.tram.core:eventuate-tram-micronaut-messaging:$eventuateTramVersion"
+    testCompile "io.eventuate.tram.core:eventuate-tram-micronaut-consumer-kafka:$eventuateTramVersion"
+    testCompile "io.eventuate.tram.core:eventuate-tram-micronaut-events:$eventuateTramVersion"
 
     compile 'mysql:mysql-connector-java:5.1.36'
     compile ('org.postgresql:postgresql:9.4-1200-jdbc41') {
