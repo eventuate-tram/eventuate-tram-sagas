@@ -1,0 +1,11 @@
+apply plugin: PublicModulePlugin
+
+
+
+dependencies {
+
+    compile project(":eventuate-tram-sagas-spring-common")
+    compile project(":eventuate-tram-sagas-spring-orchestration")
+    compile project(":eventuate-tram-sagas-spring-participant")
+
+}
