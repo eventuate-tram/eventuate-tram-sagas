@@ -9,9 +9,8 @@ include 'eventuate-tram-sagas-spring-participant'
 include 'eventuate-tram-sagas-micronaut-participant'
 include 'eventuate-tram-sagas-micronaut-configuration-tests'
 
-include 'eventuate-tram-sagas-spring-jpa-framework'
-include 'eventuate-tram-sagas-micronaut-jpa-framework'
-include 'eventuate-tram-sagas-simple-dsl'
+include 'eventuate-tram-sagas-orchestration-simple-dsl'
+include 'eventuate-tram-sagas-spring-orchestration-simple-dsl'
 include 'eventuate-tram-sagas-spring-in-memory'
 include 'eventuate-tram-sagas-micronaut-in-memory'
 include "eventuate-tram-sagas-event-sourcing-support"

@@ -18,8 +18,7 @@ dependencies {
 
     compile "io.eventuate.common:eventuate-common-micronaut-spring-jdbc:$eventuateCommonVersion"
 
-    testCompile project(":eventuate-tram-sagas-micronaut-jpa-framework")
-    testCompile project(":eventuate-tram-sagas-simple-dsl")
+    testCompile project(":eventuate-tram-sagas-orchestration-simple-dsl")
     testCompile project(":eventuate-tram-sagas-micronaut-participant")
     testCompile project(":eventuate-tram-sagas-micronaut-orchestration")
 
