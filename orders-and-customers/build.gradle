@@ -1,7 +1,7 @@
 dependencies {
     compile project(":eventuate-tram-sagas-participant")
     compile project(":eventuate-tram-sagas-orchestration")
-    compile project(":eventuate-tram-sagas-simple-dsl")
+    compile project(":eventuate-tram-sagas-orchestration-simple-dsl")
     compile 'javax.persistence:javax.persistence-api:2.2'
 }
 

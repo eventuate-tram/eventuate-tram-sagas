@@ -136,7 +136,7 @@ image::https://api.bintray.com/packages/eventuateio-oss/eventuate-maven-release/
 
 If you are writing a Saga orchestrator add this dependency to your project:
 
-* `io.eventuate.tram.sagas:eventuate-tram-sagas-simple-dsl:$eventuateTramSagasVersion`
+* `io.eventuate.tram.sagas:eventuate-tram-sagas-orchestration-simple-dsl:$eventuateTramSagasVersion`
 
 If you are writing a saga participant then add this dependency:
 
