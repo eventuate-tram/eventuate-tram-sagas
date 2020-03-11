@@ -9,7 +9,7 @@ jobs:
           keys:
             - eventuate-tram-sagas-{{ checksum "gradle.properties" }}
             - eventuate-tram-sagas-
-      - run: TERM=dumb ./gradlew testClasses
+      - run: TERM=dumb ./gradlew testClasses aggregateJavaDocs
       - save_cache:
           paths:
             - ~/.gradle
