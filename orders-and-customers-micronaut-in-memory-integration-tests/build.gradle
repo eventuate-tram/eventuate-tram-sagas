@@ -13,6 +13,8 @@ dependencyManagement {
     }
 }
 
+apply plugin: PublicModulePlugin
+
 dependencies {
     testCompile project(":orders-and-customers-micronaut")
     testCompile project(":eventuate-tram-sagas-micronaut-in-memory")
