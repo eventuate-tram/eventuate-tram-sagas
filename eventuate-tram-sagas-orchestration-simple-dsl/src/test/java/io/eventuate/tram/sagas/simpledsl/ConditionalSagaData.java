@@ -1,6 +1,10 @@
 package io.eventuate.tram.sagas.simpledsl;
 
 import io.eventuate.tram.commands.consumer.CommandWithDestination;
+import io.eventuate.tram.commands.consumer.CommandWithDestinationBuilder;
+
+import java.util.Collections;
+import java.util.Map;
 
 public class ConditionalSagaData {
 
@@ -13,6 +17,8 @@ public class ConditionalSagaData {
   public ConditionalSagaData() {
   }
 
+  public static Map<String, String> DO1_COMMAND_EXTRA_HEADERS = Collections.singletonMap("k", "v");
+
   public boolean isInvoke1() {
     return invoke1;
   }
@@ -22,7 +28,7 @@ public class ConditionalSagaData {
   }
 
   public CommandWithDestination do1() {
-    return new CommandWithDestination("participant1", null, new Do1Command());
+    return CommandWithDestinationBuilder.send(new Do1Command()).to("participant1").withExtraHeaders(DO1_COMMAND_EXTRA_HEADERS).build();
   }
 
   public CommandWithDestination undo1() {

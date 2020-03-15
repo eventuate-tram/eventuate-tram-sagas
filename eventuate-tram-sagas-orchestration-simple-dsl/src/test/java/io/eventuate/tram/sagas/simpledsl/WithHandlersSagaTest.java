@@ -31,6 +31,7 @@ public class WithHandlersSagaTest {
     expect().
             command(new Do1Command()).
             to("participant1").
+            withExtraHeaders(ConditionalSagaData.DO1_COMMAND_EXTRA_HEADERS).
     andGiven().
       successReply().
     expect().

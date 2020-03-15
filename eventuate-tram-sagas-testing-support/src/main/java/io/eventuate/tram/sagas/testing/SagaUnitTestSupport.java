@@ -110,6 +110,13 @@ public class SagaUnitTestSupport<T> {
     return this;
   }
 
+  public SagaUnitTestSupport<T> withExtraHeaders(Map<String, String> expectedExtraHeaders) {
+    Map<String, String> actualHeaders = sentCommand.getMessage().getHeaders();
+    if (!actualHeaders.entrySet().containsAll(expectedExtraHeaders.entrySet()))
+      fail(String.format("Expected headers %s to contain %s", actualHeaders, expectedExtraHeaders));
+    return this;
+  }
+
   public SagaUnitTestSupport<T> andGiven() {
     return this;
   }
@@ -186,4 +193,5 @@ public class SagaUnitTestSupport<T> {
     sagaDataConsumer.accept(SagaDataSerde.deserializeSagaData(sagaInstance.getSerializedSagaData()));
     return this;
   }
+
 }

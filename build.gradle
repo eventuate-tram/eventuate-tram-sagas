@@ -27,10 +27,6 @@ allprojects {
     repositories {
         mavenCentral()
         jcenter()
-        maven {
-            url  "https://dl.bintray.com/eventuateio-oss/eventuate-maven-release"
-        }
-        maven { url "https://repo.spring.io/milestone" }
         eventuateMavenRepoUrl.split(',').each { repoUrl -> maven { url repoUrl } }
     }
 
