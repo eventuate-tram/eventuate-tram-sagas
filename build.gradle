@@ -60,6 +60,7 @@ allprojects {
     uploadArchives {
         repositories {
             mavenDeployer {
+                configuration = configurations.deployerJars
                 repository(url: deployUrl) {
                   authentication(userName: System.getenv('S3_REPO_AWS_ACCESS_KEY'), password: System.getenv('S3_REPO_AWS_SECRET_ACCESS_KEY'))
                 }
