@@ -1,6 +1,10 @@
 = Eventuate Tram Saga
 
-image::https://api.bintray.com/packages/eventuateio-oss/eventuate-maven-release/eventuate-tram-sagas/images/download.svg[link="https://bintray.com/eventuateio-oss/eventuate-maven-release/eventuate-tram-sagas/_latestVersion"]
+[cols="5%,20%a"]
+|===
+| RC | image::https://api.bintray.com/packages/eventuateio-oss/eventuate-maven-rc/eventuate-tram-sagas/images/download.svg[link="https://bintray.com/eventuateio-oss/eventuate-maven-rc/eventuate-tram-sagas/_latestVersion"]
+| Release | image::https://api.bintray.com/packages/eventuateio-oss/eventuate-maven-release/eventuate-tram-sagas/images/download.svg[link="https://bintray.com/eventuateio-oss/eventuate-maven-release/eventuate-tram-sagas/_latestVersion"]
+|===
 
 The Eventuate Tram Saga framework is a saga framework for Java microservices that use JDBC/JPA.
 
@@ -132,7 +136,11 @@ public class CustomerCommandHandler {
 The artifacts are in https://bintray.com/eventuateio-oss/eventuate-maven-release/eventuate-tram-sagas[JCenter].
 The latest version is:
 
-image::https://api.bintray.com/packages/eventuateio-oss/eventuate-maven-release/eventuate-tram-sagas/images/download.svg[link="https://bintray.com/eventuateio-oss/eventuate-maven-release/eventuate-tram-sagas/_latestVersion"]
+[cols="5%,20%a"]
+|===
+| RC | image::https://api.bintray.com/packages/eventuateio-oss/eventuate-maven-rc/eventuate-tram-sagas/images/download.svg[link="https://bintray.com/eventuateio-oss/eventuate-maven-rc/eventuate-tram-sagas/_latestVersion"]
+| Release | image::https://api.bintray.com/packages/eventuateio-oss/eventuate-maven-release/eventuate-tram-sagas/images/download.svg[link="https://bintray.com/eventuateio-oss/eventuate-maven-release/eventuate-tram-sagas/_latestVersion"]
+|===
 
 If you are writing a Saga orchestrator add this dependency to your project:
 
