@@ -49,10 +49,16 @@ allprojects {
         }
     }
 
+    dependencies {
+        deployerJars 'org.springframework.build:aws-maven:5.0.0.RELEASE'
+    }
+
     uploadArchives {
         repositories {
             mavenDeployer {
-                repository(url: deployUrl)
+                repository(url: deployUrl) {
+                  authentication(userName: System.getenv('S3_REPO_AWS_ACCESS_KEY'), password: System.getenv('S3_REPO_AWS_SECRET_ACCESS_KEY'))
+                }
                 pom.project {
                     licenses {
                         license {
