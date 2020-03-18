@@ -49,6 +49,10 @@ allprojects {
         }
     }
 
+    configurations {
+        deployerJars
+    }
+
     dependencies {
         deployerJars 'org.springframework.build:aws-maven:5.0.0.RELEASE'
     }
