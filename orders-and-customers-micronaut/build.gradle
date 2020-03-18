@@ -13,19 +13,15 @@ dependencyManagement {
 apply plugin: PublicModulePlugin
 
 dependencies {
-    compile project(":orders-and-customers")
-    compile project(":eventuate-tram-sagas-micronaut-orchestration")
+    compile project(":eventuate-tram-sagas-micronaut-orchestration-simple-dsl")
     compile project(":eventuate-tram-sagas-micronaut-participant")
+    compile project(":orders-and-customers")
 
     compile "io.eventuate.common:eventuate-common-micronaut-spring-jdbc:$eventuateCommonVersion"
     compile "io.eventuate.util:eventuate-util-test:$eventuateUtilVersion"
     compile project(":eventuate-tram-sagas-testing-support")
 
-    compile "io.eventuate.tram.core:eventuate-tram-micronaut-producer-jdbc:$eventuateTramVersion"
-    compile "io.eventuate.tram.core:eventuate-tram-micronaut-consumer-jdbc:$eventuateTramVersion"
-    compile "io.eventuate.tram.core:eventuate-tram-micronaut-messaging:$eventuateTramVersion"
-    compile "io.eventuate.tram.core:eventuate-tram-micronaut-consumer-kafka:$eventuateTramVersion"
-    compile "io.eventuate.tram.core:eventuate-tram-micronaut-events:$eventuateTramVersion"
+    compile "io.eventuate.tram.core:eventuate-tram-micronaut-jdbc-kafka:$eventuateTramVersion"
 
     compile "io.micronaut:micronaut-spring"
     annotationProcessor "io.micronaut:micronaut-inject-java"

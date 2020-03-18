@@ -1,9 +1,8 @@
 apply plugin: PublicModulePlugin
 
 dependencies {
+    compile project(":eventuate-tram-sagas-spring-orchestration-simple-dsl")
     compile project(":eventuate-tram-sagas-spring-participant")
-    compile project(":eventuate-tram-sagas-spring-orchestration")
-    compile project(":eventuate-tram-sagas-orchestration-simple-dsl")
     compile project(":orders-and-customers")
 
     compile "org.springframework.boot:spring-boot-starter-data-jpa:$springBootVersion"

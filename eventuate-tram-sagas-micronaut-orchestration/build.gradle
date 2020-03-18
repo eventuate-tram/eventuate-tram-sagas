@@ -15,6 +15,9 @@ dependencyManagement {
 
 dependencies {
     compile project(":eventuate-tram-sagas-orchestration")
+    compile project(":eventuate-tram-sagas-micronaut-common")
+
+    compile "io.eventuate.tram.core:eventuate-tram-micronaut-events:$eventuateTramVersion"
     compile "io.eventuate.tram.core:eventuate-tram-micronaut-commands:$eventuateTramVersion"
     compile "io.eventuate.common:eventuate-common-micronaut-jdbc:$eventuateCommonVersion"
 
