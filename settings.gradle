@@ -25,3 +25,6 @@ include 'orders-and-customers-micronaut'
 include 'orders-and-customers-micronaut-integration-tests'
 include 'orders-and-customers-micronaut-in-memory-integration-tests'
 include 'orders-and-customers-micronaut-local-saga-in-memory-integration-tests'
+
+include 'eventuate-tram-sagas-spring-orchestration-simple-dsl-starter'
+include 'eventuate-tram-sagas-spring-participant-starter'
