@@ -1,6 +1,6 @@
 apply plugin: PublicModulePlugin
 
 dependencies {
-    compile "io.eventuate.client.java:eventuate-client-java:$eventuateClientVersion"
+    compile "io.eventuate.local.java:eventuate-client-java:$eventuateLocalVersion"
     compile "io.eventuate.tram.core:eventuate-tram-spring-commands:$eventuateTramVersion"
 }
