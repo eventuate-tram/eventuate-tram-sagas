@@ -17,6 +17,7 @@ include 'eventuate-tram-sagas-micronaut-in-memory'
 include "eventuate-tram-sagas-event-sourcing-support"
 include 'eventuate-tram-sagas-testing-support'
 include 'eventuate-tram-sagas-spring-testing-support'
+include 'eventuate-tram-sagas-spring-testing-support-cloud-contract'
 include 'eventuate-tram-sagas-micronaut-testing-support'
 
 include 'orders-and-customers'

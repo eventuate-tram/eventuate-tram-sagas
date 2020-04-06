@@ -1,0 +1,24 @@
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath "io.spring.gradle:dependency-management-plugin:$springDependencyManagementPluginVersion"
+    }
+}
+
+apply plugin: "io.spring.dependency-management"
+
+dependencyManagement {
+    imports {
+        mavenBom "org.springframework.cloud:spring-cloud-contract-dependencies:$springCloudContractDependenciesVersion"
+    }
+}
+
+
+dependencies {
+    compile "io.eventuate.common:eventuate-common-spring-id:$eventuateCommonVersion"
+    compile "io.eventuate.tram.core:eventuate-tram-spring-testing-support-cloud-contract:$eventuateTramVersion"
+    compile project(":eventuate-tram-sagas-spring-orchestration-simple-dsl")
+    compile 'org.springframework.cloud:spring-cloud-starter-contract-verifier'
+}
