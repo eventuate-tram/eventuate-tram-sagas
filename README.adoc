@@ -28,9 +28,9 @@ Eventuate Tram Sagas is described in more detail in my book https://www.manning.
 
 Presentations, videos and articles:
 
-* Article [Managing data consistency in a microservice architecture using Sagas - Implementing an orchestration-based saga](https://chrisrichardson.net/post/sagas/2019/12/12/developing-sagas-part-4.html)
-* Slides and video [MicroCPH - Managing data consistency in a microservice architecture using Sagas
-](https://microservices.io/microservices/sagas/2019/07/09/microcph-sagas.html)
+* Article https://chrisrichardson.net/post/sagas/2019/12/12/developing-sagas-part-4.html[Managing data consistency in a microservice architecture using Sagas - Implementing an orchestration-based saga]
+* Slides and video https://microservices.io/microservices/sagas/2019/07/09/microcph-sagas.html[MicroCPH - Managing data consistency in a microservice architecture using Sagas
+]
 
 Example applications:
 
