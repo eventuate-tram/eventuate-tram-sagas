@@ -8,5 +8,6 @@ dependencies {
     compile "io.eventuate.common:eventuate-common-spring-jdbc:$eventuateCommonVersion"
 
     testCompile "org.springframework.boot:spring-boot-starter-test:$springBootVersion"
+    testCompile "io.eventuate.common:eventuate-common-spring-id:$eventuateCommonVersion"
     testCompile project(":eventuate-tram-sagas-spring-in-memory")
 }
