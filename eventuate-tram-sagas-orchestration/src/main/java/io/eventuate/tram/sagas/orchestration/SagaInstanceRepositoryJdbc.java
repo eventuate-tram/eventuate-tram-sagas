@@ -46,40 +46,20 @@ public class SagaInstanceRepositoryJdbc implements SagaInstanceRepository {
     return insertIntoSagaInstanceSql;
   }
 
-  public void setInsertIntoSagaInstanceSql(String insertIntoSagaInstanceSql) {
-    this.insertIntoSagaInstanceSql = insertIntoSagaInstanceSql;
-  }
-
   public String getInsertIntoSagaInstanceParticipantsSql() {
     return insertIntoSagaInstanceParticipantsSql;
-  }
-
-  public void setInsertIntoSagaInstanceParticipantsSql(String insertIntoSagaInstanceParticipantsSql) {
-    this.insertIntoSagaInstanceParticipantsSql = insertIntoSagaInstanceParticipantsSql;
   }
 
   public String getSelectFromSagaInstanceSql() {
     return selectFromSagaInstanceSql;
   }
 
-  public void setSelectFromSagaInstanceSql(String selectFromSagaInstanceSql) {
-    this.selectFromSagaInstanceSql = selectFromSagaInstanceSql;
-  }
-
   public String getSelectFromSagaInstanceParticipantsSql() {
     return selectFromSagaInstanceParticipantsSql;
   }
 
-  public void setSelectFromSagaInstanceParticipantsSql(String selectFromSagaInstanceParticipantsSql) {
-    this.selectFromSagaInstanceParticipantsSql = selectFromSagaInstanceParticipantsSql;
-  }
-
   public String getUpdateSagaInstanceSql() {
     return updateSagaInstanceSql;
-  }
-
-  public void setUpdateSagaInstanceSql(String updateSagaInstanceSql) {
-    this.updateSagaInstanceSql = updateSagaInstanceSql;
   }
 
   @Override
@@ -136,8 +116,7 @@ public class SagaInstanceRepositoryJdbc implements SagaInstanceRepository {
                             rs.getString("last_request_id"),
                             new SerializedSagaData(rs.getString("saga_data_type"), rs.getString("saga_data_json")), destinationsAndResources),
             sagaType,
-            sagaId).stream().findFirst().orElse(null);
-    // TODO insert - sagaInstance.getDestinationsAndResources();
+            sagaId).stream().findFirst().orElseThrow( () -> new RuntimeException(String.format("Cannot find saga instance %s %s", sagaType, sagaId)));
   }
 
   @Override
