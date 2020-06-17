@@ -8,6 +8,7 @@ import io.eventuate.tram.messaging.consumer.MessageConsumer;
 import io.eventuate.tram.messaging.producer.MessageBuilder;
 import io.eventuate.tram.sagas.orchestration.*;
 import io.eventuate.tram.sagas.common.SagaLockManager;
+import org.junit.Assert;
 
 import java.util.*;
 import java.util.function.Consumer;
@@ -101,7 +102,7 @@ public class SagaUnitTestSupport<T> {
   }
 
   public SagaUnitTestSupport<T> to(String commandChannel) {
-    assertEquals("Expected a command", 1, sentCommands.size());
+    assertEquals("Expected one command", 1, sentCommands.size());
     sentCommand = sentCommands.get(0);
     assertEquals(commandChannel, sentCommand.getDestination());
     assertEquals(expectedCommand.getClass().getName(), sentCommand.getMessage().getRequiredHeader(CommandMessageHeaders.COMMAND_TYPE));
@@ -169,19 +170,28 @@ public class SagaUnitTestSupport<T> {
 
   public SagaUnitTestSupport<T> expectCompletedSuccessfully() {
     assertNoCommands();
-    assertTrue(sagaInstance.isEndState());
-    assertFalse(sagaInstance.isCompensating());
+    assertTrue("Expected saga to have finished", sagaInstance.isEndState());
+    assertFalse("Expected saga to have finished successfully", sagaInstance.isCompensating());
     return this;
   }
 
   private void assertNoCommands() {
-    assertEquals(emptyList(), sentCommands);
+    switch (sentCommands.size()) {
+      case 0:
+        break;
+      case 1:
+        MessageWithDestination mwd = sentCommands.get(0);
+        Assert.fail(String.format("Expected saga to have finished but found a command of %s sent to %s: %s", mwd.getMessage().getRequiredHeader(CommandMessageHeaders.COMMAND_TYPE), mwd.getDestination(), mwd.getMessage()));
+        break;
+      default:
+        assertEquals(emptyList(), sentCommands);
+    }
   }
 
   public SagaUnitTestSupport<T> expectRolledBack() {
     assertNoCommands();
-    assertTrue(sagaInstance.isEndState());
-    assertTrue(sagaInstance.isCompensating());
+    assertTrue("Expected saga to have finished", sagaInstance.isEndState());
+    assertTrue("Expected saga to have rolled back", sagaInstance.isCompensating());
     return this;
   }
 
