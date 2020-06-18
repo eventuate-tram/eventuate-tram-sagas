@@ -32,11 +32,6 @@ public class ReconfigurableCommandHandlers extends CommandHandlers {
     return handlers.stream().filter(h -> h.handles(message)).findFirst().map(x -> (CommandHandler)x);
   }
 
-  @Override
-  public Optional<CommandExceptionHandler> findExceptionHandler(Throwable cause) {
-    return super.findExceptionHandler(cause);
-  }
-
   public void reset() {
     handlers.clear();
   }
