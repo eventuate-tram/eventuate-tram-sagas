@@ -14,6 +14,7 @@ jobs:
           paths:
             - ~/.gradle
           key: eventuate-tram-sagas-{{ checksum "gradle.properties" }}
+      - run: ./.circleci/upgrade-docker-compose.sh
       - run: TERM=dumb ./build-and-test-all-mysql.sh
       - run: TERM=dumb ./build-and-test-all-postgres.sh
       - run: TERM=dumb ./build-and-test-all-activemq.sh

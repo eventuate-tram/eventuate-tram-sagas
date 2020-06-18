@@ -12,8 +12,6 @@ set -e
 
 ./gradlew "${target}InfrastructureComposeUp"
 
-"./wait-for-${database}.sh"
-
 ./gradlew "${database}AllComposeUp"
 
 if [[ "${SPRING_PROFILES_ACTIVE}" != "ActiveMQ" ]]; then
