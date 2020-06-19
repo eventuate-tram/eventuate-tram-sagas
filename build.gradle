@@ -38,7 +38,6 @@ allprojects {
 
     bintray {
         publish = true
-        override = true
         user = System.getenv('BINTRAY_USER')
         key = System.getenv('BINTRAY_KEY')
         configurations = ['archives']
