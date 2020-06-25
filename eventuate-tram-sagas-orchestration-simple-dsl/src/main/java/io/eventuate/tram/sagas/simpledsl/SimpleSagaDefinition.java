@@ -82,7 +82,8 @@ public class SimpleSagaDefinition<Data> implements SagaDefinition<Data> {
   private void invokeReplyHandler(Message message, Data data, BiConsumer<Data, Object> handler) {
     Class m;
     try {
-      m = Class.forName(message.getRequiredHeader(ReplyMessageHeaders.REPLY_TYPE));
+      String className = message.getRequiredHeader(ReplyMessageHeaders.REPLY_TYPE);
+      m = Class.forName(className, true, Thread.currentThread().getContextClassLoader());
     } catch (ClassNotFoundException e) {
       logger.error("Class not found", e);
       throw new RuntimeException("Class not found", e);
