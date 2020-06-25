@@ -5,7 +5,7 @@ DOCKER_REPO=eventuateio
 REMOTE_PREFIX=eventuate-tram-sagas
 IMAGES="mysql postgres"
 
-DOCKER_COMPOSE_PREFIX=$(echo ${PWD##*/} | sed -e 's/-//g')_
+DOCKER_COMPOSE_PREFIX=${PWD##*/}_
 
 BRANCH=$(git rev-parse --abbrev-ref HEAD)
 
