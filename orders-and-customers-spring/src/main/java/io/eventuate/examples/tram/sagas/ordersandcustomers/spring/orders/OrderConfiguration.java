@@ -17,6 +17,7 @@ import io.eventuate.tram.sagas.common.SagaLockManager;
 import io.eventuate.tram.sagas.orchestration.*;
 import io.eventuate.tram.sagas.spring.orchestration.SagaOrchestratorConfiguration;
 import io.eventuate.tram.sagas.participant.SagaCommandDispatcherFactory;
+import io.eventuate.tram.spring.optimisticlocking.OptimisticLockingDecoratorConfiguration;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.context.annotation.Bean;
@@ -30,7 +31,7 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 @EnableAutoConfiguration
 @EntityScan("io.eventuate.examples.tram.sagas.ordersandcustomers")
 @ComponentScan
-@Import({TramCommandConsumerConfiguration.class, SagaOrchestratorConfiguration.class})
+@Import(OptimisticLockingDecoratorConfiguration.class)
 public class OrderConfiguration {
 
   @Bean

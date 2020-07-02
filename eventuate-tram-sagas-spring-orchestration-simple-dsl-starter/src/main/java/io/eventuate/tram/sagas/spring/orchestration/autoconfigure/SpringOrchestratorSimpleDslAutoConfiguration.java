@@ -6,5 +6,5 @@ import org.springframework.context.annotation.Import;
 
 @Configuration
 @Import(SagaOrchestratorConfiguration.class)
-public class SpringOrchestratorSimpleDslAutoConfigure {
+public class SpringOrchestratorSimpleDslAutoConfiguration {
 }
