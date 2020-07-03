@@ -1,7 +1,9 @@
 apply plugin: PublicModulePlugin
 
 dependencies {
+    compile project(":eventuate-tram-sagas-spring-orchestration-simple-dsl")
     compile project(":eventuate-tram-sagas-spring-orchestration-simple-dsl-starter")
+    compile project(":eventuate-tram-sagas-spring-participant")
     compile project(":eventuate-tram-sagas-spring-participant-starter")
     compile project(":orders-and-customers")
 
