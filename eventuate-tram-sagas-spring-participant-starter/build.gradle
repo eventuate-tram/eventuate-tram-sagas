@@ -3,5 +3,5 @@ apply plugin: PublicModulePlugin
 dependencies {
     compile "io.eventuate.tram.core:eventuate-tram-spring-messaging-starter:$eventuateTramVersion"
 
-    compileOnly project(":eventuate-tram-sagas-spring-participant")
+    compile project(":eventuate-tram-sagas-spring-participant")
 }

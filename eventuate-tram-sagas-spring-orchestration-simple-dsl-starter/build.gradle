@@ -5,5 +5,5 @@ dependencies {
     compile "io.eventuate.tram.core:eventuate-tram-spring-commands-starter:$eventuateTramVersion"
     compile "io.eventuate.tram.core:eventuate-tram-spring-events-starter:$eventuateTramVersion"
 
-    compileOnly project(":eventuate-tram-sagas-spring-orchestration-simple-dsl")
+    compile project(":eventuate-tram-sagas-spring-orchestration-simple-dsl")
 }
