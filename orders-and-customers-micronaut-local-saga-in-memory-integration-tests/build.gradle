@@ -27,7 +27,6 @@ dependencies {
     compile  'org.springframework:spring-jdbc'
     compile "io.micronaut.configuration:micronaut-hibernate-jpa"
     annotationProcessor "javax.persistence:javax.persistence-api:2.2"
-    compile 'io.micronaut.configuration:micronaut-jdbc-hikari'
     testAnnotationProcessor "io.micronaut:micronaut-inject-java"
     testCompile "org.junit.jupiter:junit-jupiter-api"
     testCompile "io.micronaut.test:micronaut-test-junit5"
