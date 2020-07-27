@@ -1,10 +1,3 @@
-datasources:
-  default:
-    url: ${DB_URL}
-    driverClassName: ${DB_DRIVERCLASSNAME}
-    driver-class-name: ${DB_DRIVERCLASSNAME}
-    username: ${DB_USERNAME}
-    password: ${DB_PASSWORD}
 jpa:
   default:
     packages-to-scan:
@@ -14,4 +7,10 @@ jpa:
         hbm2ddl:
           auto: update
         show_sql: true
-
+transactional:
+  noop:
+    duplicate:
+      message:
+        detector:
+          factory:
+            enabled: true
