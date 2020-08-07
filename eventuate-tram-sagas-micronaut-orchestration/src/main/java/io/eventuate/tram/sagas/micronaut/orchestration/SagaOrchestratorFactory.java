@@ -10,6 +10,7 @@ import io.eventuate.tram.sagas.orchestration.*;
 import io.micronaut.context.annotation.Factory;
 
 import javax.inject.Singleton;
+import java.util.Collection;
 
 @Factory
 public class SagaOrchestratorFactory {
@@ -28,9 +29,9 @@ public class SagaOrchestratorFactory {
   @Singleton
   public SagaInstanceFactory sagaInstanceFactory(SagaInstanceRepository sagaInstanceRepository,
                                                  CommandProducer commandProducer, MessageConsumer messageConsumer,
-                                                 SagaLockManager sagaLockManager, SagaCommandProducer sagaCommandProducer) {
+                                                 SagaLockManager sagaLockManager, SagaCommandProducer sagaCommandProducer, Collection<Saga<?>> sagas) {
     SagaManagerFactory smf = new SagaManagerFactory(sagaInstanceRepository, commandProducer, messageConsumer,
             sagaLockManager, sagaCommandProducer);
-    return new SagaInstanceFactory(smf);
+    return new SagaInstanceFactory(smf, sagas);
   }
 }

@@ -3,6 +3,8 @@ package io.eventuate.tram.sagas.orchestration;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.util.Collections;
+
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.*;
 
@@ -27,7 +29,6 @@ public class SagaInstanceFactoryTest {
   @Before
   public void setUp() {
     sagaManagerFactory = mock(SagaManagerFactory.class);
-    sagaInstanceFactory = new SagaInstanceFactory(sagaManagerFactory);
 
     sagaManager = mock(SagaManagerImpl.class);
 
@@ -36,12 +37,13 @@ public class SagaInstanceFactoryTest {
     saga = mock(Saga.class);
     expectedSi1 = mock(SagaInstance.class);
     expectedSi2 = mock(SagaInstance.class);
+    when(sagaManagerFactory.make(saga)).thenReturn(sagaManager);
+    sagaInstanceFactory = new SagaInstanceFactory(sagaManagerFactory, Collections.singleton(saga));
   }
 
   @Test
   public void shouldCreateSagaInstance() {
 
-    when(sagaManagerFactory.make(saga)).thenReturn(sagaManager);
     when(sagaManager.create(sagaData1)).thenReturn(expectedSi1);
     when(sagaManager.create(sagaData2)).thenReturn(expectedSi2);
 

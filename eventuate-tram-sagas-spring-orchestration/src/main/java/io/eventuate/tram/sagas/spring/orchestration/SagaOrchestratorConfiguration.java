@@ -13,6 +13,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 
+import java.util.Collection;
+
 @Configuration
 @Import({TramCommandProducerConfiguration.class, EventuateTramSagaCommonConfiguration.class})
 public class SagaOrchestratorConfiguration {
@@ -33,9 +35,9 @@ public class SagaOrchestratorConfiguration {
   @Bean
   public SagaInstanceFactory sagaInstanceFactory(SagaInstanceRepository sagaInstanceRepository, CommandProducer
           commandProducer, MessageConsumer messageConsumer,
-                                                 SagaLockManager sagaLockManager, SagaCommandProducer sagaCommandProducer) {
+                                                 SagaLockManager sagaLockManager, SagaCommandProducer sagaCommandProducer, Collection<Saga<?>> sagas) {
     SagaManagerFactory smf = new SagaManagerFactory(sagaInstanceRepository, commandProducer, messageConsumer,
             sagaLockManager, sagaCommandProducer);
-    return new SagaInstanceFactory(smf);
+    return new SagaInstanceFactory(smf, sagas);
   }
 }
