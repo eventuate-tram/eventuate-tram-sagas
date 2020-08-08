@@ -1,11 +1,10 @@
 buildscript {
     repositories {
         jcenter()
-        maven { url "https://dl.bintray.com/eventuateio-oss/eventuate-maven-release" }
-        maven { url "https://snapshots.repositories.eventuate.io/repository" }
+        eventuateMavenRepoUrl.split(',').each { repoUrl -> maven { url repoUrl } }
     }
     dependencies {
-        classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.7.3'
+        classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.8.5'
         classpath "com.avast.gradle:gradle-docker-compose-plugin:0.9.2"
         classpath "io.eventuate.plugins.gradle:eventuate-plugins-gradle-publish:$eventuatePluginsGradleVersion"
     }
