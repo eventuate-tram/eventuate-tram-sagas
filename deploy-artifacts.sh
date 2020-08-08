@@ -1,5 +1,6 @@
 #! /bin/bash -e
 
+./gradlew  publishEventuateArtifacts
 
 DOCKER_REPO=eventuateio
 REMOTE_PREFIX=eventuate-tram-sagas
@@ -8,13 +9,6 @@ IMAGES="mysql postgres"
 DOCKER_COMPOSE_PREFIX=${PWD##*/}_
 
 BRANCH=$(git rev-parse --abbrev-ref HEAD)
-
-if [  $BRANCH == "master" ] ; then
-  BUILD_SNAPSHOT=$(sed -e '/^version=/!d' -e 's/^version=\(.*\)-SNAPSHOT$/\1.BUILD-SNAPSHOT/' < gradle.properties)
-  echo master: publishing $BUILD_SNAPSHOT
-  ./gradlew -P version=$BUILD_SNAPSHOT -P deployUrl=${S3_REPO_DEPLOY_URL?} uploadArchives
-  exit 0
-fi
 
 if ! [[  $BRANCH =~ ^[0-9]+ ]] ; then
   echo Not release $BRANCH - no PUSH
@@ -30,14 +24,7 @@ else
   exit -1
 fi
 
-echo BINTRAY_REPO_TYPE=${BINTRAY_REPO_TYPE}
-
 VERSION=$BRANCH
-
-$PREFIX ./gradlew -P version=${VERSION} \
-  -P bintrayRepoType=${BINTRAY_REPO_TYPE} \
-  -P deployUrl=https://dl.bintray.com/eventuateio-oss/eventuate-maven-${BINTRAY_REPO_TYPE} \
-  testClasses bintrayUpload
 
 function tagAndPush() {
   LOCAL=$1
