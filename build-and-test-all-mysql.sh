@@ -2,8 +2,6 @@
 
 set -e
 
-. ./set-env-mysql.sh
-
 export database=mysql
 export target=mysql
 

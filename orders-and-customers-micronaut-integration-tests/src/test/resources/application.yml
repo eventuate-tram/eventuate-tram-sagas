@@ -1,10 +1,18 @@
 datasources:
   default:
-    url: ${DB_URL}
-    driverClassName: ${DB_DRIVERCLASSNAME}
-    driver-class-name: ${DB_DRIVERCLASSNAME}
-    username: ${DB_USERNAME}
-    password: ${DB_PASSWORD}
+    url: jdbc:mysql://${$DOCKER_HOST_IP:localhost}/eventuate
+    username: mysqluser
+    password: mysqlpw
+    driverClassName: com.mysql.jdbc.Driver
+    driver-class-name: com.mysql.jdbc.Driver
+
+
+
+eventuatelocal:
+  kafka:
+    bootstrap:
+      servers: ${$DOCKER_HOST_IP:localhost}:9092
+
 jpa:
   default:
     packages-to-scan:

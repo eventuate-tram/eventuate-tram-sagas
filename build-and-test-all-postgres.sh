@@ -2,8 +2,8 @@
 
 set -e
 
-. ./set-env-postgres.sh
-
+export SPRING_PROFILES_ACTIVE=postgres
+export MICRONAUT_ENVIRONMENTS=postgres
 export database=postgres
 export target=postgres
 
