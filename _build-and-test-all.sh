@@ -2,8 +2,6 @@
 
 set -e
 
-. "./set-env-${database}.sh"
-
 ./gradlew testClasses
 
 ./gradlew "${database}AllComposeDown"
