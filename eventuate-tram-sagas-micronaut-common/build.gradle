@@ -13,7 +13,6 @@ dependencyManagement {
 }
 
 dependencies {
-    compile "io.eventuate.common:eventuate-common-micronaut-id:$eventuateCommonVersion"
     compile "io.eventuate.common:eventuate-common-micronaut-jdbc:$eventuateCommonVersion"
     compile project(":eventuate-tram-sagas-common")
 

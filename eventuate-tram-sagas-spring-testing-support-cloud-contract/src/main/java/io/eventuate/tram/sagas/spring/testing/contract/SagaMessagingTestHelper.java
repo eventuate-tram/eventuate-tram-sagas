@@ -28,7 +28,7 @@ public class SagaMessagingTestHelper {
   public <C extends Command, R> R sendAndReceiveCommand(CommandEndpoint<C> commandEndpoint, C command, Class<R> replyClass, String sagaType) {
     // TODO verify that replyClass is allowed
 
-    String sagaId = idGenerator.genId().asString();
+    String sagaId = idGenerator.genId(null).asString();
 
     String replyTo = sagaType + "-reply";
     sagaCommandProducer.sendCommands(sagaType, sagaId, Collections.singletonList(new CommandWithDestination(commandEndpoint.getCommandChannel(), (String)null, (Command)command)), replyTo);

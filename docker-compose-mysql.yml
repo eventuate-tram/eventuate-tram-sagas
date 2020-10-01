@@ -41,6 +41,7 @@ services:
       - MYSQL_ROOT_PASSWORD=rootpassword
       - MYSQL_USER=mysqluser
       - MYSQL_PASSWORD=mysqlpw
+      - USE_DB_ID=${USE_DB_ID}
 
   cdcservice:
     image: eventuateio/eventuate-cdc-service:$EVENTUATE_CDC_VERSION
@@ -65,3 +66,4 @@ services:
       EVENTUATELOCAL_CDC_MYSQL_BINLOG_CLIENT_UNIQUE_ID: 2
       ACTIVEMQ_URL: tcp://activemq:61616
       SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE}
+      EVENTUATE_OUTBOX_ID: 1

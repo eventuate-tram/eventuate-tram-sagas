@@ -68,7 +68,7 @@ public class SagaUnitTestSupport<T> {
 
     CommandProducerImpl commandProducer = new CommandProducerImpl((destination, message) -> {
       String id = genId();
-      message.getHeaders().put(Message.ID, id);
+      message.setHeader(Message.ID, id);
       sentCommands.add(new MessageWithDestination(destination, message));
     });
 

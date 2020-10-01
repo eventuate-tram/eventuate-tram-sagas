@@ -31,6 +31,7 @@ services:
     environment:
       POSTGRES_USER: eventuate
       POSTGRES_PASSWORD: eventuate
+      USE_DB_ID: ${USE_DB_ID}
 
   cdcservice:
     image: eventuateio/eventuate-cdc-service:$EVENTUATE_CDC_VERSION
@@ -52,3 +53,4 @@ services:
       SPRING_PROFILES_ACTIVE: EventuatePolling
       EVENTUATELOCAL_CDC_READER_NAME: ClientEventuateTram
       EVENTUATELOCAL_CDC_MYSQL_BINLOG_CLIENT_UNIQUE_ID: 2
+      EVENTUATE_OUTBOX_ID: 1

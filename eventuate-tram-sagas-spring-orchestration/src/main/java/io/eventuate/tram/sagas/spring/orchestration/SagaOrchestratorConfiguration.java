@@ -1,6 +1,6 @@
 package io.eventuate.tram.sagas.spring.orchestration;
 
-import io.eventuate.common.id.IdGenerator;
+import io.eventuate.common.id.ApplicationIdGenerator;
 import io.eventuate.common.jdbc.EventuateJdbcStatementExecutor;
 import io.eventuate.common.jdbc.EventuateSchema;
 import io.eventuate.tram.commands.producer.CommandProducer;
@@ -22,9 +22,8 @@ public class SagaOrchestratorConfiguration {
 
   @Bean
   public SagaInstanceRepository sagaInstanceRepository(EventuateJdbcStatementExecutor eventuateJdbcStatementExecutor,
-                                                       IdGenerator idGenerator,
                                                        EventuateSchema eventuateSchema) {
-    return new SagaInstanceRepositoryJdbc(eventuateJdbcStatementExecutor, idGenerator, eventuateSchema);
+    return new SagaInstanceRepositoryJdbc(eventuateJdbcStatementExecutor, new ApplicationIdGenerator(), eventuateSchema);
   }
 
   @Bean

@@ -1,9 +1,8 @@
 package io.eventuate.tram.sagas.orchestration;
 
-import io.eventuate.common.id.IdGenerator;
+import io.eventuate.common.id.ApplicationIdGenerator;
 import io.eventuate.common.jdbc.EventuateJdbcStatementExecutor;
 import io.eventuate.common.jdbc.EventuateSchema;
-import io.eventuate.common.spring.id.IdGeneratorConfiguration;
 import io.eventuate.common.spring.jdbc.EventuateCommonJdbcOperationsConfiguration;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -30,14 +29,13 @@ public class SagaInstanceRepositoryJdbcIntegrationTest {
   private SagaInstance sagaInstance = new SagaInstance(sagaType, null, "SomeState", "lastRequestId", new SerializedSagaData("sagaDatType", "{}"), Collections.emptySet());
 
   @Configuration
-  @Import({EventuateCommonJdbcOperationsConfiguration.class, IdGeneratorConfiguration.class})
+  @Import(EventuateCommonJdbcOperationsConfiguration.class)
   public static class Config {
 
     @Bean
     public SagaInstanceRepository sagaInstanceRepository(EventuateJdbcStatementExecutor eventuateJdbcStatementExecutor,
-                                                         IdGenerator idGenerator,
                                                          EventuateSchema eventuateSchema) {
-      return new SagaInstanceRepositoryJdbc(eventuateJdbcStatementExecutor, idGenerator, eventuateSchema);
+      return new SagaInstanceRepositoryJdbc(eventuateJdbcStatementExecutor, new ApplicationIdGenerator(), eventuateSchema);
     }
 
 
