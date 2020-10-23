@@ -26,6 +26,7 @@ services:
       context: ./postgres
       args:
         EVENTUATE_COMMON_VERSION: "$EVENTUATE_COMMON_VERSION"
+    image: eventuateio/eventuate-tram-sagas-postgres:$DOCKER_IMAGE_TAG
     ports:
       - 5432:5432
     environment:

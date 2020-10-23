@@ -35,6 +35,7 @@ services:
       context: ./mysql
       args:
         EVENTUATE_COMMON_VERSION: "$EVENTUATE_COMMON_VERSION"
+    image: eventuateio/eventuate-tram-sagas-mysql:$DOCKER_IMAGE_TAG
     ports:
       - 3306:3306
     environment:

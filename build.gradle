@@ -18,6 +18,7 @@ allprojects {
 }
 
 apply plugin: "io.eventuate.plugins.gradle.publish.EventuatePublish"
+apply plugin: "io.eventuate.plugins.gradle.publish.EventuatePublishDockerImages"
 
 allprojects {
 
@@ -65,6 +66,8 @@ dockerCompose {
     environment.put "EVENTUATE_COMMON_VERSION", eventuateCommonImageVersion
     environment.put "EVENTUATE_CDC_VERSION", eventuateCdcImageVersion
 
+    environment.put "DOCKER_IMAGE_TAG", dockerImageTag
+
     activemqInfrastructure {
         projectName = null
         useComposeFiles = ["docker-compose-mysql.yml"]
@@ -87,5 +90,10 @@ dockerCompose {
     postgresAll {
         projectName = null
         useComposeFiles = ["docker-compose-postgres.yml"]
+    }
+
+    publish {
+        projectName = null
+        useComposeFiles = ["docker-compose-mysql.yml", "docker-compose-postgres.yml"]
     }
 }
