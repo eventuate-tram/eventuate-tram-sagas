@@ -3,8 +3,8 @@ datasources:
     url: jdbc:mysql://${$DOCKER_HOST_IP:localhost}/eventuate
     username: mysqluser
     password: mysqlpw
-    driverClassName: com.mysql.jdbc.Driver
-    driver-class-name: com.mysql.jdbc.Driver
+    driverClassName: com.mysql.cj.jdbc.Driver
+    driver-class-name: com.mysql.cj.jdbc.Driver
 
 
 
