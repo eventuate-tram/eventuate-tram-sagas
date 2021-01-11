@@ -28,7 +28,7 @@ dependencies {
     testCompile "io.eventuate.tram.core:eventuate-tram-micronaut-consumer-kafka:$eventuateTramVersion"
     testCompile "io.eventuate.tram.core:eventuate-tram-micronaut-events:$eventuateTramVersion"
 
-    compile 'mysql:mysql-connector-java:5.1.36'
+    compile 'mysql:mysql-connector-java:8.0.21'
     compile ('org.postgresql:postgresql:9.4-1200-jdbc41') {
         exclude group: "org.slf4j", module: "slf4j-simple"
     }
