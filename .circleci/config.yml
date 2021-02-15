@@ -1,35 +1,63 @@
-version: 2
-jobs:
-  build:
-    machine: true
-    working_directory: ~/eventuate-tram-sagas
-    steps:
-      - checkout
-      - restore_cache:
-          keys:
-            - eventuate-tram-sagas-{{ checksum "gradle.properties" }}
-            - eventuate-tram-sagas-
-      - run: TERM=dumb ./gradlew testClasses aggregateJavaDocs
-      - save_cache:
-          paths:
-            - ~/.gradle
-          key: eventuate-tram-sagas-{{ checksum "gradle.properties" }}
-      - run: ./.circleci/upgrade-docker-compose.sh
-      - run: TERM=dumb ./build-and-test-all-mysql.sh
-      - run: TERM=dumb ./build-and-test-all-postgres.sh
-      - run: TERM=dumb ./build-and-test-all-activemq.sh
-      - run:
-          name: Save JUNIT test results
-          command: |
-            mkdir -p ~/junit/
-            find . -type f -regex ".*/build/test-results/.*xml" -exec cp {} ~/junit/ \;
-          when: always
-      - store_test_results:
-          path: ~/junit
-      - store_artifacts:
-          path: ~/junit
-      - run:
-          name: Publish artifacts
-          command: |
-            TERM=dumb ./deploy-artifacts.sh
-          when: on_success
+version: 2.1
+orbs:
+  build-and-test:
+    jobs:
+      build-and-test:
+        parameters:
+          script:
+            description: the script to execute
+            type: string
+        machine: true
+        working_directory: ~/eventuate-tram-sagas
+        steps:
+          - checkout
+          - restore_cache:
+              keys:
+                - eventuate-tram-sagas-{{ checksum "gradle.properties" }}-{{ checksum "gradle/wrapper/gradle-wrapper.properties" }}
+                - eventuate-tram-sagas-
+          - run:
+              command: |
+                ./.circleci/upgrade-docker-compose.sh
+          - run:
+              command: |
+                . ./.circleci/setenv-circle-ci.sh
+                ./gradlew testClasses aggregateJavaDocs
+          - save_cache:
+              paths:
+                - ~/.gradle
+              key: eventuate-tram-sagas-{{ checksum "gradle.properties" }}-{{ checksum "gradle/wrapper/gradle-wrapper.properties" }}
+          - run: <<parameters.script>>
+          - run:
+              name: Save test results
+              command: ./.circleci/save-containers-and-tests.sh
+              when: always
+          - store_test_results:
+              path: ~/junit
+          - store_artifacts:
+              path: ~/junit
+          - store_artifacts:
+              path: ~/container-logs
+workflows:
+  version: 2.1
+  build-test-and-deploy:
+    jobs:
+      - build-and-test/build-and-test:
+          name: build-and-test-mysql
+          script: ./build-and-test-all-mysql.sh
+      - build-and-test/build-and-test:
+          name: build-and-test-mssql
+          script: ./build-and-test-all-mssql.sh
+      - build-and-test/build-and-test:
+          name: build-and-test-postgres
+          script: ./build-and-test-all-postgres.sh
+      - build-and-test/build-and-test:
+          name: build-and-test-activemq
+          script: ./build-and-test-all-activemq.sh
+      - build-and-test/build-and-test:
+          name: deploy-artifacts
+          requires:
+            - build-and-test-mysql
+            - build-and-test-mssql
+            - build-and-test-postgres
+            - build-and-test-activemq
+          script: ./deploy-artifacts.sh

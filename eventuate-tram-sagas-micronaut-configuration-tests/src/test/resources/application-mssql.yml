@@ -1,0 +1,7 @@
+datasources:
+  default:
+    url: jdbc:sqlserver://${$DOCKER_HOST_IP:localhost}:1433;databaseName=eventuate
+    username: sa
+    password: Eventuate123!
+    driverClassName: com.microsoft.sqlserver.jdbc.SQLServerDriver
+    driver-class-name: com.microsoft.sqlserver.jdbc.SQLServerDriver
