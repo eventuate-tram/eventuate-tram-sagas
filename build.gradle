@@ -73,27 +73,25 @@ dockerCompose {
         useComposeFiles = ["docker-compose-mysql.yml"]
         startedServices = ["mysql", "activemq"]
     }
-    mysqlInfrastructure {
-        projectName = null
-        useComposeFiles = ["docker-compose-mysql.yml"]
-        startedServices = ["mysql", "zookeeper", "kafka"]
-    }
+
     mysqlAll {
         projectName = null
         useComposeFiles = ["docker-compose-mysql.yml"]
     }
-    postgresInfrastructure {
-        projectName = null
-        useComposeFiles = ["docker-compose-postgres.yml"]
-        startedServices = ["postgres", "zookeeper", "kafka"]
-    }
+
+
     postgresAll {
         projectName = null
         useComposeFiles = ["docker-compose-postgres.yml"]
     }
 
+    mssqlAll {
+        projectName = null
+        useComposeFiles = ["docker-compose-mssql.yml"]
+    }
+
     publish {
         projectName = null
-        useComposeFiles = ["docker-compose-mysql.yml", "docker-compose-postgres.yml"]
+        useComposeFiles = ["docker-compose-mysql.yml", "docker-compose-postgres.yml", "docker-compose-mssql.yml"]
     }
 }
