@@ -13,6 +13,8 @@ dependencyManagement {
 }
 
 dependencies {
+    compile project(":eventuate-tram-sagas-common-in-memory")
+
     compile "org.springframework.boot:spring-boot-starter-jdbc:$springBootVersion"
 
     implementation  "io.eventuate.tram.core:eventuate-tram-micronaut-in-memory:$eventuateTramVersion"
