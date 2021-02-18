@@ -35,44 +35,12 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 public class OrderConfiguration {
 
   @Bean
-  public OrderService orderService(SagaManager<CreateOrderSagaData> createOrderSagaManager,
-                                   SagaManager<LocalCreateOrderSagaData> localCreateOrderSagaManager,
-                                   OrderDao orderDao,
+  public OrderService orderService(OrderDao orderDao,
                                    EventuateTransactionTemplate eventuateTransactionTemplate,
                                    SagaInstanceFactory sagaInstanceFactory,
-                                   LocalCreateOrderSaga localCreateOrderSaga) {
-    return new OrderService(createOrderSagaManager, orderDao, eventuateTransactionTemplate, sagaInstanceFactory, localCreateOrderSaga);
-  }
-
-
-  @Bean
-  public SagaManager<CreateOrderSagaData> createOrderSagaManager(Saga<CreateOrderSagaData> saga,
-                                                                 SagaInstanceRepository sagaInstanceRepository,
-                                                                 CommandProducer commandProducer,
-                                                                 MessageConsumer messageConsumer,
-                                                                 SagaLockManager sagaLockManager,
-                                                                 SagaCommandProducer sagaCommandProducer) {
-    return new SagaManagerImpl<>(saga,
-            sagaInstanceRepository,
-            commandProducer,
-            messageConsumer,
-            sagaLockManager,
-            sagaCommandProducer);
-  }
-
-  @Bean
-  public SagaManager<LocalCreateOrderSagaData> localCreateOrderSagaManager(Saga<LocalCreateOrderSagaData> saga,
-                                                                           SagaInstanceRepository sagaInstanceRepository,
-                                                                           CommandProducer commandProducer,
-                                                                           MessageConsumer messageConsumer,
-                                                                           SagaLockManager sagaLockManager,
-                                                                           SagaCommandProducer sagaCommandProducer) {
-    return new SagaManagerImpl<>(saga,
-            sagaInstanceRepository,
-            commandProducer,
-            messageConsumer,
-            sagaLockManager,
-            sagaCommandProducer);
+                                   LocalCreateOrderSaga localCreateOrderSaga,
+                                   CreateOrderSaga createOrderSaga) {
+    return new OrderService(orderDao, eventuateTransactionTemplate, sagaInstanceFactory, localCreateOrderSaga, createOrderSaga);
   }
 
 
