@@ -24,49 +24,13 @@ import javax.inject.Singleton;
 public class OrderFactory {
 
   @Singleton
-  public OrderService orderService(@Named("createOrderSagaManager") SagaManager<CreateOrderSagaData> createOrderSagaManager,
-                                   @Named("localCreateOrderSagaManager") SagaManager<LocalCreateOrderSagaData> localCreateOrderSagaManager,
-                                   OrderDao orderDao,
+  public OrderService orderService(OrderDao orderDao,
                                    EventuateTransactionTemplate eventuateTransactionTemplate,
                                    SagaInstanceFactory sagaInstanceFactory,
-                                   @Named("localCreateOrderSaga") LocalCreateOrderSaga localCreateOrderSaga) {
-    return new OrderService(createOrderSagaManager, orderDao, eventuateTransactionTemplate, sagaInstanceFactory, localCreateOrderSaga);
+                                   @Named("localCreateOrderSaga") LocalCreateOrderSaga localCreateOrderSaga,
+                                   @Named("createOrderSaga") CreateOrderSaga createOrderSaga) {
+    return new OrderService(orderDao, eventuateTransactionTemplate, sagaInstanceFactory, localCreateOrderSaga, createOrderSaga);
   }
-
-
-  @Singleton
-  @Named("createOrderSagaManager")
-  public SagaManager<CreateOrderSagaData> createOrderSagaManager(@Named("createOrderSaga") Saga<CreateOrderSagaData> saga,
-                                                                 SagaInstanceRepository sagaInstanceRepository,
-
-                                                                 CommandProducer commandProducer,
-                                                                 MessageConsumer messageConsumer,
-                                                                 SagaLockManager sagaLockManager,
-                                                                 SagaCommandProducer sagaCommandProducer) {
-    return new SagaManagerImpl<>(saga,
-            sagaInstanceRepository,
-            commandProducer,
-            messageConsumer,
-            sagaLockManager,
-            sagaCommandProducer);
-  }
-
-  @Singleton
-  @Named("localCreateOrderSagaManager")
-  public SagaManager<LocalCreateOrderSagaData> localCreateOrderSagaManager(@Named("localCreateOrderSaga") Saga<LocalCreateOrderSagaData> saga,
-                                                                           SagaInstanceRepository sagaInstanceRepository,
-                                                                           CommandProducer commandProducer,
-                                                                           MessageConsumer messageConsumer,
-                                                                           SagaLockManager sagaLockManager,
-                                                                           SagaCommandProducer sagaCommandProducer) {
-    return new SagaManagerImpl<>(saga,
-            sagaInstanceRepository,
-            commandProducer,
-            messageConsumer,
-            sagaLockManager,
-            sagaCommandProducer);
-  }
-
 
   @Singleton
   @Named("createOrderSaga")
@@ -89,5 +53,4 @@ public class OrderFactory {
   public CommandDispatcher orderCommandDispatcher(OrderCommandHandler target, SagaCommandDispatcherFactory sagaCommandDispatcherFactory) {
     return sagaCommandDispatcherFactory.make("orderCommandDispatcher", target.commandHandlerDefinitions());
   }
-
 }

@@ -3,6 +3,7 @@ package io.eventuate.examples.tram.sagas.ordersandcustomers.orders.service;
 import io.eventuate.common.jdbc.EventuateTransactionTemplate;
 import io.eventuate.examples.tram.sagas.ordersandcustomers.orders.domain.Order;
 import io.eventuate.examples.tram.sagas.ordersandcustomers.orders.domain.OrderDao;
+import io.eventuate.examples.tram.sagas.ordersandcustomers.orders.sagas.createorder.CreateOrderSaga;
 import io.eventuate.examples.tram.sagas.ordersandcustomers.orders.sagas.createorder.CreateOrderSagaData;
 import io.eventuate.examples.tram.sagas.ordersandcustomers.orders.sagas.createorder.LocalCreateOrderSaga;
 import io.eventuate.examples.tram.sagas.ordersandcustomers.orders.sagas.createorder.LocalCreateOrderSagaData;
@@ -12,23 +13,23 @@ import io.eventuate.tram.sagas.orchestration.SagaManager;
 
 public class OrderService {
 
-  private SagaManager<CreateOrderSagaData> createOrderSagaManager;
   private OrderDao orderRepository;
   private EventuateTransactionTemplate eventuateTransactionTemplate;
   private SagaInstanceFactory sagaInstanceFactory;
   private LocalCreateOrderSaga localCreateOrderSaga;
+  private CreateOrderSaga createOrderSaga;
 
-  public OrderService(SagaManager<CreateOrderSagaData> createOrderSagaManager,
-                      OrderDao orderDao,
+  public OrderService(OrderDao orderDao,
                       EventuateTransactionTemplate eventuateTransactionTemplate,
                       SagaInstanceFactory sagaInstanceFactory,
-                      LocalCreateOrderSaga localCreateOrderSaga) {
+                      LocalCreateOrderSaga localCreateOrderSaga,
+                      CreateOrderSaga createOrderSaga) {
 
-    this.createOrderSagaManager = createOrderSagaManager;
     this.orderRepository = orderDao;
     this.eventuateTransactionTemplate = eventuateTransactionTemplate;
     this.sagaInstanceFactory = sagaInstanceFactory;
     this.localCreateOrderSaga = localCreateOrderSaga;
+    this.createOrderSaga = createOrderSaga;
   }
 
   public Order createOrder(OrderDetails orderDetails) {
@@ -37,7 +38,7 @@ public class OrderService {
       Order order = oe.result;
       orderRepository.save(order);
       CreateOrderSagaData data = new CreateOrderSagaData(order.getId(), orderDetails);
-      createOrderSagaManager.create(data, Order.class, order.getId());
+      sagaInstanceFactory.create(createOrderSaga, data);
       return order;
     });
   }
