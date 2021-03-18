@@ -60,6 +60,8 @@ workflows:
           script: ./build-and-test-all-activemq.sh
       - build-and-test/build-and-test:
           name: deploy-artifacts
+          context:
+            - publish
           requires:
             - build-and-test-mysql
             - build-and-test-mssql
