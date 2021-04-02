@@ -1,5 +1,6 @@
 package io.eventuate.examples.tram.sagas.ordersandcustomers.micronaut.tests;
 
+import io.eventuate.common.jdbc.EventuateTransactionTemplate;
 import io.eventuate.examples.tram.sagas.ordersandcustomers.commondomain.Money;
 import io.eventuate.examples.tram.sagas.ordersandcustomers.customers.domain.Customer;
 import io.eventuate.examples.tram.sagas.ordersandcustomers.customers.service.CustomerService;
@@ -12,7 +13,6 @@ import io.eventuate.examples.tram.sagas.ordersandcustomers.orders.service.OrderD
 import io.eventuate.examples.tram.sagas.ordersandcustomers.orders.service.OrderService;
 import io.eventuate.util.test.async.Eventually;
 import org.junit.jupiter.api.Test;
-import org.springframework.transaction.support.TransactionTemplate;
 
 import javax.inject.Inject;
 import java.util.concurrent.TimeUnit;
@@ -28,13 +28,13 @@ public abstract class AbstractOrdersAndCustomersIntegrationTest {
   protected OrderService orderService;
 
   @Inject
-  private OrderDao orderRepository;
+  protected OrderDao orderRepository;
 
   @Inject
-  private TransactionTemplate transactionTemplate;
+  protected EventuateTransactionTemplate transactionTemplate;
 
   @Inject
-  private SagaEventsConsumer sagaEventsConsumer;
+  protected SagaEventsConsumer sagaEventsConsumer;
 
   @Test
   public void shouldApproveOrder() {
@@ -81,9 +81,8 @@ public abstract class AbstractOrdersAndCustomersIntegrationTest {
   }
 
   private void assertOrderState(Long id, OrderState expectedState) {
-
     Eventually.eventually(120, 500, TimeUnit.MILLISECONDS, () -> {
-      Order order = transactionTemplate.execute(s -> orderRepository.findById(id));
+      Order order = transactionTemplate.executeInTransaction(() -> orderRepository.findById(id));
       assertEquals(expectedState, order.getState());
     });
 
