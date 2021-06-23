@@ -1,0 +1,17 @@
+@startuml
+CustomerConfiguration *-- SagaCommandDispatcher
+CustomerConfiguration o-- SagaCommandDispatcherFactory
+CustomerConfiguration *-- CustomerCommandHandler
+
+SagaCommandDispatcherFactory *-- SagaCommandDispatcher
+SagaCommandDispatcher o-- SagaLockManager
+SagaLockManager <|-- SagaLockManagerImpl
+
+AbstractSagaCommandHandlersBuilder <|-- SagaCommandHandlerBuilder
+AbstractSagaCommandHandlersBuilder <|-- SagaCommandHandlersBuilder
+
+CustomerCommandHandler *-- SagaCommandHandlerBuilder
+SagaCommandHandlerBuilder *-- SagaCommandHandlersBuilder
+SagaCommandHandlerBuilder *-- SagaCommandHandler
+SagaCommandHandlersBuilder *-- SagaCommandHandler
+@enduml
