@@ -5,8 +5,8 @@ import io.eventuate.common.jdbc.EventuateSchema;
 public class SagaLockManagerImplDefaultSchemaTest extends SagaLockManagerImplSchemaTest {
 
   @Override
-  protected SagaLockManagerImpl getSagaLockManager() {
-    return new SagaLockManagerImpl(null, new EventuateSchema());
+  protected SagaLockManagerSql getSagaLockManagerSql() {
+    return new SagaLockManagerSql(new EventuateSchema());
   }
 
   @Override
@@ -16,7 +16,7 @@ public class SagaLockManagerImplDefaultSchemaTest extends SagaLockManagerImplSch
 
   @Override
   protected String getExpectedInsertIntoSagaStashTable() {
-    return String.format("INSERT INTO %s.saga_stash_table(message_id, target, saga_type, saga_id, message_headers, message_payload) VALUES(?, ?,?, ?, ?, ?)", EventuateSchema.DEFAULT_SCHEMA);
+    return String.format("INSERT INTO %s.saga_stash_table(message_id, target, saga_type, saga_id, message_headers, message_payload) VALUES(?, ?, ?, ?, ?, ?)", EventuateSchema.DEFAULT_SCHEMA);
   }
 
   @Override
