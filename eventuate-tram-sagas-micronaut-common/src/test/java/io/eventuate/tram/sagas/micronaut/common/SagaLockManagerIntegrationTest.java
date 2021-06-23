@@ -16,7 +16,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 
-@MicronautTest(transactional = false)
+@MicronautTest
 public class SagaLockManagerIntegrationTest {
 
   @Inject

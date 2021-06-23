@@ -2,7 +2,7 @@ package io.eventuate.examples.tram.sagas.ordersandcustomers.micronaut.customers.
 
 import io.eventuate.examples.tram.sagas.ordersandcustomers.customers.domain.Customer;
 import io.eventuate.examples.tram.sagas.ordersandcustomers.customers.domain.CustomerDao;
-import io.micronaut.spring.tx.annotation.Transactional;
+import io.micronaut.transaction.annotation.TransactionalAdvice;
 
 import javax.inject.Singleton;
 import javax.persistence.EntityManager;
@@ -20,7 +20,7 @@ public class CustomerDaoImpl implements CustomerDao {
   }
 
   @Override
-  @Transactional
+  @TransactionalAdvice
   public Customer save(Customer customer) {
     entityManager.persist(customer);
     return customer;

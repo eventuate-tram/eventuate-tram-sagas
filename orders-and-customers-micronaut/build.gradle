@@ -6,7 +6,7 @@ plugins {
 
 dependencyManagement {
     imports {
-        mavenBom 'io.micronaut:micronaut-bom:1.2.0'
+        mavenBom "io.micronaut:micronaut-bom:$micronautVersion"
     }
 }
 
@@ -16,23 +16,21 @@ dependencies {
     compile project(":eventuate-tram-sagas-micronaut-participant")
     compile project(":orders-and-customers")
 
-    compile "io.eventuate.common:eventuate-common-micronaut-spring-jdbc:$eventuateCommonVersion"
+    compile "io.eventuate.common:eventuate-common-micronaut-data-jdbc:$eventuateCommonVersion"
     compile "io.eventuate.util:eventuate-util-test:$eventuateUtilVersion"
     compile project(":eventuate-tram-sagas-testing-support")
 
     compile "io.eventuate.tram.core:eventuate-tram-micronaut-jdbc-kafka:$eventuateTramVersion"
-
-    compile "io.micronaut:micronaut-spring"
+    compile "io.micronaut.sql:micronaut-hibernate-jpa"
+    annotationProcessor "javax.persistence:javax.persistence-api:2.2"
     annotationProcessor "io.micronaut:micronaut-inject-java"
     annotationProcessor "io.micronaut:micronaut-validation"
     annotationProcessor "io.micronaut.configuration:micronaut-openapi"
     compile "io.micronaut:micronaut-inject"
     compile "io.micronaut:micronaut-validation"
     compile "io.micronaut:micronaut-runtime"
-    compile  'org.springframework:spring-jdbc'
-    compile "io.micronaut.configuration:micronaut-hibernate-jpa"
     annotationProcessor "javax.persistence:javax.persistence-api:2.2"
-    compile 'io.micronaut.configuration:micronaut-jdbc-hikari'
+    compile 'io.micronaut.sql:micronaut-jdbc-hikari'
     annotationProcessor "io.micronaut:micronaut-inject-java"
     compile "org.junit.jupiter:junit-jupiter-api"
     compile "io.micronaut.test:micronaut-test-junit5"
