@@ -1,6 +1,5 @@
 package io.eventuate.tram.sagas.common;
 
-import io.eventuate.tram.sagas.common.SagaLockManagerImpl;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -8,40 +7,40 @@ public abstract class SagaLockManagerImplSchemaTest {
 
   @Test
   public void testInsertIntoSagaLockTable() {
-    Assert.assertEquals(getExpectedInsertIntoSagaLockTable(), getSagaLockManager().getInsertIntoSagaLockTableSql());
+    Assert.assertEquals(getExpectedInsertIntoSagaLockTable(), getSagaLockManagerSql().getInsertIntoSagaLockTableSql());
   }
 
   @Test
   public void testInsertIntoSagaStashTable() {
-    Assert.assertEquals(getExpectedInsertIntoSagaStashTable(), getSagaLockManager().getInsertIntoSagaStashTableSql());
+    Assert.assertEquals(getExpectedInsertIntoSagaStashTable(), getSagaLockManagerSql().getInsertIntoSagaStashTableSql());
   }
 
   @Test
   public void testSelectFromSagaLockTable() {
-    Assert.assertEquals(getExpectedSelectFromSagaLockTable(), getSagaLockManager().getSelectFromSagaLockTableSql());
+    Assert.assertEquals(getExpectedSelectFromSagaLockTable(), getSagaLockManagerSql().getSelectFromSagaLockTableSql());
   }
 
   @Test
   public void testSelectFromSagaStashTable() {
-    Assert.assertEquals(getExpectedSelectFromSagaStashTable(), getSagaLockManager().getSelectFromSagaStashTableSql());
+    Assert.assertEquals(getExpectedSelectFromSagaStashTable(), getSagaLockManagerSql().getSelectFromSagaStashTableSql());
   }
 
   @Test
   public void testUpdateSagaLockTable() {
-    Assert.assertEquals(getExpectedUpdateSagaLockTable(), getSagaLockManager().getUpdateSagaLockTableSql());
+    Assert.assertEquals(getExpectedUpdateSagaLockTable(), getSagaLockManagerSql().getUpdateSagaLockTableSql());
   }
 
   @Test
   public void testDeleteFromSagaLockTable() {
-    Assert.assertEquals(getExpectedDeleteFromSagaLockTable(), getSagaLockManager().getDeleteFromSagaLockTableSql());
+    Assert.assertEquals(getExpectedDeleteFromSagaLockTable(), getSagaLockManagerSql().getDeleteFromSagaLockTableSql());
   }
 
   @Test
   public void testDeleteFromSagaStashTable() {
-    Assert.assertEquals(getExpectedDeleteFromSagaStashTable(), getSagaLockManager().getDeleteFromSagaStashTableSql());
+    Assert.assertEquals(getExpectedDeleteFromSagaStashTable(), getSagaLockManagerSql().getDeleteFromSagaStashTableSql());
   }
 
-  protected abstract SagaLockManagerImpl getSagaLockManager();
+  protected abstract SagaLockManagerSql getSagaLockManagerSql();
   protected abstract String getExpectedInsertIntoSagaLockTable();
   protected abstract String getExpectedInsertIntoSagaStashTable();
   protected abstract String getExpectedSelectFromSagaLockTable();
