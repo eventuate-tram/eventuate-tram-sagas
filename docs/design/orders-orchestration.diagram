@@ -1,0 +1,60 @@
+@startuml
+OrderConfiguration *-- SagaCommandDispatcher
+OrderConfiguration o-- SagaCommandDispatcherFactory
+OrderConfiguration *-- OrderCommandHandler
+OrderConfiguration *-- CreateOrderSaga
+OrderConfiguration *-- LocalCreateOrderSaga
+OrderConfiguration o-- SagaInstanceFactory
+
+SagaInstanceFactory o-- SagaManagerFactory
+SagaInstanceFactory *-- SagaManager
+SagaInstanceFactory *-- SagaInstance
+SagaInstanceFactory o-- Saga
+
+SagaManagerFactory o-- SagaLockManager
+SagaManagerFactory o-- SagaInstanceRepository
+SagaManagerFactory o-- SagaCommandProducer
+
+SagaManager o-- SagaLockManager
+SagaManager o-- SagaInstanceRepository
+SagaManager o-- SagaCommandProducer
+
+SagaInstanceRepository o-- SagaInstace
+SagaInstanceRepository <|-- SagaInstanceRepositoryJdbc
+
+SagaManager *-- SagaInstance
+SagaManager <|-- SagaManagerImpl
+
+CreateOrderSaga o-- SagaDefinition
+SimpleSaga <|-- LocalCreateOrderSaga
+
+LocalCreateOrderSaga *-- StepBuilder
+LocalCreateOrderSaga *-- SagaDefinition
+
+SimpleSaga <|-- CreateOrderSaga
+Saga <|-- SimpleSaga
+SimpleSagaDsl <|-- SimpleSaga
+
+SimpleSagaDsl *-- StepBuilder
+SimpleSagaDsl *-- SimpleSagaDefinitionBuilder
+StepBuilder o-- SimpleSagaDefinitionBuilder
+StepBuilder *-- InvokeParticipantStepBuilder
+StepBuilder *-- LocalStepBuilder
+LocalStepBuilder o-- SimpleSagaDefinitionBuilder
+LocalStepBuilder *-- StepBuilder
+LocalStepBuilder o-- SagaDefinition
+WithCompensationBuilder <|-- StepBuilder
+WithCompensationBuilder <|-- InvokeParticipantStepBuilder
+
+SagaCommandDispatcherFactory *-- SagaCommandDispatcher
+SagaCommandDispatcher o-- SagaLockManager
+SagaLockManager <|-- SagaLockManagerImpl
+
+AbstractSagaCommandHandlersBuilder <|-- SagaCommandHandlerBuilder
+AbstractSagaCommandHandlersBuilder <|-- SagaCommandHandlersBuilder
+
+OrderCommandHandler *-- SagaCommandHandlersBuilder
+SagaCommandHandlerBuilder *-- SagaCommandHandlersBuilder
+SagaCommandHandlerBuilder *-- SagaCommandHandler
+SagaCommandHandlersBuilder *-- SagaCommandHandler
+@enduml
