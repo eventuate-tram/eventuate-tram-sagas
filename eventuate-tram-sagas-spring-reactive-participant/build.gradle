@@ -1,0 +1,4 @@
+dependencies {
+    compile project(":eventuate-tram-sagas-spring-reactive-common")
+    compile project(":eventuate-tram-sagas-reactive-participant")
+}

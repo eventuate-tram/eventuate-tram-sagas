@@ -11,7 +11,7 @@ import org.springframework.context.annotation.Import;
 
 @Configuration
 @Import(EventuateCommonReactiveDatabaseConfiguration.class)
-public class EventuateTramSagaCommonConfiguration {
+public class EventuateReactiveTramSagaCommonConfiguration {
 
   @Bean
   public ReactiveSagaLockManager sagaLockManager(EventuateReactiveJdbcStatementExecutor eventuateJdbcStatementExecutor,

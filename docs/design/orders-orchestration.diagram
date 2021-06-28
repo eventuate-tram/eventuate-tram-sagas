@@ -1,7 +1,6 @@
 @startuml
-OrderConfiguration *-- SagaCommandDispatcher
-OrderConfiguration o-- SagaCommandDispatcherFactory
-OrderConfiguration *-- OrderCommandHandler
+hide empty members
+
 OrderConfiguration *-- CreateOrderSaga
 OrderConfiguration *-- LocalCreateOrderSaga
 OrderConfiguration o-- SagaInstanceFactory
@@ -45,16 +44,4 @@ LocalStepBuilder *-- StepBuilder
 LocalStepBuilder o-- SagaDefinition
 WithCompensationBuilder <|-- StepBuilder
 WithCompensationBuilder <|-- InvokeParticipantStepBuilder
-
-SagaCommandDispatcherFactory *-- SagaCommandDispatcher
-SagaCommandDispatcher o-- SagaLockManager
-SagaLockManager <|-- SagaLockManagerImpl
-
-AbstractSagaCommandHandlersBuilder <|-- SagaCommandHandlerBuilder
-AbstractSagaCommandHandlersBuilder <|-- SagaCommandHandlersBuilder
-
-OrderCommandHandler *-- SagaCommandHandlersBuilder
-SagaCommandHandlerBuilder *-- SagaCommandHandlersBuilder
-SagaCommandHandlerBuilder *-- SagaCommandHandler
-SagaCommandHandlersBuilder *-- SagaCommandHandler
 @enduml

@@ -1,4 +1,6 @@
 @startuml
+hide empty members
+
 CustomerConfiguration *-- SagaCommandDispatcher
 CustomerConfiguration o-- SagaCommandDispatcherFactory
 CustomerConfiguration *-- CustomerCommandHandler
