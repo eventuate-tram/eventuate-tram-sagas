@@ -1,4 +1,6 @@
 @startuml
+hide empty members
+
 CustomerConfiguration *-- SagaCommandDispatcher
 CustomerConfiguration o-- SagaCommandDispatcherFactory
 CustomerConfiguration *-- CustomerCommandHandler
@@ -14,4 +16,36 @@ CustomerCommandHandler *-- SagaCommandHandlerBuilder
 SagaCommandHandlerBuilder *-- SagaCommandHandlersBuilder
 SagaCommandHandlerBuilder *-- SagaCommandHandler
 SagaCommandHandlersBuilder *-- SagaCommandHandler
+
+skinparam class { 
+ BackgroundColor<<Reactive>> SpringGreen
+}
+
+class ReactiveCustomerConfiguration<<Reactive>>
+class ReactiveSagaCommandDispatcher<<Reactive>>
+class ReactiveSagaCommandDispatcherFactory<<Reactive>>
+class ReactiveCustomerCommandHandler<<Reactive>>
+class ReactiveSagaLockManager<<Reactive>>
+class ReactiveSagaLockManagerImpl<<Reactive>>
+class AbstractReactiveSagaCommandHandlersBuilder<<Reactive>>
+class ReactiveSagaCommandHandlerBuilder<<Reactive>>
+class ReactiveSagaCommandHandlersBuilder<<Reactive>>
+class ReactiveSagaCommandHandler<<Reactive>>
+
+
+ReactiveCustomerConfiguration *-- ReactiveSagaCommandDispatcher
+ReactiveCustomerConfiguration o-- ReactiveSagaCommandDispatcherFactory
+ReactiveCustomerConfiguration *-- ReactiveCustomerCommandHandler
+
+ReactiveSagaCommandDispatcherFactory *-- ReactiveSagaCommandDispatcher
+ReactiveSagaCommandDispatcher o-- ReactiveSagaLockManager
+ReactiveSagaLockManager <|-- ReactiveSagaLockManagerImpl
+
+AbstractReactiveSagaCommandHandlersBuilder <|-- ReactiveSagaCommandHandlerBuilder
+AbstractReactiveSagaCommandHandlersBuilder <|-- ReactiveSagaCommandHandlersBuilder
+
+ReactiveCustomerCommandHandler *-- ReactiveSagaCommandHandlerBuilder
+ReactiveSagaCommandHandlerBuilder *-- ReactiveSagaCommandHandlersBuilder
+ReactiveSagaCommandHandlerBuilder *-- ReactiveSagaCommandHandler
+ReactiveSagaCommandHandlersBuilder *-- ReactiveSagaCommandHandler
 @enduml

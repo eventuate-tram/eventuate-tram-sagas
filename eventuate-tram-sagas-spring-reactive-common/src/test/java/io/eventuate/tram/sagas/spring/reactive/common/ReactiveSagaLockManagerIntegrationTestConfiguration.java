@@ -6,6 +6,6 @@ import org.springframework.context.annotation.Import;
 
 @Configuration
 @EnableAutoConfiguration
-@Import(EventuateTramSagaCommonConfiguration.class)
+@Import(EventuateReactiveTramSagaCommonConfiguration.class)
 public class ReactiveSagaLockManagerIntegrationTestConfiguration {
 }
