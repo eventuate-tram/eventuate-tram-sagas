@@ -18,7 +18,7 @@ SagaManager o-- SagaLockManager
 SagaManager o-- SagaInstanceRepository
 SagaManager o-- SagaCommandProducer
 
-SagaInstanceRepository o-- SagaInstace
+SagaInstanceRepository o-- SagaInstance
 SagaInstanceRepository <|-- SagaInstanceRepositoryJdbc
 
 SagaManager *-- SagaInstance
@@ -44,4 +44,74 @@ LocalStepBuilder *-- StepBuilder
 LocalStepBuilder o-- SagaDefinition
 WithCompensationBuilder <|-- StepBuilder
 WithCompensationBuilder <|-- InvokeParticipantStepBuilder
+
+skinparam class {
+ BackgroundColor<<Reactive>> SpringGreen
+}
+
+class ReactiveOrderConfiguration<<Reactive>>
+class ReactiveCreateOrderSaga<<Reactive>>
+class ReactiveLocalCreateOrderSaga<<Reactive>>
+class ReactiveSagaInstanceFactory<<Reactive>>
+class ReactiveSagaManagerFactory<<Reactive>>
+class ReactiveSagaManager<<Reactive>>
+class ReactiveSagaManagerImpl<<Reactive>>
+class ReactiveSaga<<Reactive>>
+class ReactiveSagaLockManager<<Reactive>>
+class ReactiveSagaInstanceRepository<<Reactive>>
+class ReactiveSagaCommandProducer<<Reactive>>
+class ReactiveSagaInstanceRepositoryJdbc<<Reactive>>
+class ReactiveSagaDefinition<<Reactive>>
+class ReactiveSimpleSagaDefinition<<Reactive>>
+class ReactiveStepBuilder<<Reactive>>
+class ReactiveSimpleSaga<<Reactive>>
+class ReactiveSimpleSagaDsl<<Reactive>>
+class ReactiveSimpleSagaDefinitionBuilder<<Reactive>>
+class ReactiveLocalStepBuilder<<Reactive>>
+class ReactiveInvokeParticipantStepBuilder<<Reactive>>
+class ReactiveWithCompensationBuilder<<Reactive>>
+
+ReactiveOrderConfiguration *-- ReactiveCreateOrderSaga
+ReactiveOrderConfiguration *-- ReactiveLocalCreateOrderSaga
+ReactiveOrderConfiguration o-- ReactiveSagaInstanceFactory
+
+ReactiveSagaInstanceFactory o-- ReactiveSagaManagerFactory
+ReactiveSagaInstanceFactory *-- ReactiveSagaManager
+ReactiveSagaInstanceFactory *-- SagaInstance
+ReactiveSagaInstanceFactory o-- ReactiveSaga
+
+ReactiveSagaManagerFactory o-- ReactiveSagaLockManager
+ReactiveSagaManagerFactory o-- ReactiveSagaInstanceRepository
+ReactiveSagaManagerFactory o-- ReactiveSagaCommandProducer
+
+ReactiveSagaManager o-- ReactiveSagaLockManager
+ReactiveSagaManager o-- ReactiveSagaInstanceRepository
+ReactiveSagaManager o-- ReactiveSagaCommandProducer
+
+ReactiveSagaInstanceRepository o-- SagaInstance
+ReactiveSagaInstanceRepository <|-- ReactiveSagaInstanceRepositoryJdbc
+
+ReactiveSagaManager *-- SagaInstance
+ReactiveSagaManager <|-- ReactiveSagaManagerImpl
+
+ReactiveCreateOrderSaga o-- ReactiveSagaDefinition
+ReactiveSimpleSaga <|-- ReactiveLocalCreateOrderSaga
+
+ReactiveLocalCreateOrderSaga *-- ReactiveStepBuilder
+ReactiveLocalCreateOrderSaga *-- ReactiveSagaDefinition
+
+ReactiveSimpleSaga <|-- ReactiveCreateOrderSaga
+ReactiveSaga <|-- ReactiveSimpleSaga
+ReactiveSimpleSagaDsl <|-- ReactiveSimpleSaga
+
+ReactiveSimpleSagaDsl *-- ReactiveStepBuilder
+ReactiveSimpleSagaDsl *-- ReactiveSimpleSagaDefinitionBuilder
+ReactiveStepBuilder o-- ReactiveSimpleSagaDefinitionBuilder
+ReactiveStepBuilder *-- ReactiveInvokeParticipantStepBuilder
+ReactiveStepBuilder *-- ReactiveLocalStepBuilder
+ReactiveLocalStepBuilder o-- ReactiveSimpleSagaDefinitionBuilder
+ReactiveLocalStepBuilder *-- ReactiveStepBuilder
+ReactiveLocalStepBuilder o-- ReactiveSagaDefinition
+ReactiveWithCompensationBuilder <|-- ReactiveStepBuilder
+ReactiveWithCompensationBuilder <|-- ReactiveInvokeParticipantStepBuilder
 @enduml
