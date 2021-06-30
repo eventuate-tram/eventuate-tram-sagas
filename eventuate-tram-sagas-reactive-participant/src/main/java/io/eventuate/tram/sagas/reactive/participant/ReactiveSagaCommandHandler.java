@@ -19,11 +19,11 @@ public class ReactiveSagaCommandHandler extends ReactiveCommandHandler {
   private Optional<BiFunction<CommandMessage, PathVariables, LockTarget>> preLock = Optional.empty();
   private Optional<PostLockFunction> postLock = Optional.empty();
 
-  public <C> ReactiveSagaCommandHandler(String channel, String resource, Class<C> commandClass, BiFunction<CommandMessage<C>, PathVariables, Publisher<List<Message>>> handler) {
+  public <C> ReactiveSagaCommandHandler(String channel, String resource, Class<C> commandClass, BiFunction<CommandMessage<C>, PathVariables, Publisher<Message>> handler) {
     super(channel, Optional.of(resource), commandClass, handler);
   }
 
-  public <C> ReactiveSagaCommandHandler(String channel, Class<C> commandClass, Function<CommandMessage<C>, Publisher<List<Message>>> handler) {
+  public <C> ReactiveSagaCommandHandler(String channel, Class<C> commandClass, Function<CommandMessage<C>, Publisher<Message>> handler) {
     super(channel, Optional.empty(), commandClass, (c, pv) -> handler.apply(c));
   }
 

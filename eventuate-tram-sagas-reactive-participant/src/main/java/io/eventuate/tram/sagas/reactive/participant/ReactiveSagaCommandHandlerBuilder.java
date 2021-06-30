@@ -8,7 +8,6 @@ import io.eventuate.tram.sagas.common.LockTarget;
 import io.eventuate.tram.sagas.participant.PostLockFunction;
 import org.reactivestreams.Publisher;
 
-import java.util.List;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 
@@ -21,12 +20,6 @@ public class ReactiveSagaCommandHandlerBuilder<C> implements AbstractReactiveSag
     this.parent = parent;
     this.h = h;
   }
-
-  @Override
-  public <C> ReactiveSagaCommandHandlerBuilder<C> onMessageReturningMessages(Class<C> commandClass, Function<CommandMessage<C>, Publisher<List<Message>>> handler) {
-    return parent.onMessageReturningMessages(commandClass, handler);
-  }
-
 
   @Override
   public <C> ReactiveSagaCommandHandlerBuilder<C> onMessage(Class<C> commandClass, Function<CommandMessage<C>, Publisher<Message>> handler) {
