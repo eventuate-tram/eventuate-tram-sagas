@@ -15,12 +15,9 @@ import io.eventuate.tram.sagas.common.*;
 import io.eventuate.tram.sagas.participant.SagaReplyMessage;
 import io.eventuate.tram.sagas.reactive.common.ReactiveSagaLockManager;
 import org.reactivestreams.Publisher;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-
-import java.util.Collections;
-import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 public class ReactiveSagaCommandDispatcher extends ReactiveCommandDispatcher {
 
@@ -65,10 +62,10 @@ public class ReactiveSagaCommandDispatcher extends ReactiveCommandDispatcher {
 
 
   @Override
-  protected Publisher<List<Message>> invoke(ReactiveCommandHandler commandHandler, CommandMessage cm, CommandHandlerParams commandHandlerParams) {
+  protected Publisher<Message> invoke(ReactiveCommandHandler commandHandler, CommandMessage cm, CommandHandlerParams commandHandlerParams) {
     Optional<String> lockedTarget = Optional.empty();
 
-    Mono<List<Message>> result = Mono.just(Collections.emptyList());
+    Flux<Message> result = Flux.empty();
 
     if (commandHandler instanceof ReactiveSagaCommandHandler) {
       ReactiveSagaCommandHandler sch = (ReactiveSagaCommandHandler) commandHandler;
@@ -80,58 +77,47 @@ public class ReactiveSagaCommandDispatcher extends ReactiveCommandDispatcher {
         String target = lockTarget.getTarget();
         lockedTarget = Optional.of(target);
 
-        result = result.flatMap(messages ->
-          sagaLockManager
+        result = Flux.from(sagaLockManager
                   .claimLock(sagaType, sagaId, target)
                   .flatMap(locked -> {
                     if (!locked) return Mono.error(new StashMessageRequiredException(target));
-                    else return Mono.just(messages);
+                    else return Mono.empty();
                   }));
       }
     }
 
-    result = result.flatMap(messages -> Mono.from(super.invoke(commandHandler, cm, commandHandlerParams)));
+    result = result.thenMany(super.invoke(commandHandler, cm, commandHandlerParams));
+    Flux<Message> finalizedResult = result;
 
     if (lockedTarget.isPresent())
       return addLockedHeader(result, lockedTarget.get());
     else {
       Mono<LockTarget> lock = getLock(result);
 
-      return result.flatMap(messages ->
-        lock
-                .flatMap(lt -> {
-                  Message message = cm.getMessage();
-                  String sagaType = getSagaType(message);
-                  String sagaId = getSagaId(message);
-                  return sagaLockManager
-                          .claimLock(sagaType, sagaId, lt.getTarget())
-                          .flatMap(locked -> {
-                            if (locked) return addLockedHeader(Mono.just(messages), lt.getTarget());
-                            else return Mono.error(new RuntimeException("Cannot claim lock"));
-                          });
-                })
-                .switchIfEmpty(Mono.just(messages)));
+      return Flux.from(lock).flatMap(lt ->
+        finalizedResult.flatMap(msg -> {
+          Message message = cm.getMessage();
+          String sagaType = getSagaType(message);
+          String sagaId = getSagaId(message);
+          return Flux.from(sagaLockManager
+                  .claimLock(sagaType, sagaId, lt.getTarget())
+                  .flatMap(locked -> {
+                    if (locked) return Mono.from(addLockedHeader(Flux.just(msg), lt.getTarget()));
+                    else return Mono.error(new RuntimeException("Cannot claim lock"));
+                  }));
+        }));
     }
   }
 
-  private Mono<LockTarget> getLock(Mono<List<Message>> messages) {
-    return messages.flatMap(msgs -> {
-      Optional<LockTarget> lockTarget = msgs
-              .stream()
-              .filter(m -> m instanceof SagaReplyMessage && ((SagaReplyMessage) m).hasLockTarget())
-              .findFirst()
-              .flatMap(m -> ((SagaReplyMessage)m).getLockTarget());
-
-      return Mono.justOrEmpty(lockTarget);
-    });
+  private Mono<LockTarget> getLock(Flux<Message> messages) {
+    return messages
+            .filter(m -> m instanceof SagaReplyMessage && ((SagaReplyMessage) m).hasLockTarget())
+            .map(m -> ((SagaReplyMessage)m).getLockTarget().get())
+            .next();
   }
 
-  private Mono<List<Message>> addLockedHeader(Mono<List<Message>> messages, String lockedTarget) {
-    return messages
-            .map(msgs -> msgs
-                    .stream()
-                    .map(m -> MessageBuilder.withMessage(m).withHeader(SagaReplyHeaders.REPLY_LOCKED, lockedTarget).build())
-                    .collect(Collectors.toList()));
+  private Publisher<Message> addLockedHeader(Publisher<Message> messages, String lockedTarget) {
+    return Flux.from(messages).map(msg -> MessageBuilder.withMessage(msg).withHeader(SagaReplyHeaders.REPLY_LOCKED, lockedTarget).build());
   }
 
   private boolean isUnlockMessage(Message message) {
