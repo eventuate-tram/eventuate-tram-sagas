@@ -1,0 +1,6 @@
+
+dependencies {
+    compile "io.eventuate.tram.core:eventuate-tram-spring-reactive-messaging-starter:$eventuateTramVersion"
+
+    compile project(":eventuate-tram-sagas-spring-reactive-participant")
+}

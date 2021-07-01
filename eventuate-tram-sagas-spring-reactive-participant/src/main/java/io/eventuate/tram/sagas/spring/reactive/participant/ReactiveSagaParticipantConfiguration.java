@@ -11,7 +11,7 @@ import org.springframework.context.annotation.Import;
 
 @Configuration
 @Import(EventuateReactiveTramSagaCommonConfiguration.class)
-public class SagaParticipantConfiguration {
+public class ReactiveSagaParticipantConfiguration {
   @Bean
   public ReactiveSagaCommandDispatcherFactory sagaCommandDispatcherFactory(ReactiveMessageConsumer messageConsumer,
                                                                            ReactiveMessageProducer messageProducer,
