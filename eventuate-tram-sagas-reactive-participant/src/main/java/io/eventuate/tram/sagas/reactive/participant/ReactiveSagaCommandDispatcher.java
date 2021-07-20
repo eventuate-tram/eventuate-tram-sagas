@@ -105,7 +105,7 @@ public class ReactiveSagaCommandDispatcher extends ReactiveCommandDispatcher {
                     if (locked) return Mono.from(addLockedHeader(Flux.just(msg), lt.getTarget()));
                     else return Mono.error(new RuntimeException("Cannot claim lock"));
                   }));
-        }));
+        })).switchIfEmpty(finalizedResult);
     }
   }
 
