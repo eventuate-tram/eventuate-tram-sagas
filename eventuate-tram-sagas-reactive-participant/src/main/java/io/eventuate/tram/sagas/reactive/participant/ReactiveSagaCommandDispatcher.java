@@ -86,7 +86,7 @@ public class ReactiveSagaCommandDispatcher extends ReactiveCommandDispatcher {
       }
     }
 
-    result = result.thenMany(super.invoke(commandHandler, cm, commandHandlerParams));
+    result = result.thenMany(super.invoke(commandHandler, cm, commandHandlerParams)).cache();
     Flux<Message> finalizedResult = result;
 
     if (lockedTarget.isPresent())
