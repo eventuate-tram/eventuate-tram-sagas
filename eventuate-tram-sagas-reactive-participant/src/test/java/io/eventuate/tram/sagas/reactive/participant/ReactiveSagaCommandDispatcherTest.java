@@ -11,13 +11,18 @@ import io.eventuate.tram.reactive.commands.consumer.ReactiveCommandHandlers;
 import io.eventuate.tram.reactive.messaging.producer.common.ReactiveMessageProducer;
 import io.eventuate.tram.sagas.reactive.common.ReactiveSagaLockManager;
 import org.junit.Test;
-import org.mockito.Mockito;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.util.Collections;
 import java.util.Optional;
 import java.util.function.Function;
+
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+import static reactor.core.publisher.Mono.from;
 
 public class ReactiveSagaCommandDispatcherTest {
   @Test
@@ -27,9 +32,9 @@ public class ReactiveSagaCommandDispatcherTest {
     ReactiveSagaCommandDispatcher reactiveSagaCommandDispatcher =
             new ReactiveSagaCommandDispatcher("commandDispatcherId1", createReactiveCommandHandlers(messageHandlerConsumer), mockConsumer(), mockProducer(), mockLockManager());
 
-    Mono.from(reactiveSagaCommandDispatcher.messageHandler(createCommandMessage())).block();
+    from(reactiveSagaCommandDispatcher.messageHandler(createCommandMessage())).block();
 
-    Mockito.verify(messageHandlerConsumer).apply(Mockito.any());
+    verify(messageHandlerConsumer).apply(any());
   }
 
   private Message createCommandMessage() {
@@ -50,27 +55,27 @@ public class ReactiveSagaCommandDispatcherTest {
   }
 
   private Function<String, Message> createMessageHandlerConsumer() {
-    Function<String, Message> messageHandlerConsumer = Mockito.mock(Function.class);
+    Function<String, Message> messageHandlerConsumer = mock(Function.class);
 
-    Mockito.when(messageHandlerConsumer.apply(Mockito.any())).thenReturn(CommandHandlerReplyBuilder.withSuccess());
+    when(messageHandlerConsumer.apply(any())).thenReturn(CommandHandlerReplyBuilder.withSuccess());
 
     return messageHandlerConsumer;
   }
 
   private ReactiveMessageProducer mockProducer() {
-    ReactiveMessageProducer producer =  Mockito.mock(ReactiveMessageProducer.class);
+    ReactiveMessageProducer producer =  mock(ReactiveMessageProducer.class);
 
-    Mockito.when(producer.send(Mockito.any(), Mockito.any())).thenReturn(Mono.just(CommandHandlerReplyBuilder.withSuccess()));
+    when(producer.send(any(), any())).thenReturn(Mono.just(CommandHandlerReplyBuilder.withSuccess()));
 
     return producer;
   }
 
   private ReactiveSagaLockManager mockLockManager() {
-    return Mockito.mock(ReactiveSagaLockManager.class);
+    return mock(ReactiveSagaLockManager.class);
   }
 
   private ReactiveMessageConsumer mockConsumer() {
-    return Mockito.mock(ReactiveMessageConsumer.class);
+    return mock(ReactiveMessageConsumer.class);
   }
 
   public static class TestCommand implements Command {}

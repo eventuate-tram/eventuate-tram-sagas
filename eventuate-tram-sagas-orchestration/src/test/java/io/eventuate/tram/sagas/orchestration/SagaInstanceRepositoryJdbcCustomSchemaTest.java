@@ -1,14 +1,15 @@
 package io.eventuate.tram.sagas.orchestration;
 
 import io.eventuate.common.jdbc.EventuateSchema;
+import io.eventuate.tram.sagas.common.SagaInstanceRepositorySql;
 
 public class SagaInstanceRepositoryJdbcCustomSchemaTest extends SagaInstanceRepositoryJdbcSchemaTest {
 
   private String custom = "custom";
 
   @Override
-  protected SagaInstanceRepositoryJdbc getSagaInstanceRepositoryJdbc() {
-    return new SagaInstanceRepositoryJdbc(null, null, new EventuateSchema(custom));
+  protected SagaInstanceRepositorySql getSagaInstanceRepositoryJdbcSql() {
+    return new SagaInstanceRepositorySql(new EventuateSchema(custom));
   }
 
   @Override
