@@ -83,7 +83,7 @@ public class ReactiveSagaInstanceRepositoryJdbc implements ReactiveSagaInstanceR
 
   @Override
   public Mono<SagaInstance> find(String sagaType, String sagaId) {
-    Flux<DestinationAndResource> destinationAndResources = eventuateJdbcStatementExecutor.queryForList(sagaInstanceRepositorySql.getSelectFromSagaInstanceSql(),
+    Flux<DestinationAndResource> destinationAndResources = eventuateJdbcStatementExecutor.queryForList(sagaInstanceRepositorySql.getSelectFromSagaInstanceParticipantsSql(),
             (row, rowMetadata) -> new DestinationAndResource(row.get("destination").toString(), row.get("resource").toString()),
             sagaId, sagaType);
 
@@ -118,6 +118,6 @@ public class ReactiveSagaInstanceRepositoryJdbc implements ReactiveSagaInstanceR
                 return Mono.error(new RuntimeException("Should be 1 : " + count));
               }
               else return Mono.empty();
-            }).then(saveDestinationsAndResources(sagaInstance));
+            }).then(Mono.defer(() -> saveDestinationsAndResources(sagaInstance)));
   }
 }
