@@ -86,7 +86,7 @@ public class ReactiveSagaCommandDispatcher extends ReactiveCommandDispatcher {
       }
     }
 
-    result = result.thenMany(super.invoke(commandHandler, cm, commandHandlerParams));
+    result = result.thenMany(super.invoke(commandHandler, cm, commandHandlerParams)).cache();
     Flux<Message> finalizedResult = result;
 
     if (lockedTarget.isPresent())
@@ -105,7 +105,7 @@ public class ReactiveSagaCommandDispatcher extends ReactiveCommandDispatcher {
                     if (locked) return Mono.from(addLockedHeader(Flux.just(msg), lt.getTarget()));
                     else return Mono.error(new RuntimeException("Cannot claim lock"));
                   }));
-        }));
+        })).switchIfEmpty(finalizedResult);
     }
   }
 

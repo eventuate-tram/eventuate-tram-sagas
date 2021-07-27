@@ -1,35 +1,36 @@
 package io.eventuate.tram.sagas.orchestration;
 
+import io.eventuate.tram.sagas.common.SagaInstanceRepositorySql;
 import org.junit.Assert;
 import org.junit.Test;
 
 public abstract class SagaInstanceRepositoryJdbcSchemaTest {
   @Test
   public void testInsertIntoSagaInstance() {
-    Assert.assertEquals(getExpectedInsertIntoSagaInstance(), getSagaInstanceRepositoryJdbc().getInsertIntoSagaInstanceSql());
+    Assert.assertEquals(getExpectedInsertIntoSagaInstance(), getSagaInstanceRepositoryJdbcSql().getInsertIntoSagaInstanceSql());
   }
 
   @Test
   public void testInsertIntoSagaInstanceParticipants() {
-    Assert.assertEquals(getExpectedInsertIntoSagaInstanceParticipants(), getSagaInstanceRepositoryJdbc().getInsertIntoSagaInstanceParticipantsSql());
+    Assert.assertEquals(getExpectedInsertIntoSagaInstanceParticipants(), getSagaInstanceRepositoryJdbcSql().getInsertIntoSagaInstanceParticipantsSql());
   }
 
   @Test
   public void testSelectFromSagaInstance() {
-    Assert.assertEquals(getExpectedSelectFromSagaInstance(), getSagaInstanceRepositoryJdbc().getSelectFromSagaInstanceSql());
+    Assert.assertEquals(getExpectedSelectFromSagaInstance(), getSagaInstanceRepositoryJdbcSql().getSelectFromSagaInstanceSql());
   }
 
   @Test
   public void testSelectFromSagaInstanceParticipants() {
-    Assert.assertEquals(getExpectedSelectFromSagaInstanceParticipants(), getSagaInstanceRepositoryJdbc().getSelectFromSagaInstanceParticipantsSql());
+    Assert.assertEquals(getExpectedSelectFromSagaInstanceParticipants(), getSagaInstanceRepositoryJdbcSql().getSelectFromSagaInstanceParticipantsSql());
   }
 
   @Test
   public void testUpdateSagaInstance() {
-    Assert.assertEquals(getExpectedUpdateSagaInstance(), getSagaInstanceRepositoryJdbc().getUpdateSagaInstanceSql());
+    Assert.assertEquals(getExpectedUpdateSagaInstance(), getSagaInstanceRepositoryJdbcSql().getUpdateSagaInstanceSql());
   }
 
-  protected abstract SagaInstanceRepositoryJdbc getSagaInstanceRepositoryJdbc();
+  protected abstract SagaInstanceRepositorySql getSagaInstanceRepositoryJdbcSql();
 
   private String getExpectedInsertIntoSagaInstance() {
     return String.format("INSERT INTO %ssaga_instance(saga_type, saga_id, state_name, last_request_id, saga_data_type, saga_data_json, end_state, compensating) VALUES(?, ?, ?, ?, ?, ?, ?, ?)", getExpectedPrefix());

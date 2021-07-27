@@ -4,6 +4,7 @@ import io.eventuate.common.id.IdGenerator;
 import io.eventuate.common.jdbc.EventuateDuplicateKeyException;
 import io.eventuate.common.jdbc.EventuateJdbcStatementExecutor;
 import io.eventuate.common.jdbc.EventuateSchema;
+import io.eventuate.tram.sagas.common.SagaInstanceRepositorySql;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import java.util.HashSet;
@@ -16,13 +17,7 @@ public class SagaInstanceRepositoryJdbc implements SagaInstanceRepository {
   private EventuateJdbcStatementExecutor eventuateJdbcStatementExecutor;
   private IdGenerator idGenerator;
 
-  private String insertIntoSagaInstanceSql;
-  private String insertIntoSagaInstanceParticipantsSql;
-
-  private String selectFromSagaInstanceSql;
-  private String selectFromSagaInstanceParticipantsSql;
-
-  private String updateSagaInstanceSql;
+  private SagaInstanceRepositorySql sagaInstanceRepositorySql;
 
   public SagaInstanceRepositoryJdbc(EventuateJdbcStatementExecutor eventuateJdbcStatementExecutor,
                                     IdGenerator idGenerator,
@@ -30,43 +25,14 @@ public class SagaInstanceRepositoryJdbc implements SagaInstanceRepository {
     this.eventuateJdbcStatementExecutor = eventuateJdbcStatementExecutor;
     this.idGenerator = idGenerator;
 
-    String sagaInstanceTable = eventuateSchema.qualifyTable("saga_instance");
-    String sagaInstanceParticipantsTable = eventuateSchema.qualifyTable("saga_instance_participants");
-
-    insertIntoSagaInstanceSql = String.format("INSERT INTO %s(saga_type, saga_id, state_name, last_request_id, saga_data_type, saga_data_json, end_state, compensating) VALUES(?, ?, ?, ?, ?, ?, ?, ?)", sagaInstanceTable);
-    insertIntoSagaInstanceParticipantsSql = String.format("INSERT INTO %s(saga_type, saga_id, destination, resource) values(?,?,?,?)", sagaInstanceParticipantsTable);
-
-    selectFromSagaInstanceSql = String.format("SELECT * FROM %s WHERE saga_type = ? AND saga_id = ?", sagaInstanceTable);
-    selectFromSagaInstanceParticipantsSql = String.format("SELECT destination, resource FROM %s WHERE saga_type = ? AND saga_id = ?", sagaInstanceParticipantsTable);
-
-    updateSagaInstanceSql = String.format("UPDATE %s SET state_name = ?, last_request_id = ?, saga_data_type = ?, saga_data_json = ?, end_state = ?, compensating = ? where saga_type = ? AND saga_id = ?", sagaInstanceTable);
-  }
-
-  public String getInsertIntoSagaInstanceSql() {
-    return insertIntoSagaInstanceSql;
-  }
-
-  public String getInsertIntoSagaInstanceParticipantsSql() {
-    return insertIntoSagaInstanceParticipantsSql;
-  }
-
-  public String getSelectFromSagaInstanceSql() {
-    return selectFromSagaInstanceSql;
-  }
-
-  public String getSelectFromSagaInstanceParticipantsSql() {
-    return selectFromSagaInstanceParticipantsSql;
-  }
-
-  public String getUpdateSagaInstanceSql() {
-    return updateSagaInstanceSql;
+    sagaInstanceRepositorySql = new SagaInstanceRepositorySql(eventuateSchema);
   }
 
   @Override
   public void save(SagaInstance sagaInstance) {
     sagaInstance.setId(idGenerator.genId(null).asString());
     logger.info("Saving {} {}", sagaInstance.getSagaType(), sagaInstance.getId());
-    eventuateJdbcStatementExecutor.update(insertIntoSagaInstanceSql,
+    eventuateJdbcStatementExecutor.update(sagaInstanceRepositorySql.getInsertIntoSagaInstanceSql(),
             sagaInstance.getSagaType(),
             sagaInstance.getId(),
             sagaInstance.getStateName(),
@@ -82,7 +48,7 @@ public class SagaInstanceRepositoryJdbc implements SagaInstanceRepository {
   private void saveDestinationsAndResources(SagaInstance sagaInstance) {
     for (DestinationAndResource dr : sagaInstance.getDestinationsAndResources()) {
       try {
-        eventuateJdbcStatementExecutor.update(insertIntoSagaInstanceParticipantsSql,
+        eventuateJdbcStatementExecutor.update(sagaInstanceRepositorySql.getInsertIntoSagaInstanceParticipantsSql(),
                 sagaInstance.getSagaType(),
                 sagaInstance.getId(),
                 dr.getDestination(),
@@ -103,14 +69,14 @@ public class SagaInstanceRepositoryJdbc implements SagaInstanceRepository {
     logger.info("finding {} {}", sagaType, sagaId);
 
     Set<DestinationAndResource> destinationsAndResources = new HashSet<>(eventuateJdbcStatementExecutor.query(
-            selectFromSagaInstanceParticipantsSql,
+            sagaInstanceRepositorySql.getSelectFromSagaInstanceParticipantsSql(),
             (rs, rownum) ->
                     new DestinationAndResource(rs.getString("destination"), rs.getString("resource")),
             sagaType,
             sagaId));
 
     return eventuateJdbcStatementExecutor.query(
-            selectFromSagaInstanceSql,
+            sagaInstanceRepositorySql.getSelectFromSagaInstanceSql(),
             (rs, rownum) ->
                     new SagaInstance(sagaType, sagaId, rs.getString("state_name"),
                             rs.getString("last_request_id"),
@@ -122,7 +88,7 @@ public class SagaInstanceRepositoryJdbc implements SagaInstanceRepository {
   @Override
   public void update(SagaInstance sagaInstance) {
     logger.info("Updating {} {}", sagaInstance.getSagaType(), sagaInstance.getId());
-    int count = eventuateJdbcStatementExecutor.update(updateSagaInstanceSql,
+    int count = eventuateJdbcStatementExecutor.update(sagaInstanceRepositorySql.getUpdateSagaInstanceSql(),
             sagaInstance.getStateName(),
             sagaInstance.getLastRequestId(),
             sagaInstance.getSerializedSagaData().getSagaDataType(),
@@ -136,6 +102,4 @@ public class SagaInstanceRepositoryJdbc implements SagaInstanceRepository {
 
     saveDestinationsAndResources(sagaInstance);
   }
-
-
 }

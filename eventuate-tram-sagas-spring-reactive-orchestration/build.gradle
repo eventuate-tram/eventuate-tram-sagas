@@ -1,0 +1,11 @@
+
+dependencies {
+    compile project(":eventuate-tram-sagas-reactive-orchestration")
+    compile project(":eventuate-tram-sagas-spring-reactive-common")
+
+    compile "io.eventuate.tram.core:eventuate-tram-spring-reactive-events:$eventuateTramVersion"
+    compile "io.eventuate.common:eventuate-common-spring-reactive-jdbc:$eventuateCommonVersion"
+
+    testCompile "org.springframework.boot:spring-boot-starter-test:$springBootVersion"
+    testCompile "io.eventuate.common:eventuate-common-id:$eventuateCommonVersion"
+}
