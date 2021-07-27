@@ -85,8 +85,7 @@ public class ReactiveSagaInstanceRepositoryJdbc implements ReactiveSagaInstanceR
   public Mono<SagaInstance> find(String sagaType, String sagaId) {
     Flux<DestinationAndResource> destinationAndResources = eventuateJdbcStatementExecutor.queryForList(sagaInstanceRepositorySql.getSelectFromSagaInstanceParticipantsSql(),
             (row, rowMetadata) -> new DestinationAndResource(row.get("destination").toString(), row.get("resource").toString()),
-            sagaId, sagaType);
-
+            sagaType, sagaId);
 
     Mono<List<SagaInstance>> result = destinationAndResources.collectList().flatMap(dar ->
       eventuateJdbcStatementExecutor.queryForList(sagaInstanceRepositorySql.getSelectFromSagaInstanceSql(),
@@ -96,10 +95,7 @@ public class ReactiveSagaInstanceRepositoryJdbc implements ReactiveSagaInstanceR
                         new SerializedSagaData(row.get("saga_data_type").toString(), row.get("saga_data_json").toString()), new HashSet<>(dar)),
               sagaType, sagaId).collectList());
 
-    return result.flatMap(sagaInstances -> {
-      if (sagaInstances.isEmpty()) return Mono.error(new RuntimeException(String.format("Cannot find saga instance %s %s", sagaType, sagaId)));
-      else return Mono.just(sagaInstances.get(0));
-    });
+    return result.flatMapMany(Flux::fromIterable).single();
   }
 
 
