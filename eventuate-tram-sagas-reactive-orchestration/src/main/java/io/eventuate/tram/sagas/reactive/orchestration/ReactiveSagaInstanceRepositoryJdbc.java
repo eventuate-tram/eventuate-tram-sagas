@@ -87,15 +87,13 @@ public class ReactiveSagaInstanceRepositoryJdbc implements ReactiveSagaInstanceR
             (row, rowMetadata) -> new DestinationAndResource(row.get("destination").toString(), row.get("resource").toString()),
             sagaType, sagaId);
 
-    Mono<List<SagaInstance>> result = destinationAndResources.collectList().flatMap(dar ->
+    return destinationAndResources.collectList().flatMap(dar ->
       eventuateJdbcStatementExecutor.queryForList(sagaInstanceRepositorySql.getSelectFromSagaInstanceSql(),
               (row, rowMetadata) ->
                 new SagaInstance(sagaType, sagaId, row.get("state_name").toString(),
                         row.get("last_request_id").toString(),
                         new SerializedSagaData(row.get("saga_data_type").toString(), row.get("saga_data_json").toString()), new HashSet<>(dar)),
-              sagaType, sagaId).collectList());
-
-    return result.flatMapMany(Flux::fromIterable).single();
+              sagaType, sagaId).single());
   }
 
 
