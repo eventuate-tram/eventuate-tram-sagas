@@ -21,7 +21,7 @@ import static org.mockito.Mockito.when;
 public class ReactiveSagaInstanceRepositoryJdbcTest {
 
   @Test
-  public void testFindUsesExpecetedQueriesInCorrectOrder() {
+  public void testFindUsesExpectedQueriesInCorrectOrder() {
     EventuateSchema eventuateSchema = new EventuateSchema();
     SagaInstanceRepositorySql sagaInstanceRepositorySql =
             new SagaInstanceRepositorySql(eventuateSchema);
