@@ -9,3 +9,10 @@ dependencies {
     testCompile "org.springframework.boot:spring-boot-starter-test:$springBootVersion"
     testCompile "io.eventuate.common:eventuate-common-id:$eventuateCommonVersion"
 }
+
+test {
+    def profile = System.env['SPRING_PROFILES_ACTIVE']
+    if (profile != null && profile != "" && !profile.toLowerCase().contains("mysql")) {
+        exclude '**/**'
+    }
+}
