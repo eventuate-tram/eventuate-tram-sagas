@@ -1,0 +1,5 @@
+
+dependencies {
+    compile project(":eventuate-tram-sagas-reactive-orchestration")
+    compile project(":eventuate-tram-sagas-orchestration-simple-dsl")
+}
