@@ -1,10 +1,9 @@
 package io.eventuate.tram.sagas.reactive.orchestration;
 
-import io.eventuate.tram.sagas.orchestration.Saga;
 import io.eventuate.tram.sagas.orchestration.SagaInstance;
-import io.eventuate.tram.sagas.orchestration.SagaManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import reactor.core.publisher.Mono;
 
 import java.util.Collection;
 import java.util.concurrent.ConcurrentHashMap;
@@ -21,8 +20,8 @@ public class ReactiveSagaInstanceFactory {
     }
   }
 
-  public <SagaData> SagaInstance create(Saga<SagaData> saga, SagaData data) {
-    SagaManager<SagaData>  sagaManager = (SagaManager<SagaData>)sagaManagers.get(saga);
+  public <SagaData> Mono<SagaInstance> create(ReactiveSaga<SagaData> saga, SagaData data) {
+    ReactiveSagaManager<SagaData>  sagaManager = (ReactiveSagaManager<SagaData>)sagaManagers.get(saga);
     if (sagaManager == null)
       throw new RuntimeException(("No SagaManager for " + saga));
     return sagaManager.create(data);
