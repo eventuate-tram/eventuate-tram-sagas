@@ -1,9 +1,12 @@
 = Eventuate Tram Sagas
 
 [cols="5%,20%a"]
+[cols="a,a"]
 |===
-| Release | image::https://api.bintray.com/packages/eventuateio-oss/eventuate-maven-release/eventuate-tram-sagas/images/download.svg[link="https://bintray.com/eventuateio-oss/eventuate-maven-release/eventuate-tram-sagas/_latestVersion"]
-| RC | image::https://api.bintray.com/packages/eventuateio-oss/eventuate-maven-rc/eventuate-tram-sagas/images/download.svg[link="https://bintray.com/eventuateio-oss/eventuate-maven-rc/eventuate-tram-sagas/_latestVersion"]
+| Spring/Micronaut
+| image::https://img.shields.io/maven-central/v/io.eventuate.tram.sagas/eventuate-tram-sagas-bom[link="https://search.maven.org/search?q=io.eventuate.tram.sagas"]
+| Quarkus
+| image::https://img.shields.io/maven-central/v/io.eventuate.tram.sagas/eventuate-tram-sagas-quarkus-bom[link="https://search.maven.org/search?q=io.eventuate.tram.sagas"]
 |===
 
 The Eventuate Tram Sagas framework is a saga framework for Java microservices that use JDBC/JPA and Spring Boot/Micronaut.
