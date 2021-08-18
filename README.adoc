@@ -23,7 +23,7 @@ Each transaction is the invocation of a saga participant using a command message
 A saga executes the forward transactions sequentially.
 If one of them fails then the saga executes the compensating transactions in reverse order to rollback the saga.
 
-Eventuate Tram Sagas is a saga orchestration framework for Spring Boot and Micronaut applications.
+Eventuate Tram Sagas is a saga orchestration framework for Spring Boot, Micronaut and Quarkus (using https://github.com/eventuate-tram/eventuate-tram-sagas-quarkus[Eventuate Tram for Quarkus]) applications.
 It is built on the https://github.com/eventuate-tram/eventuate-tram-core[Eventuate Tram framework], which enables an application to atomically update a database and publish a message without using JTA.
 Eventuate Tram Sagas is described in more detail in my book https://www.manning.com/books/microservice-patterns[Microservice Patterns].
 
