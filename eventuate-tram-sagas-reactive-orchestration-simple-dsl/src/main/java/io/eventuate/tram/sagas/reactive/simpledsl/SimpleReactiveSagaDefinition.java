@@ -50,7 +50,7 @@ public class SimpleReactiveSagaDefinition<Data> implements ReactiveSagaDefinitio
     });
 
     if (currentStep.isSuccessfulReply(compensating, message)) {
-      return executeNextStep(sagaData, state);
+      return Mono.from(executeNextStep(sagaData, state));
     } else if (compensating) {
       throw new UnsupportedOperationException("Failure when compensating");
     } else {

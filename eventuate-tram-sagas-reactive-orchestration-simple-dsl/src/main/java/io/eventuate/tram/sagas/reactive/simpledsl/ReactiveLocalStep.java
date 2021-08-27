@@ -3,6 +3,7 @@ package io.eventuate.tram.sagas.reactive.simpledsl;
 import io.eventuate.tram.commands.common.CommandReplyOutcome;
 import io.eventuate.tram.commands.common.ReplyMessageHeaders;
 import io.eventuate.tram.messaging.common.Message;
+import io.eventuate.tram.sagas.simpledsl.StepOutcome;
 import org.reactivestreams.Publisher;
 import reactor.core.publisher.Mono;
 
@@ -41,7 +42,7 @@ public class ReactiveLocalStep<Data> implements ReactiveSagaStep<Data> {
   }
 
   @Override
-  public Publisher<ReactiveStepOutcome> makeStepOutcome(Data data, boolean compensating) {
+  public Publisher<StepOutcome> makeStepOutcome(Data data, boolean compensating) {
 
     Publisher<?> result;
 
@@ -53,8 +54,8 @@ public class ReactiveLocalStep<Data> implements ReactiveSagaStep<Data> {
 
     return Mono
             .from(result)
-            .then(Mono.just(ReactiveStepOutcome.makeLocalOutcome(Optional.empty())))
-            .onErrorResume(RuntimeException.class, e -> Mono.just(ReactiveStepOutcome.makeLocalOutcome(Optional.of(e))));
+            .then(Mono.defer(() -> Mono.just(StepOutcome.makeLocalOutcome(Optional.empty()))))
+            .onErrorResume(RuntimeException.class, e -> Mono.just(StepOutcome.makeLocalOutcome(Optional.of(e)))); //TODO: if here is exception it will not be handled somewhere else
   }
 
 }

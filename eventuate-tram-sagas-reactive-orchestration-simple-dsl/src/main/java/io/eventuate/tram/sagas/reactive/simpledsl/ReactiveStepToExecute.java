@@ -37,13 +37,17 @@ public class ReactiveStepToExecute<Data> {
 
     return Mono
             .from(step.get().makeStepOutcome(data, this.compensating))
-            .map(step -> step.visit(e -> Mono.just(builder.withIsLocal(e)), command -> Mono.just(builder.withCommands(command))))
-            .thenReturn(builder
-                    .withUpdatedSagaData(data)
-                    .withUpdatedState(encodeState(newState))
-                    .withIsEndState(newState.isEndState())
-                    .withIsCompensating(compensating)
-                    .build());
+            .map(step -> {
+              step.visit(builder::withIsLocal, builder::withCommands);
+              return step;
+            })
+            .then(Mono.fromSupplier(() ->
+              builder
+                      .withUpdatedSagaData(data)
+                      .withUpdatedState(encodeState(newState))
+                      .withIsEndState(newState.isEndState())
+                      .withIsCompensating(compensating)
+                      .build()));
   }
 
 }

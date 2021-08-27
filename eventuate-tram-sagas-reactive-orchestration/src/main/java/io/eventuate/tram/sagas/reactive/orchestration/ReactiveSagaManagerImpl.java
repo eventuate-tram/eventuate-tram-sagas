@@ -116,13 +116,14 @@ public class ReactiveSagaManagerImpl<Data>
               }
               return Mono.empty();
             })
-            .then(Mono.defer(() ->Mono.from(getStateDefinition().start(sagaData))))
+            .then(Mono.defer(() -> Mono.from(getStateDefinition().start(sagaData))))
             .flatMap(actions -> {
+              //TODO: what if local step has an exception? should is be here?
               if (actions.getLocalException().isPresent()) return Mono.error(actions.getLocalException().get());
               else return Mono.just(actions);
             })
             .flatMap(actions -> processActions(sagaInstance.getId(), sagaInstance, sagaData, Mono.just(actions)))
-            .thenReturn(sagaInstance);
+            .then(Mono.fromSupplier(() -> sagaInstance));
   }
 
 
@@ -213,7 +214,6 @@ public class ReactiveSagaManagerImpl<Data>
     return SagaDataSerde.deserializeSagaData(sagaInstance.getSerializedSagaData());
   }
 
-
   private Mono<SagaActions<Data>> processActions(String sagaId, SagaInstance sagaInstance, Data sagaData, Mono<SagaActions<Data>> actions) {
     return actions.flatMap(acts -> {
       if (acts.getLocalException().isPresent()) {
@@ -243,19 +243,18 @@ public class ReactiveSagaManagerImpl<Data>
                 })
                 .then(Mono.defer(() -> sagaInstanceRepository.update(sagaInstance)))
                 .then(Mono.defer(() -> {
-                  return Mono.from(getStateDefinition()
-                          .handleReply(acts.getUpdatedState().get(),
-                                  acts.getUpdatedSagaData().get(),
+                  if (!acts.isLocal()) return Mono.empty();
+                  else return Mono.just(acts);
+                }))
+                .flatMap(newActs ->
+                  Mono.from(getStateDefinition()
+                          .handleReply(newActs.getUpdatedState().get(),
+                                  newActs.getUpdatedSagaData().get(),
                                   MessageBuilder
                                           .withPayload("{}")
                                           .withHeader(ReplyMessageHeaders.REPLY_OUTCOME, CommandReplyOutcome.SUCCESS.name())
                                           .withHeader(ReplyMessageHeaders.REPLY_TYPE, Success.class.getName())
-                                          .build()));
-                }))
-                .then(Mono.defer(() -> {
-                  if (acts.isLocal()) return Mono.empty();
-                  else return Mono.just(acts);
-                }));
+                                          .build())));
 
         return nextActions.flatMap(na -> processActions(sagaId, sagaInstance, sagaData, Mono.just(na)));
       }

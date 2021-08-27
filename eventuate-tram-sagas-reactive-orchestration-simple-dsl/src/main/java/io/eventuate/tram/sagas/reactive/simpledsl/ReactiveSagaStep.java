@@ -1,6 +1,7 @@
 package io.eventuate.tram.sagas.reactive.simpledsl;
 
 import io.eventuate.tram.messaging.common.Message;
+import io.eventuate.tram.sagas.simpledsl.StepOutcome;
 import org.reactivestreams.Publisher;
 
 import java.util.Optional;
@@ -11,7 +12,7 @@ public interface ReactiveSagaStep<Data> {
 
   Optional<BiFunction<Data, Object, Publisher<?>>> getReplyHandler(Message message, boolean compensating);
 
-  Publisher<ReactiveStepOutcome>  makeStepOutcome(Data data, boolean compensating);
+  Publisher<StepOutcome>  makeStepOutcome(Data data, boolean compensating);
 
   boolean hasAction(Data data);
 

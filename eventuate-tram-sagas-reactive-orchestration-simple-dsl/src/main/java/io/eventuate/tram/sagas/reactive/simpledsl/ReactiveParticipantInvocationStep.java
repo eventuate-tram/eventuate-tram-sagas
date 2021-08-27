@@ -3,6 +3,7 @@ package io.eventuate.tram.sagas.reactive.simpledsl;
 import io.eventuate.tram.commands.common.ReplyMessageHeaders;
 import io.eventuate.tram.commands.consumer.CommandWithDestination;
 import io.eventuate.tram.messaging.common.Message;
+import io.eventuate.tram.sagas.simpledsl.StepOutcome;
 import org.reactivestreams.Publisher;
 import reactor.core.publisher.Mono;
 
@@ -50,8 +51,9 @@ public class ReactiveParticipantInvocationStep<Data> implements ReactiveSagaStep
   }
 
   @Override
-  public Publisher<ReactiveStepOutcome> makeStepOutcome(Data data, boolean compensating) {
-    Publisher<CommandWithDestination> commandWithDestination = getParticipantInvocation(compensating).map(x -> x.makeCommandToSend(data)).orElse(Mono.empty());
-    return Mono.from(commandWithDestination).map(cmd -> ReactiveStepOutcome.makeRemoteStepOutcome(Collections.singletonList(cmd)));
+  public Publisher<StepOutcome> makeStepOutcome(Data data, boolean compensating) {
+    Publisher<CommandWithDestination> commandWithDestination =
+            getParticipantInvocation(compensating).map(x -> x.makeCommandToSend(data)).orElse(Mono.empty());
+    return Mono.from(commandWithDestination).map(cmd -> StepOutcome.makeRemoteStepOutcome(Collections.singletonList(cmd)));
   }
 }
