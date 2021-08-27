@@ -16,6 +16,8 @@ include 'eventuate-tram-sagas-micronaut-participant'
 include 'eventuate-tram-sagas-micronaut-configuration-tests'
 
 include 'eventuate-tram-sagas-orchestration-simple-dsl'
+include 'eventuate-tram-sagas-spring-reactive-orchestration-simple-dsl-starter'
+include 'eventuate-tram-sagas-reactive-orchestration-simple-dsl'
 include 'eventuate-tram-sagas-spring-orchestration-simple-dsl'
 include 'eventuate-tram-sagas-micronaut-orchestration-simple-dsl'
 include 'eventuate-tram-sagas-common-in-memory'
