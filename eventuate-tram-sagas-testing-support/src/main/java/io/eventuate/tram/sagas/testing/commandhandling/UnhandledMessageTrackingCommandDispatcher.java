@@ -1,5 +1,6 @@
 package io.eventuate.tram.sagas.testing.commandhandling;
 
+import io.eventuate.tram.commands.common.CommandNameMapping;
 import io.eventuate.tram.commands.consumer.CommandDispatcher;
 import io.eventuate.tram.commands.consumer.CommandHandler;
 import io.eventuate.tram.commands.consumer.CommandHandlers;
@@ -22,8 +23,12 @@ public class UnhandledMessageTrackingCommandDispatcher extends CommandDispatcher
   private CommandHandlers commandHandlers;
   private List<Message> unhandledMessages = new LinkedList<>();
 
-  public UnhandledMessageTrackingCommandDispatcher(String commandDispatcherId, CommandHandlers commandHandlers, MessageConsumer messageConsumer, MessageProducer messageProducer) {
-    super(commandDispatcherId, commandHandlers, messageConsumer, messageProducer);
+  public UnhandledMessageTrackingCommandDispatcher(String commandDispatcherId,
+                                                   CommandHandlers commandHandlers,
+                                                   MessageConsumer messageConsumer,
+                                                   MessageProducer messageProducer,
+                                                   CommandNameMapping commandNameMapping) {
+    super(commandDispatcherId, commandHandlers, messageConsumer, messageProducer, commandNameMapping);
     this.commandHandlers = commandHandlers;
   }
 
