@@ -31,6 +31,7 @@ include 'eventuate-tram-sagas-micronaut-testing-support'
 
 include 'orders-and-customers'
 include 'orders-and-customers-spring'
+include 'orders-and-customers-spring-reactive'
 include 'orders-and-customers-micronaut'
 include 'orders-and-customers-micronaut-integration-tests'
 include 'orders-and-customers-micronaut-in-memory-integration-tests'
