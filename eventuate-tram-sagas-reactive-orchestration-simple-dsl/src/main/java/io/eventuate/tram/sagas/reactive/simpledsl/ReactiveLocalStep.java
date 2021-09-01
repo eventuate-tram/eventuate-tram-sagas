@@ -55,7 +55,7 @@ public class ReactiveLocalStep<Data> implements ReactiveSagaStep<Data> {
     return Mono
             .from(result)
             .then(Mono.defer(() -> Mono.just(StepOutcome.makeLocalOutcome(Optional.empty()))))
-            .onErrorResume(RuntimeException.class, e -> Mono.just(StepOutcome.makeLocalOutcome(Optional.of(e)))); //TODO: if here is exception it will not be handled somewhere else
+            .onErrorResume(RuntimeException.class, e -> Mono.just(StepOutcome.makeLocalOutcome(Optional.of(e))));
   }
 
 }

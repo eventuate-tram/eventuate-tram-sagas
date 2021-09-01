@@ -66,11 +66,13 @@ public class SagaUnitTestSupport<T> {
 
     };
 
+    CommandNameMapping commandNameMapping = new DefaultCommandNameMapping();
+
     CommandProducerImpl commandProducer = new CommandProducerImpl((destination, message) -> {
       String id = genId();
       message.setHeader(Message.ID, id);
       sentCommands.add(new MessageWithDestination(destination, message));
-    });
+    }, commandNameMapping);
 
     SagaCommandProducer sagaCommandProducer = new SagaCommandProducer(commandProducer);
 

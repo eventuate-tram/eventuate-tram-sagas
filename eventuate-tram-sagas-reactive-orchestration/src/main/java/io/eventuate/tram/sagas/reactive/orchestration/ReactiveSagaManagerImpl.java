@@ -118,7 +118,6 @@ public class ReactiveSagaManagerImpl<Data>
             })
             .then(Mono.defer(() -> Mono.from(getStateDefinition().start(sagaData))))
             .flatMap(actions -> {
-              //TODO: what if local step has an exception? should is be here?
               if (actions.getLocalException().isPresent()) return Mono.error(actions.getLocalException().get());
               else return Mono.just(actions);
             })

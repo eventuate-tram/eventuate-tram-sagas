@@ -45,17 +45,19 @@ public class SimpleReactiveSagaDefinition<Data> implements ReactiveSagaDefinitio
     ReactiveSagaStep<Data> currentStep = sagaSteps.get(state.getCurrentlyExecuting());
     boolean compensating = state.isCompensating();
 
-    currentStep.getReplyHandler(message, compensating).ifPresent(handler -> {
-      invokeReplyHandler(message, sagaData, handler);
-    });
-
-    if (currentStep.isSuccessfulReply(compensating, message)) {
-      return Mono.from(executeNextStep(sagaData, state));
-    } else if (compensating) {
-      throw new UnsupportedOperationException("Failure when compensating");
-    } else {
-      return executeNextStep(sagaData, state.startCompensating());
-    }
+    return currentStep
+            .getReplyHandler(message, compensating)
+            .map(handler -> Mono.from(invokeReplyHandler(message, sagaData, handler)))
+            .orElse(Mono.empty())
+            .then(Mono.defer(() -> {
+              if (currentStep.isSuccessfulReply(compensating, message)) {
+                return Mono.from(executeNextStep(sagaData, state));
+              } else if (compensating) {
+                return Mono.error(new UnsupportedOperationException("Failure when compensating"));
+              } else {
+                return Mono.from(executeNextStep(sagaData, state.startCompensating()));
+              }
+            }));
   }
 
 

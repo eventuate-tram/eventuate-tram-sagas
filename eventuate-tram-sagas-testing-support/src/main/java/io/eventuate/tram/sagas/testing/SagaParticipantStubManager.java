@@ -2,6 +2,7 @@ package io.eventuate.tram.sagas.testing;
 
 import io.eventuate.common.json.mapper.JSonMapper;
 import io.eventuate.tram.commands.common.Command;
+import io.eventuate.tram.commands.common.CommandNameMapping;
 import io.eventuate.tram.commands.consumer.CommandMessage;
 import io.eventuate.tram.messaging.common.Message;
 import io.eventuate.tram.messaging.consumer.MessageConsumer;
@@ -29,13 +30,17 @@ public class SagaParticipantStubManager {
   private String currentCommandChannel;
 
 
-  public SagaParticipantStubManager(SagaParticipantChannels sagaParticipantChannels, MessageConsumer messageConsumer, MessageProducer messageProducer) {
+  public SagaParticipantStubManager(SagaParticipantChannels sagaParticipantChannels,
+                                    MessageConsumer messageConsumer,
+                                    MessageProducer messageProducer,
+                                    CommandNameMapping commandNameMapping) {
     this.commandChannels = sagaParticipantChannels.getChannels();
     this.commandHandlers = new ReconfigurableCommandHandlers(this.commandChannels);
     this.commandDispatcher = new UnhandledMessageTrackingCommandDispatcher("SagaParticipantStubManager-command-dispatcher-" + System.currentTimeMillis(),
             commandHandlers,
             messageConsumer,
-            messageProducer);
+            messageProducer,
+            commandNameMapping);
 
     /// TODO handle scenario where a command is recieved for which there is not a handler.
   }

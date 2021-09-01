@@ -1,5 +1,6 @@
 package io.eventuate.tram.sagas.micronaut.testing;
 
+import io.eventuate.tram.commands.common.CommandNameMapping;
 import io.eventuate.tram.messaging.consumer.MessageConsumer;
 import io.eventuate.tram.messaging.producer.MessageProducer;
 import io.eventuate.tram.sagas.testing.SagaParticipantChannels;
@@ -12,7 +13,10 @@ import javax.inject.Singleton;
 public class SagaParticipantStubManagerFactory {
 
   @Singleton
-  public SagaParticipantStubManager sagaParticipantStubManager(SagaParticipantChannels sagaParticipantChannels, MessageConsumer messageConsumer, MessageProducer messageProducer) {
-    return new SagaParticipantStubManager(sagaParticipantChannels, messageConsumer, messageProducer);
+  public SagaParticipantStubManager sagaParticipantStubManager(SagaParticipantChannels sagaParticipantChannels,
+                                                               MessageConsumer messageConsumer,
+                                                               MessageProducer messageProducer,
+                                                               CommandNameMapping commandNameMapping) {
+    return new SagaParticipantStubManager(sagaParticipantChannels, messageConsumer, messageProducer, commandNameMapping);
   }
 }

@@ -1,6 +1,7 @@
 package io.eventuate.tram.sagas.participant;
 
 import io.eventuate.tram.commands.common.CommandMessageHeaders;
+import io.eventuate.tram.commands.common.CommandNameMapping;
 import io.eventuate.tram.commands.consumer.CommandDispatcher;
 import io.eventuate.tram.commands.consumer.CommandHandler;
 import io.eventuate.tram.commands.consumer.CommandHandlers;
@@ -25,8 +26,9 @@ public class SagaCommandDispatcher extends CommandDispatcher {
                                CommandHandlers target,
                                MessageConsumer messageConsumer,
                                MessageProducer messageProducer,
-                               SagaLockManager sagaLockManager) {
-    super(commandDispatcherId, target, messageConsumer, messageProducer);
+                               SagaLockManager sagaLockManager,
+                               CommandNameMapping commandNameMapping) {
+    super(commandDispatcherId, target, messageConsumer, messageProducer, commandNameMapping);
     this.sagaLockManager = sagaLockManager;
   }
 
