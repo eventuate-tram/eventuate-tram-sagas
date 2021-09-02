@@ -10,3 +10,9 @@ dependencies {
     testCompile "org.springframework.boot:spring-boot-starter-test:${springBootVersion}"
 }
 
+test {
+    def profile = System.env['SPRING_PROFILES_ACTIVE']
+    if (profile != null && profile != "" && (!profile.toLowerCase().contains("mysql") || profile.toLowerCase().contains("activemq"))) {
+        exclude '**/**'
+    }
+}
