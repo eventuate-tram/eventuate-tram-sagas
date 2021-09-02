@@ -34,11 +34,13 @@ public class CreateOrderSaga implements SimpleReactiveSaga<CreateOrderSagaData> 
           .build();
 
   private Mono<Void> handleCustomerNotFound(CreateOrderSagaData data, CustomerNotFound reply) {
-    return Mono.fromRunnable(() -> data.setRejectionReason(RejectionReason.UNKNOWN_CUSTOMER));
+    data.setRejectionReason(RejectionReason.UNKNOWN_CUSTOMER);
+    return Mono.empty();
   }
 
   private Mono<Void> handleCustomerCreditLimitExceeded(CreateOrderSagaData data, CustomerCreditLimitExceeded reply) {
-    return Mono.fromRunnable(() -> data.setRejectionReason(RejectionReason.INSUFFICIENT_CREDIT));
+    data.setRejectionReason(RejectionReason.INSUFFICIENT_CREDIT);
+    return Mono.empty();
   }
 
   @Override
@@ -46,14 +48,13 @@ public class CreateOrderSaga implements SimpleReactiveSaga<CreateOrderSagaData> 
     return this.sagaDefinition;
   }
 
-  private Mono<Void> create(CreateOrderSagaData data) {
+  private Mono<?> create(CreateOrderSagaData data) {
     return orderService
             .createOrder(data.getOrderDetails())
             .map(o -> {
               data.setOrderId(o.getId());
               return o;
-            })
-            .then();
+            });
   }
 
   private Mono<CommandWithDestination> reserveCredit(CreateOrderSagaData data) {
@@ -61,16 +62,16 @@ public class CreateOrderSaga implements SimpleReactiveSaga<CreateOrderSagaData> 
     Money orderTotal = data.getOrderDetails().getOrderTotal();
 
     return Mono
-            .fromSupplier(() -> send(new ReserveCreditCommand(customerId, data.getOrderId(), orderTotal))
-                      .to("customerService")
-                      .build());
+            .just(send(new ReserveCreditCommand(customerId, data.getOrderId(), orderTotal))
+                    .to("customerService")
+                    .build());
   }
 
   private Mono<Void> approve(CreateOrderSagaData data) {
-    return Mono.defer(() -> orderService.approveOrder(data.getOrderId()));
+    return orderService.approveOrder(data.getOrderId());
   }
 
   private Mono<Void> reject(CreateOrderSagaData data) {
-    return Mono.defer(() -> orderService.rejectOrder(data.getOrderId(), data.getRejectionReason()));
+    return orderService.rejectOrder(data.getOrderId(), data.getRejectionReason());
   }
 }
