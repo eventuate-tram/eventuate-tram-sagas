@@ -8,7 +8,7 @@ set -e
 ./gradlew "${database}AllComposeUp"
 
 if [ "${database}" == "mysql" ]; then
-  cat reactive-schema.sql | ./mysql-cli.sh -i
+  cat schema-for-testing-reactive-framework.sql | ./mysql-cli.sh -i
 fi
 
 if [[ "${SPRING_PROFILES_ACTIVE}" != "ActiveMQ" ]]; then

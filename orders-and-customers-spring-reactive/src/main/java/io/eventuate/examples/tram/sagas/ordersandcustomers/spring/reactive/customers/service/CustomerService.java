@@ -47,7 +47,6 @@ public class CustomerService {
                       .flatMap(creditReservations -> handleCreditReservation(creditReservations, customer, orderId, customerId, orderTotal));
             })
             .switchIfEmpty(Mono.error(new CustomerNotFoundException()))
-            .as(transactionalOperator::transactional)
             .doOnError(throwable -> logger.error("credit reservation failed", throwable));
   }
 
