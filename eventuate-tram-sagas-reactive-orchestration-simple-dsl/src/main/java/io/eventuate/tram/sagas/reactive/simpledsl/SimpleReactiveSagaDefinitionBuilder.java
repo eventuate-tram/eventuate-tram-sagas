@@ -1,19 +1,21 @@
 package io.eventuate.tram.sagas.reactive.simpledsl;
 
-import io.eventuate.tram.sagas.reactive.orchestration.ReactiveSagaDefinition;
+import io.eventuate.tram.sagas.orchestration.SagaActions;
+import io.eventuate.tram.sagas.orchestration.SagaDefinition;
+import org.reactivestreams.Publisher;
 
 import java.util.LinkedList;
 import java.util.List;
 
-public class SimpleReactiveSagaDefinitionBuilder<Data> {
+public class SimpleReactiveSagaDefinitionBuilder<SAGA_DATA> {
 
-  private List<ReactiveSagaStep<Data>> sagaSteps = new LinkedList<>();
+  private List<ReactiveSagaStep<SAGA_DATA>> sagaSteps = new LinkedList<>();
 
-  public void addStep(ReactiveSagaStep<Data> sagaStep) {
+  public void addStep(ReactiveSagaStep<SAGA_DATA> sagaStep) {
     sagaSteps.add(sagaStep);
   }
 
-  public ReactiveSagaDefinition<Data> build() {
+  public SagaDefinition<Publisher<SagaActions<SAGA_DATA>>, SAGA_DATA> build() {
     return new SimpleReactiveSagaDefinition<>(sagaSteps);
   }
 }

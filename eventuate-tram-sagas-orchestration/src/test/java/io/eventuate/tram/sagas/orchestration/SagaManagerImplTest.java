@@ -60,7 +60,7 @@ public class SagaManagerImplTest {
   private TestSaga testSaga;
 
   @Mock
-  private SagaDefinition<TestSagaData> sagaDefinition;
+  private SagaDefinition<SagaActions<TestSagaData>, TestSagaData> sagaDefinition;
 
   private String testResource = "SomeResource";
   private String sagaType = "MySagaType";

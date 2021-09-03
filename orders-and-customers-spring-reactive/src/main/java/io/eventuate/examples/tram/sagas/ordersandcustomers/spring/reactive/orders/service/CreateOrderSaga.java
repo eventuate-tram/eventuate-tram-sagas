@@ -7,8 +7,10 @@ import io.eventuate.examples.tram.sagas.ordersandcustomers.spring.reactive.custo
 import io.eventuate.examples.tram.sagas.ordersandcustomers.spring.reactive.orders.common.RejectionReason;
 import io.eventuate.examples.tram.sagas.ordersandcustomers.spring.reactive.orders.createorder.CreateOrderSagaData;
 import io.eventuate.tram.commands.consumer.CommandWithDestination;
-import io.eventuate.tram.sagas.reactive.orchestration.ReactiveSagaDefinition;
+import io.eventuate.tram.sagas.orchestration.SagaActions;
+import io.eventuate.tram.sagas.orchestration.SagaDefinition;
 import io.eventuate.tram.sagas.reactive.simpledsl.SimpleReactiveSaga;
+import org.reactivestreams.Publisher;
 import reactor.core.publisher.Mono;
 
 import static io.eventuate.tram.commands.consumer.CommandWithDestinationBuilder.send;
@@ -21,7 +23,7 @@ public class CreateOrderSaga implements SimpleReactiveSaga<CreateOrderSagaData> 
     this.orderService = orderService;
   }
 
-  private ReactiveSagaDefinition<CreateOrderSagaData> sagaDefinition =
+  private SagaDefinition<Publisher<SagaActions<CreateOrderSagaData>>, CreateOrderSagaData> sagaDefinition =
           step()
             .invokeLocal(this::create)
             .withCompensation(this::reject)
@@ -44,7 +46,7 @@ public class CreateOrderSaga implements SimpleReactiveSaga<CreateOrderSagaData> 
   }
 
   @Override
-  public ReactiveSagaDefinition<CreateOrderSagaData> getSagaDefinition() {
+  public SagaDefinition<Publisher<SagaActions<CreateOrderSagaData>>, CreateOrderSagaData> getSagaDefinition() {
     return this.sagaDefinition;
   }
 

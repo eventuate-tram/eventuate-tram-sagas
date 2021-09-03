@@ -6,6 +6,7 @@ import io.eventuate.examples.tram.sagas.ordersandcustomers.orders.sagas.particip
 import io.eventuate.examples.tram.sagas.ordersandcustomers.orders.service.RejectOrderCommand;
 import io.eventuate.tram.commands.consumer.CommandWithDestination;
 import io.eventuate.tram.events.publisher.DomainEventPublisher;
+import io.eventuate.tram.sagas.orchestration.SagaActions;
 import io.eventuate.tram.sagas.orchestration.SagaDefinition;
 import io.eventuate.tram.sagas.simpledsl.SimpleSaga;
 
@@ -21,18 +22,18 @@ public class CreateOrderSaga implements SimpleSaga<CreateOrderSagaData> {
     this.domainEventPublisher = domainEventPublisher;
   }
 
-  private SagaDefinition<CreateOrderSagaData> sagaDefinition =
+  private SagaDefinition<SagaActions<CreateOrderSagaData>, CreateOrderSagaData> sagaDefinition =
           step()
-            .withCompensation(this::reject)
-          .step()
-            .invokeParticipant(this::reserveCredit)
-          .step()
-            .invokeParticipant(this::approve)
-          .build();
+                  .withCompensation(this::reject)
+                  .step()
+                  .invokeParticipant(this::reserveCredit)
+                  .step()
+                  .invokeParticipant(this::approve)
+                  .build();
 
 
   @Override
-  public SagaDefinition<CreateOrderSagaData> getSagaDefinition() {
+  public SagaDefinition<SagaActions<CreateOrderSagaData>, CreateOrderSagaData> getSagaDefinition() {
     return this.sagaDefinition;
   }
 
