@@ -35,7 +35,17 @@ public abstract class AbstractSagaDefinition<SAGA_STEP extends AbstractSagaStep<
 			return stepToExecute.executeStep(sagaData, currentState);
 	}
 
-	protected Object prepareReply(Message message, SAGA_DATA data) {
+	@Override
+	public SAGA_ACTIONS handleReply(String currentState, SAGA_DATA sagaData, Message message) {
+		SagaExecutionState state = SagaExecutionStateJsonSerde.decodeState(currentState);
+		SAGA_STEP currentStep = sagaSteps.get(state.getCurrentlyExecuting());
+		boolean compensating = state.isCompensating();
+
+		return executeReplyStep(currentStep, state, message, sagaData, compensating);
+	}
+
+
+	protected Object prepareReply(Message message) {
 		Class m;
 		try {
 			String className = message.getRequiredHeader(ReplyMessageHeaders.REPLY_TYPE);
@@ -84,6 +94,12 @@ public abstract class AbstractSagaDefinition<SAGA_STEP extends AbstractSagaStep<
 	protected abstract AbstractStepToExecute<SAGA_STEP, SAGA_ACTIONS, SAGA_DATA> createStepToExecute(Optional<SAGA_STEP> step,
 																																																	 int skipped,
 																																																	 boolean compensating);
+
+	protected abstract SAGA_ACTIONS executeReplyStep(SAGA_STEP currentStep,
+																									 SagaExecutionState state,
+																									 Message message,
+																									 SAGA_DATA sagaData,
+																									 boolean compensating);
 
 	protected abstract SAGA_ACTIONS actualSagaActionsFromPureSagaActions(SagaActions<SAGA_DATA> sagaActions);
 }
