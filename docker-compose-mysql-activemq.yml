@@ -31,7 +31,10 @@ services:
       - 61614:61614
 
   mysql:
-    image: ${MYSQL_MULTI_ARCH_IMAGE:-localhost:5002/eventuate-tram-sagas-mysql:multi-arch-local-build}
+    build:
+      context: ./mysql
+      args:
+        EVENTUATE_COMMON_VERSION: "$EVENTUATE_COMMON_VERSION"
     ports:
       - 3306:3306
     environment:
