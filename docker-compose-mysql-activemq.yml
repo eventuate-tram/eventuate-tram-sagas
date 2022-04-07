@@ -1,13 +1,13 @@
 version: "3"
 services:
   zookeeper:
-    image: confluentinc/cp-zookeeper:5.2.4
+    image: eventuateio/eventuate-zookeeper:${EVENTUATE_COMMON_VERSION?}
     ports:
       - 2181:2181
     environment:
       ZOOKEEPER_CLIENT_PORT: 2181
   kafka:
-    image: "confluentinc/cp-kafka:5.2.4"
+    image: "eventuateio/eventuate-kafka:${EVENTUATE_MESSAGING_KAFKA_IMAGE_VERSION?}"
     ports:
       - 9092:9092
     depends_on:
@@ -31,11 +31,7 @@ services:
       - 61614:61614
 
   mysql:
-    build:
-      context: ./mysql
-      args:
-        EVENTUATE_COMMON_VERSION: "$EVENTUATE_COMMON_VERSION"
-    image: eventuateio/eventuate-tram-sagas-mysql:$DOCKER_IMAGE_TAG
+    image: ${MYSQL_MULTI_ARCH_IMAGE:-localhost:5002/eventuate-tram-sagas-mysql:multi-arch-local-build}
     ports:
       - 3306:3306
     environment:

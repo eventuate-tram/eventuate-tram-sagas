@@ -66,33 +66,39 @@ gradle.projectsEvaluated {
 dockerCompose {
     environment.put "EVENTUATE_COMMON_VERSION", eventuateCommonImageVersion
     environment.put "EVENTUATE_CDC_VERSION", eventuateCdcImageVersion
+    environment.put "EVENTUATE_MESSAGING_KAFKA_IMAGE_VERSION", eventuateMessagingKafkaImageVersion
 
     environment.put "DOCKER_IMAGE_TAG", dockerImageTag
 
     activemqInfrastructure {
         projectName = null
-        useComposeFiles = ["docker-compose-mysql.yml"]
+        useComposeFiles = ["docker-compose-mysql-kafka.yml"]
         startedServices = ["mysql", "activemq"]
     }
 
-    mysqlAll {
+    mysqlKafkaAll {
         projectName = null
-        useComposeFiles = ["docker-compose-mysql.yml"]
+        useComposeFiles = ["docker-compose-mysql-kafka.yml"]
+    }
+
+    mysqlactivemqAll {
+        projectName = null
+        useComposeFiles = ["docker-compose-mysql-activemq.yml"]
     }
 
 
-    postgresAll {
+    postgresKafkaAll {
         projectName = null
         useComposeFiles = ["docker-compose-postgres.yml"]
     }
 
-    mssqlAll {
+    mssqlKafkaAll {
         projectName = null
         useComposeFiles = ["docker-compose-mssql.yml"]
     }
 
     publish {
         projectName = null
-        useComposeFiles = ["docker-compose-mysql.yml", "docker-compose-postgres.yml", "docker-compose-mssql.yml"]
+        useComposeFiles = ["docker-compose-mysql-kafka.yml", "docker-compose-postgres.yml", "docker-compose-mssql.yml"]
     }
 }

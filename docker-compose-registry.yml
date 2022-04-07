@@ -1,0 +1,6 @@
+version: '3'
+services:
+  registry:
+    image: registry:2
+    ports:
+      - "5002:5000"

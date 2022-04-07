@@ -7,7 +7,17 @@ orbs:
           script:
             description: the script to execute
             type: string
-        machine: true
+          resource_class:
+            description: the resource class
+            type: string
+            default: 'medium'
+          skip_multi_arch_env_vars:
+            description: if set don't set multi-arch env vars
+            type: string
+            default: ''
+        machine:
+          image: ubuntu-2004:202101-01
+        resource_class: <<parameters.resource_class>>
         working_directory: ~/eventuate-tram-sagas
         steps:
           - checkout
@@ -17,16 +27,18 @@ orbs:
                 - eventuate-tram-sagas-
           - run:
               command: |
-                ./.circleci/upgrade-docker-compose.sh
-          - run:
-              command: |
                 . ./.circleci/setenv-circle-ci.sh
                 ./gradlew testClasses aggregateJavaDocs
           - save_cache:
               paths:
                 - ~/.gradle
               key: eventuate-tram-sagas-{{ checksum "gradle.properties" }}-{{ checksum "gradle/wrapper/gradle-wrapper.properties" }}
-          - run: <<parameters.script>>
+          - run:
+              command: |
+                if [ -z "<<parameters.skip_multi_arch_env_vars>>" ] ; then
+                  . set-multi-arch-image-env-vars.sh
+                fi
+                <<parameters.script>>
           - run:
               name: Save test results
               command: |
@@ -42,13 +54,81 @@ orbs:
               path: ~/junit
           - store_artifacts:
               path: ~/container-logs
+jobs:
+  build-multi-arch-images:
+    docker:
+      - image: cimg/base:stable
+    working_directory: ~/eventuate-tram-sagas
+    steps:
+      - checkout
+      - setup_remote_docker:
+          version: 20.10.11
+      - run:
+          name: docker buildx build
+          command: |
+            . set-multi-arch-image-env-vars.sh
+            docker context create tls-env
+            docker buildx create tls-env --use
+
+            # failed to solve: process "/dev/.buildkit_qemu_emulator
+            # https://github.com/docker/buildx/issues/493#issuecomment-754834977
+            # https://github.com/tonistiigi/binfmt#installing-emulators
+
+            docker run --privileged --rm tonistiigi/binfmt --install arm64,arm
+
+            ./build-multi-arch-images.sh
+  deploy-multi-arch:
+    docker:
+      - image: cimg/base:stable
+    working_directory: ~/eventuate-tram-sagas
+    steps:
+      - checkout
+      - run:
+          command: |
+            . set-multi-arch-image-env-vars.sh
+            ./deploy-multi-arch.sh
 workflows:
   version: 2.1
   build-test-and-deploy:
     jobs:
       - build-and-test/build-and-test:
-          name: build-and-test-mysql
-          script: ./build-and-test-all-mysql.sh
+          name: build-and-test-intel
+          skip_multi_arch_env_vars: "true"
+          script: |
+            docker context create tls-env
+            docker buildx create tls-env --use
+            docker run --privileged --rm tonistiigi/binfmt --install arm64,arm
+            export DOCKER_HOST_NAME=$(hostname)
+            ./build-and-test-all-multi-arch-locally-mysql-kafka.sh
+      - build-and-test/build-and-test:
+          name: build-and-test-arm
+          resource_class: arm.medium
+          skip_multi_arch_env_vars: "true"
+          script: |
+            docker context create tls-env
+            docker buildx create tls-env --use
+            docker run --privileged --rm tonistiigi/binfmt --install amd64
+            hostname -I
+            export DOCKER_HOST_NAME=$(hostname -I | sed -e 's/ .*//g')
+            echo $DOCKER_HOST_NAME
+            ./build-and-test-all-multi-arch-locally-mysql-kafka.sh
+      - build-multi-arch-images:
+          context:
+            - publish
+          requires:
+            - build-and-test-intel
+            - build-and-test-arm
+      - build-and-test/build-and-test:
+          name: test-multi-arch-intel
+          script: ./build-and-test-all.sh
+          requires:
+            - build-multi-arch-images
+      - build-and-test/build-and-test:
+          name: test-multi-arch-arm
+          script: ./build-and-test-all.sh
+          resource_class: arm.medium
+          requires:
+            - build-multi-arch-images
       - build-and-test/build-and-test:
           name: build-and-test-mssql
           script: ./build-and-test-all-mssql.sh
@@ -57,14 +137,24 @@ workflows:
           script: ./build-and-test-all-postgres.sh
       - build-and-test/build-and-test:
           name: build-and-test-activemq
-          script: ./build-and-test-all-activemq.sh
+          script: ./build-and-test-all-mysql-activemq.sh
       - build-and-test/build-and-test:
           name: deploy-artifacts
           context:
             - publish
           requires:
-            - build-and-test-mysql
+            - test-multi-arch-intel
+            - test-multi-arch-arm
             - build-and-test-mssql
             - build-and-test-postgres
             - build-and-test-activemq
           script: ./deploy-artifacts.sh
+      - deploy-multi-arch:
+          context:
+            - publish
+          requires:
+            - test-multi-arch-intel
+            - test-multi-arch-arm
+            - build-and-test-mssql
+            - build-and-test-postgres
+            - build-and-test-activemq
