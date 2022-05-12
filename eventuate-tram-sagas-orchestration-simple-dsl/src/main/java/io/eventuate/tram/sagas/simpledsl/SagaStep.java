@@ -5,14 +5,8 @@ import io.eventuate.tram.messaging.common.Message;
 import java.util.Optional;
 import java.util.function.BiConsumer;
 
-public interface SagaStep<Data> {
-  boolean isSuccessfulReply(boolean compensating, Message message);
+public interface SagaStep<SAGA_DATA> extends AbstractSagaStep<SAGA_DATA> {
+  Optional<BiConsumer<SAGA_DATA, Object>> getReplyHandler(Message message, boolean compensating);
 
-  Optional<BiConsumer<Data, Object>> getReplyHandler(Message message, boolean compensating);
-
-  StepOutcome makeStepOutcome(Data data, boolean compensating);
-
-  boolean hasAction(Data data);
-
-  boolean hasCompensation(Data data);
+  StepOutcome makeStepOutcome(SAGA_DATA sagaData, boolean compensating);
 }

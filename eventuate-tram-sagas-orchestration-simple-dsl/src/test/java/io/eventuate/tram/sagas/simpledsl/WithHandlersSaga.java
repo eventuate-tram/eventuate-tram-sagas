@@ -2,12 +2,13 @@ package io.eventuate.tram.sagas.simpledsl;
 
 import io.eventuate.tram.commands.common.Failure;
 import io.eventuate.tram.commands.common.Success;
+import io.eventuate.tram.sagas.orchestration.SagaActions;
 import io.eventuate.tram.sagas.orchestration.SagaDefinition;
 
 
 public class WithHandlersSaga implements SimpleSaga<ConditionalSagaData> {
 
-  private SagaDefinition<ConditionalSagaData> sagaDefinition;
+  private SagaDefinition<SagaActions<ConditionalSagaData>, ConditionalSagaData> sagaDefinition;
   private Handlers handlers;
 
   public WithHandlersSaga(Handlers handlers) {
@@ -28,7 +29,7 @@ public class WithHandlersSaga implements SimpleSaga<ConditionalSagaData> {
 
 
   @Override
-  public SagaDefinition<ConditionalSagaData> getSagaDefinition() {
+  public SagaDefinition<SagaActions<ConditionalSagaData>, ConditionalSagaData> getSagaDefinition() {
     return this.sagaDefinition;
   }
 

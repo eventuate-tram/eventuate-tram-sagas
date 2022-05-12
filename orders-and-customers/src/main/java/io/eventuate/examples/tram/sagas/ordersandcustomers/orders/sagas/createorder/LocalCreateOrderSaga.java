@@ -7,6 +7,7 @@ import io.eventuate.examples.tram.sagas.ordersandcustomers.orders.sagas.particip
 import io.eventuate.tram.commands.consumer.CommandWithDestination;
 import io.eventuate.tram.events.publisher.DomainEventPublisher;
 import io.eventuate.tram.events.publisher.ResultWithEvents;
+import io.eventuate.tram.sagas.orchestration.SagaActions;
 import io.eventuate.tram.sagas.orchestration.SagaDefinition;
 import io.eventuate.tram.sagas.simpledsl.SimpleSaga;
 
@@ -25,18 +26,18 @@ public class LocalCreateOrderSaga implements SimpleSaga<LocalCreateOrderSagaData
     this.orderDao = orderDao;
   }
 
-  private SagaDefinition<LocalCreateOrderSagaData> sagaDefinition =
+  private SagaDefinition<SagaActions<LocalCreateOrderSagaData>, LocalCreateOrderSagaData> sagaDefinition =
           step()
-            .invokeLocal(this::create)
-            .withCompensation(this::reject)
-          .step()
-            .invokeParticipant(this::reserveCredit)
-          .step()
-            .invokeLocal(this::approve)
-          .build();
+                  .invokeLocal(this::create)
+                  .withCompensation(this::reject)
+                  .step()
+                  .invokeParticipant(this::reserveCredit)
+                  .step()
+                  .invokeLocal(this::approve)
+                  .build();
 
   @Override
-  public SagaDefinition<LocalCreateOrderSagaData> getSagaDefinition() {
+  public SagaDefinition<SagaActions<LocalCreateOrderSagaData>, LocalCreateOrderSagaData> getSagaDefinition() {
     return this.sagaDefinition;
   }
 

@@ -1,19 +1,20 @@
 package io.eventuate.tram.sagas.simpledsl;
 
+import io.eventuate.tram.sagas.orchestration.SagaActions;
 import io.eventuate.tram.sagas.orchestration.SagaDefinition;
 
 import java.util.LinkedList;
 import java.util.List;
 
-public class SimpleSagaDefinitionBuilder<Data> {
+public class SimpleSagaDefinitionBuilder<SAGA_DATA> {
 
-  private List<SagaStep<Data>> sagaSteps = new LinkedList<>();
+  private List<SagaStep<SAGA_DATA>> sagaSteps = new LinkedList<>();
 
-  public void addStep(SagaStep<Data> sagaStep) {
+  public void addStep(SagaStep<SAGA_DATA> sagaStep) {
     sagaSteps.add(sagaStep);
   }
 
-  public SagaDefinition<Data> build() {
+  public SagaDefinition<SagaActions<SAGA_DATA>, SAGA_DATA> build() {
     return new SimpleSagaDefinition<>(sagaSteps);
   }
 }

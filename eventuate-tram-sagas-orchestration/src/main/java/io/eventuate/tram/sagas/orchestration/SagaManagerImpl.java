@@ -17,19 +17,19 @@ import java.util.Optional;
 
 import static java.util.Collections.singleton;
 
-public class SagaManagerImpl<Data>
-        implements SagaManager<Data> {
+public class SagaManagerImpl<SAGA_DATA>
+        implements SagaManager<SAGA_DATA> {
 
   private Logger logger = LoggerFactory.getLogger(getClass());
 
-  private Saga<Data> saga;
+  private Saga<SAGA_DATA> saga;
   private SagaInstanceRepository sagaInstanceRepository;
   private CommandProducer commandProducer;
   private MessageConsumer messageConsumer;
   private SagaLockManager sagaLockManager;
   private SagaCommandProducer sagaCommandProducer;
 
-  public SagaManagerImpl(Saga<Data> saga,
+  public SagaManagerImpl(Saga<SAGA_DATA> saga,
                          SagaInstanceRepository sagaInstanceRepository,
                          CommandProducer commandProducer,
                          MessageConsumer messageConsumer,
@@ -65,17 +65,17 @@ public class SagaManagerImpl<Data>
   }
 
   @Override
-  public SagaInstance create(Data sagaData) {
+  public SagaInstance create(SAGA_DATA sagaData) {
     return create(sagaData, Optional.empty());
   }
 
   @Override
-  public SagaInstance create(Data data, Class targetClass, Object targetId) {
+  public SagaInstance create(SAGA_DATA data, Class targetClass, Object targetId) {
     return create(data, Optional.of(new LockTarget(targetClass, targetId).getTarget()));
   }
 
   @Override
-  public SagaInstance create(Data sagaData, Optional<String> resource) {
+  public SagaInstance create(SAGA_DATA sagaData, Optional<String> resource) {
 
 
     SagaInstance sagaInstance = new SagaInstance(getSagaType(),
@@ -96,7 +96,7 @@ public class SagaManagerImpl<Data>
       }
     });
 
-    SagaActions<Data> actions = getStateDefinition().start(sagaData);
+    SagaActions<SAGA_DATA> actions = getStateDefinition().start(sagaData);
 
     actions.getLocalException().ifPresent(e -> {
       throw e;
@@ -108,7 +108,7 @@ public class SagaManagerImpl<Data>
   }
 
 
-  private void performEndStateActions(String sagaId, SagaInstance sagaInstance, boolean compensating, Data sagaData) {
+  private void performEndStateActions(String sagaId, SagaInstance sagaInstance, boolean compensating, SAGA_DATA sagaData) {
     for (DestinationAndResource dr : sagaInstance.getDestinationsAndResources()) {
       Map<String, String> headers = new HashMap<>();
       headers.put(SagaCommandHeaders.SAGA_ID, sagaId);
@@ -123,8 +123,8 @@ public class SagaManagerImpl<Data>
 
   }
 
-  private SagaDefinition<Data> getStateDefinition() {
-    SagaDefinition<Data> sm = saga.getSagaDefinition();
+  private SagaDefinition<SagaActions<SAGA_DATA>, SAGA_DATA> getStateDefinition() {
+    SagaDefinition<SagaActions<SAGA_DATA>, SAGA_DATA> sm = saga.getSagaDefinition();
 
     if (sm == null) {
       throw new RuntimeException("state machine cannot be null");
@@ -158,7 +158,6 @@ public class SagaManagerImpl<Data>
     }
   }
 
-
   private void handleReply(Message message) {
 
     if (!isReplyForThisSagaType(message))
@@ -170,7 +169,7 @@ public class SagaManagerImpl<Data>
     String sagaType = message.getRequiredHeader(SagaReplyHeaders.REPLY_SAGA_TYPE);
 
     SagaInstance sagaInstance = sagaInstanceRepository.find(sagaType, sagaId);
-    Data sagaData = SagaDataSerde.deserializeSagaData(sagaInstance.getSerializedSagaData());
+    SAGA_DATA sagaData = SagaDataSerde.deserializeSagaData(sagaInstance.getSerializedSagaData());
 
 
     message.getHeader(SagaReplyHeaders.REPLY_LOCKED).ifPresent(lockedTarget -> {
@@ -182,16 +181,14 @@ public class SagaManagerImpl<Data>
 
     logger.info("Current state={}", currentState);
 
-    SagaActions<Data> actions = getStateDefinition().handleReply(currentState, sagaData, message);
+    SagaActions<SAGA_DATA> actions = getStateDefinition().handleReply(currentState, sagaData, message);
 
     logger.info("Handled reply. Sending commands {}", actions.getCommands());
 
     processActions(sagaId, sagaInstance, sagaData, actions);
-
-
   }
 
-  private void processActions(String sagaId, SagaInstance sagaInstance, Data sagaData, SagaActions<Data> actions) {
+  private void processActions(String sagaId, SagaInstance sagaInstance, SAGA_DATA sagaData, SagaActions<SAGA_DATA> actions) {
 
 
     while (true) {
@@ -233,7 +230,7 @@ public class SagaManagerImpl<Data>
     }
   }
 
-  private void updateState(SagaInstance sagaInstance, SagaActions<Data> actions) {
+  private void updateState(SagaInstance sagaInstance, SagaActions<SAGA_DATA> actions) {
     actions.getUpdatedState().ifPresent(stateName -> {
       sagaInstance.setStateName(stateName);
       sagaInstance.setEndState(actions.isEndState());

@@ -16,6 +16,7 @@ import io.eventuate.tram.sagas.common.SagaUnlockCommand;
 import io.eventuate.tram.sagas.orchestration.DestinationAndResource;
 import io.eventuate.tram.sagas.orchestration.SagaActions;
 import io.eventuate.tram.sagas.orchestration.SagaDataSerde;
+import io.eventuate.tram.sagas.orchestration.SagaDefinition;
 import io.eventuate.tram.sagas.orchestration.SagaInstance;
 import io.eventuate.tram.sagas.reactive.common.ReactiveSagaLockManager;
 import org.reactivestreams.Publisher;
@@ -34,19 +35,19 @@ import java.util.Optional;
 
 import static java.util.Collections.singleton;
 
-public class ReactiveSagaManagerImpl<Data>
-        implements ReactiveSagaManager<Data> {
+public class ReactiveSagaManagerImpl<SAGA_DATA>
+        implements ReactiveSagaManager<SAGA_DATA> {
 
   private Logger logger = LoggerFactory.getLogger(getClass());
 
-  private ReactiveSaga<Data> saga;
+  private ReactiveSaga<SAGA_DATA> saga;
   private ReactiveSagaInstanceRepository sagaInstanceRepository;
   private ReactiveCommandProducer commandProducer;
   private ReactiveMessageConsumer messageConsumer;
   private ReactiveSagaLockManager sagaLockManager;
   private ReactiveSagaCommandProducer sagaCommandProducer;
 
-  public ReactiveSagaManagerImpl(ReactiveSaga<Data> saga,
+  public ReactiveSagaManagerImpl(ReactiveSaga<SAGA_DATA> saga,
                                  ReactiveSagaInstanceRepository sagaInstanceRepository,
                                  ReactiveCommandProducer commandProducer,
                                  ReactiveMessageConsumer messageConsumer,
@@ -82,17 +83,17 @@ public class ReactiveSagaManagerImpl<Data>
   }
 
   @Override
-  public Mono<SagaInstance> create(Data sagaData) {
+  public Mono<SagaInstance> create(SAGA_DATA sagaData) {
     return create(sagaData, Optional.empty());
   }
 
   @Override
-  public Mono<SagaInstance> create(Data data, Class targetClass, Object targetId) {
+  public Mono<SagaInstance> create(SAGA_DATA data, Class targetClass, Object targetId) {
     return create(data, Optional.of(new LockTarget(targetClass, targetId).getTarget()));
   }
 
   @Override
-  public Mono<SagaInstance> create(Data sagaData, Optional<String> resource) {
+  public Mono<SagaInstance> create(SAGA_DATA sagaData, Optional<String> resource) {
     SagaInstance sagaInstance = new SagaInstance(getSagaType(),
             null,
             "????",
@@ -126,7 +127,7 @@ public class ReactiveSagaManagerImpl<Data>
   }
 
 
-  private Mono<Void> performEndStateActions(String sagaId, SagaInstance sagaInstance, boolean compensating, Data sagaData) {
+  private Mono<Void> performEndStateActions(String sagaId, SagaInstance sagaInstance, boolean compensating, SAGA_DATA sagaData) {
     List<Mono<String>> actions = new ArrayList<>();
 
     for (DestinationAndResource dr : sagaInstance.getDestinationsAndResources()) {
@@ -139,8 +140,8 @@ public class ReactiveSagaManagerImpl<Data>
     return Flux.merge(actions).then(compensating ? saga.onSagaRolledBack(sagaId, sagaData) : saga.onSagaCompletedSuccessfully(sagaId, sagaData));
   }
 
-  private ReactiveSagaDefinition<Data> getStateDefinition() {
-    ReactiveSagaDefinition<Data> sm = saga.getSagaDefinition();
+  private SagaDefinition<Publisher<SagaActions<SAGA_DATA>>, SAGA_DATA> getStateDefinition() {
+    SagaDefinition<Publisher<SagaActions<SAGA_DATA>>, SAGA_DATA> sm = saga.getSagaDefinition();
 
     if (sm == null) {
       throw new RuntimeException("state machine cannot be null");
@@ -200,23 +201,23 @@ public class ReactiveSagaManagerImpl<Data>
             .flatMap(si -> {
               String currentState = si.getStateName();
 
-              Data data = SagaDataSerde.deserializeSagaData(si.getSerializedSagaData());
+              SAGA_DATA data = SagaDataSerde.deserializeSagaData(si.getSerializedSagaData());
 
-              Mono<SagaActions<Data>> actions = Mono.from(getStateDefinition().handleReply(currentState, getSagaData(si), message));
+              Mono<SagaActions<SAGA_DATA>> actions = Mono.from(getStateDefinition().handleReply(currentState, getSagaData(si), message));
 
               return processActions(sagaId, si, data, actions);
             })
             .then();
   }
 
-  private Data getSagaData(SagaInstance sagaInstance) {
+  private SAGA_DATA getSagaData(SagaInstance sagaInstance) {
     return SagaDataSerde.deserializeSagaData(sagaInstance.getSerializedSagaData());
   }
 
-  private Mono<SagaActions<Data>> processActions(String sagaId, SagaInstance sagaInstance, Data sagaData, Mono<SagaActions<Data>> actions) {
+  private Mono<SagaActions<SAGA_DATA>> processActions(String sagaId, SagaInstance sagaInstance, SAGA_DATA sagaData, Mono<SagaActions<SAGA_DATA>> actions) {
     return actions.flatMap(acts -> {
       if (acts.getLocalException().isPresent()) {
-        Mono<SagaActions<Data>> nextActions = Mono.from(getStateDefinition()
+        Mono<SagaActions<SAGA_DATA>> nextActions = Mono.from(getStateDefinition()
                 .handleReply(
                         acts.getUpdatedState().get(),
                         acts.getUpdatedSagaData().get(),
@@ -229,7 +230,7 @@ public class ReactiveSagaManagerImpl<Data>
 
         return processActions(sagaId, sagaInstance, sagaData, nextActions);
       } else {
-        Mono<SagaActions<Data>> nextActions = sagaCommandProducer
+        Mono<SagaActions<SAGA_DATA>> nextActions = sagaCommandProducer
                 .sendCommands(this.getSagaType(), sagaId, acts.getCommands(), this.makeSagaReplyChannel())
                 .map(lastId -> {
                   sagaInstance.setLastRequestId(lastId);
@@ -260,7 +261,7 @@ public class ReactiveSagaManagerImpl<Data>
     });
   }
 
-  private void updateState(SagaInstance sagaInstance, SagaActions<Data> actions) {
+  private void updateState(SagaInstance sagaInstance, SagaActions<SAGA_DATA> actions) {
     actions.getUpdatedState().ifPresent(stateName -> {
       sagaInstance.setStateName(stateName);
       sagaInstance.setEndState(actions.isEndState());

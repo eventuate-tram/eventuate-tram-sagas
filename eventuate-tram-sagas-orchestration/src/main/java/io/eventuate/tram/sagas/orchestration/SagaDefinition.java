@@ -3,10 +3,9 @@ package io.eventuate.tram.sagas.orchestration;
 
 import io.eventuate.tram.messaging.common.Message;
 
-public interface SagaDefinition<Data> {
+public interface SagaDefinition<SAGA_ACTIONS, SAGA_DATA> {
 
-  SagaActions<Data> start(Data sagaData);
+  SAGA_ACTIONS start(SAGA_DATA sagaData);
 
-  SagaActions<Data> handleReply(String currentState, Data sagaData, Message message);
-
+  SAGA_ACTIONS handleReply(String currentState, SAGA_DATA sagaData, Message message);
 }
