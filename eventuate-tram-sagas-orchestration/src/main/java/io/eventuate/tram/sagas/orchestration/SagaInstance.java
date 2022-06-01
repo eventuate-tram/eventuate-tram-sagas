@@ -12,6 +12,7 @@ public class SagaInstance {
   private Set<DestinationAndResource> destinationsAndResources;
   private Boolean endState = false;
   private Boolean compensating = false;
+  private Boolean failed = false;
 
   public void setSagaType(String sagaType) {
     this.sagaType = sagaType;
@@ -25,6 +26,14 @@ public class SagaInstance {
     this.stateName = stateName;
   }
 
+  public SagaInstance(String sagaType, String sagaId, String stateName, String lastRequestId, SerializedSagaData serializedSagaData, Set<DestinationAndResource> destinationsAndResources,
+                      boolean endState, boolean compensating, boolean failed) {
+    this(sagaType, sagaId, stateName, lastRequestId, serializedSagaData, destinationsAndResources);
+
+    this.endState = endState;
+    this.compensating = compensating;
+    this.failed = failed;
+  }
   public SagaInstance(String sagaType, String sagaId, String stateName, String lastRequestId, SerializedSagaData serializedSagaData, Set<DestinationAndResource> destinationsAndResources) {
     this.sagaType = sagaType;
     this.id = sagaId;
@@ -85,5 +94,13 @@ public class SagaInstance {
 
   public Boolean isCompensating() {
     return compensating;
+  }
+
+  public void setFailed(boolean failed) {
+    this.failed = failed;
+  }
+
+  public Boolean isFailed() {
+    return failed;
   }
 }

@@ -22,19 +22,19 @@ import java.util.UUID;
 
 import static java.util.Arrays.asList;
 import static java.util.Collections.singleton;
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.*;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = ReactiveSagaInstanceRepositoryJdbcIntegrationTest.Config.class,  webEnvironment = SpringBootTest.WebEnvironment.NONE)
 @EnableAutoConfiguration
 public class ReactiveSagaInstanceRepositoryJdbcIntegrationTest {
 
-  private String sagaType = generateId();
-  private String sagaState = generateId();
-  private String lastRequestId = generateId();
-  private String sagaDataType = generateId();
-  private String destination = generateId();
-  private String resource = generateId();
+  private final String sagaType = generateId();
+  private final String sagaState = generateId();
+  private final String lastRequestId = generateId();
+  private final String sagaDataType = generateId();
+  private final String destination = generateId();
+  private final String resource = generateId();
 
   @Configuration
   @Import(EventuateCommonReactiveDatabaseConfiguration.class)
@@ -71,6 +71,10 @@ public class ReactiveSagaInstanceRepositoryJdbcIntegrationTest {
     DestinationAndResource destinationAndResource = destinationAndResources.stream().findAny().get();
     assertEquals(destination, destinationAndResource.getDestination());
     assertEquals(resource, destinationAndResource.getResource());
+
+    assertFalse(sagaInstance.isEndState());
+    assertFalse(sagaInstance.isFailed());
+    assertFalse(sagaInstance.isCompensating());
   }
 
   private void updateSagaInstance() {
@@ -78,6 +82,7 @@ public class ReactiveSagaInstanceRepositoryJdbcIntegrationTest {
     sagaInstance.setLastRequestId("UpdateLastId");
     sagaInstance.setSerializedSagaData(new SerializedSagaData("UpdatedSagaType", "{\"value\" : \"updatedValue\"}"));
     sagaInstance.getDestinationsAndResources().add(new DestinationAndResource("newDestination", "newResource"));
+    sagaInstance.setEndState(true);
     sagaInstanceRepository.update(sagaInstance).block();
     sagaInstance = sagaInstanceRepository.find(sagaType, sagaInstance.getId()).block();
   }
@@ -87,6 +92,9 @@ public class ReactiveSagaInstanceRepositoryJdbcIntegrationTest {
     assertEquals("UpdateLastId", sagaInstance.getLastRequestId());
     assertEquals("UpdatedSagaType", sagaInstance.getSerializedSagaData().getSagaDataType());
     assertEquals("{\"value\" : \"updatedValue\"}", sagaInstance.getSerializedSagaData().getSagaDataJSON());
+    assertTrue(sagaInstance.isEndState());
+    assertFalse(sagaInstance.isFailed());
+    assertFalse(sagaInstance.isCompensating());
 
     Set<DestinationAndResource> destinationAndResources = sagaInstance.getDestinationsAndResources();
     assertEquals(new HashSet<>(asList(new DestinationAndResource(destination, resource), new DestinationAndResource("newDestination", "newResource"))), destinationAndResources);
@@ -103,7 +111,8 @@ public class ReactiveSagaInstanceRepositoryJdbcIntegrationTest {
             sagaState,
             lastRequestId,
             new SerializedSagaData(sagaDataType, "{}"),
-            singleton(new DestinationAndResource(destination, resource)));
+            singleton(new DestinationAndResource(destination, resource)),
+            false, false, false);
   }
 
   private String generateId() {

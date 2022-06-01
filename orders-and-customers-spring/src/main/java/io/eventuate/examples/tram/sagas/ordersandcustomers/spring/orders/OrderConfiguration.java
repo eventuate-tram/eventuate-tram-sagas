@@ -5,21 +5,17 @@ import io.eventuate.examples.tram.sagas.ordersandcustomers.orders.domain.OrderDa
 import io.eventuate.examples.tram.sagas.ordersandcustomers.orders.sagas.createorder.CreateOrderSaga;
 import io.eventuate.examples.tram.sagas.ordersandcustomers.orders.sagas.createorder.CreateOrderSagaData;
 import io.eventuate.examples.tram.sagas.ordersandcustomers.orders.sagas.createorder.LocalCreateOrderSaga;
-import io.eventuate.examples.tram.sagas.ordersandcustomers.orders.sagas.createorder.LocalCreateOrderSagaData;
 import io.eventuate.examples.tram.sagas.ordersandcustomers.orders.service.OrderCommandHandler;
 import io.eventuate.examples.tram.sagas.ordersandcustomers.orders.service.OrderService;
 import io.eventuate.tram.commands.consumer.CommandDispatcher;
-import io.eventuate.tram.commands.producer.CommandProducer;
-import io.eventuate.tram.spring.commands.consumer.TramCommandConsumerConfiguration;
 import io.eventuate.tram.events.publisher.DomainEventPublisher;
-import io.eventuate.tram.messaging.consumer.MessageConsumer;
-import io.eventuate.tram.sagas.common.SagaLockManager;
-import io.eventuate.tram.sagas.orchestration.*;
-import io.eventuate.tram.sagas.spring.orchestration.SagaOrchestratorConfiguration;
+import io.eventuate.tram.sagas.orchestration.SagaInstanceFactory;
 import io.eventuate.tram.sagas.participant.SagaCommandDispatcherFactory;
 import io.eventuate.tram.spring.optimisticlocking.OptimisticLockingDecoratorConfiguration;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
@@ -46,7 +42,20 @@ public class OrderConfiguration {
 
   @Bean
   public CreateOrderSaga createOrderSaga(DomainEventPublisher domainEventPublisher) {
-    return new CreateOrderSaga(domainEventPublisher);
+    return new CreateOrderSaga(domainEventPublisher) {
+      @Autowired
+      private ApplicationEventPublisher applicationEventPublisher;
+
+      @Override
+      public void onStarting(String sagaId, CreateOrderSagaData createOrderSagaData) {
+        applicationEventPublisher.publishEvent(new SagaStartedEvent(this, sagaId));
+      }
+
+      @Override
+      public void onSagaFailed(String sagaId, CreateOrderSagaData createOrderSagaData) {
+        applicationEventPublisher.publishEvent(new SagaFailedEvent(this, sagaId));
+      }
+    };
   }
 
   @Bean

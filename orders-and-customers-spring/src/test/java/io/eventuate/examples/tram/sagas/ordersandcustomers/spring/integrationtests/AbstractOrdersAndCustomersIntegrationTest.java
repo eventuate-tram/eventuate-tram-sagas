@@ -66,10 +66,14 @@ public abstract class AbstractOrdersAndCustomersIntegrationTest {
     Customer customer = customerService.createCustomer("Fred", creditLimit);
     Order order = createOrder(customer);
 
-    assertOrderState(order.getId(), OrderState.REJECTED);
+    assertOrderRejected(order);
 
     assertCreateOrderSagaRolledBack(order);
 
+  }
+
+  protected void assertOrderRejected(Order order) {
+    assertOrderState(order.getId(), OrderState.REJECTED);
   }
 
   protected void assertCreateOrderSagaRolledBack(Order order) {

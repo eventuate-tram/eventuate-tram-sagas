@@ -4,10 +4,9 @@ import io.eventuate.common.id.IdGenerator;
 import io.eventuate.common.jdbc.EventuateDuplicateKeyException;
 import io.eventuate.common.jdbc.EventuateSchema;
 import io.eventuate.common.reactive.jdbc.EventuateReactiveJdbcStatementExecutor;
-import io.eventuate.tram.sagas.common.SagaInstanceRepositorySql;
 import io.eventuate.tram.sagas.orchestration.DestinationAndResource;
 import io.eventuate.tram.sagas.orchestration.SagaInstance;
-import io.eventuate.tram.sagas.orchestration.SerializedSagaData;
+import io.eventuate.tram.sagas.orchestration.SagaInstanceRepositorySql;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import reactor.core.publisher.Flux;
@@ -43,14 +42,7 @@ public class ReactiveSagaInstanceRepositoryJdbc implements ReactiveSagaInstanceR
 
     return  eventuateJdbcStatementExecutor
             .update(sagaInstanceRepositorySql.getInsertIntoSagaInstanceSql(),
-                    sagaInstance.getSagaType(),
-                    sagaInstance.getId(),
-                    sagaInstance.getStateName(),
-                    sagaInstance.getLastRequestId(),
-                    sagaInstance.getSerializedSagaData().getSagaDataType(),
-                    sagaInstance.getSerializedSagaData().getSagaDataJSON(),
-                    sagaInstance.isEndState(),
-                    sagaInstance.isCompensating())
+                    sagaInstanceRepositorySql.makeSaveArgs(sagaInstance))
             .then(Mono.defer(() -> saveDestinationsAndResources(sagaInstance)));
   }
 
@@ -90,9 +82,7 @@ public class ReactiveSagaInstanceRepositoryJdbc implements ReactiveSagaInstanceR
     return destinationAndResources.collectList().flatMap(dar ->
       eventuateJdbcStatementExecutor.queryForList(sagaInstanceRepositorySql.getSelectFromSagaInstanceSql(),
               (row, rowMetadata) ->
-                new SagaInstance(sagaType, sagaId, row.get("state_name").toString(),
-                        row.get("last_request_id").toString(),
-                        new SerializedSagaData(row.get("saga_data_type").toString(), row.get("saga_data_json").toString()), new HashSet<>(dar)),
+                      sagaInstanceRepositorySql.mapToSagaInstance(sagaType, sagaId, new HashSet<>(dar), new ReactiveSqlQueryRow(row)),
               sagaType, sagaId).single());
   }
 
@@ -100,13 +90,7 @@ public class ReactiveSagaInstanceRepositoryJdbc implements ReactiveSagaInstanceR
   @Override
   public Mono<Void> update(SagaInstance sagaInstance) {
     return eventuateJdbcStatementExecutor
-            .update(sagaInstanceRepositorySql.getUpdateSagaInstanceSql(),
-                    sagaInstance.getStateName(),
-                    sagaInstance.getLastRequestId(),
-                    sagaInstance.getSerializedSagaData().getSagaDataType(),
-                    sagaInstance.getSerializedSagaData().getSagaDataJSON(),
-                    sagaInstance.isEndState(), sagaInstance.isCompensating(),
-                    sagaInstance.getSagaType(), sagaInstance.getId())
+            .update(sagaInstanceRepositorySql.getUpdateSagaInstanceSql(), sagaInstanceRepositorySql.makeUpdateArgs(sagaInstance))
             .flatMap(count -> {
               if (count != 1) {
                 return Mono.error(new RuntimeException("Should be 1 : " + count));

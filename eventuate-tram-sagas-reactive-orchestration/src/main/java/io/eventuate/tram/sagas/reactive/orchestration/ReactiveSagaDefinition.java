@@ -9,5 +9,5 @@ public interface ReactiveSagaDefinition<Data> {
 
   Publisher<SagaActions<Data>> start(Data sagaData);
 
-  Publisher<SagaActions<Data>> handleReply(String currentState, Data sagaData, Message message);
+  Publisher<SagaActions<Data>> handleReply(String sagaType, String sagaId, String currentState, Data sagaData, Message message);
 }

@@ -1,10 +1,6 @@
 package io.eventuate.tram.sagas.reactive.orchestration;
 
-import io.eventuate.tram.commands.common.CommandMessageHeaders;
-import io.eventuate.tram.commands.common.CommandReplyOutcome;
-import io.eventuate.tram.commands.common.Failure;
-import io.eventuate.tram.commands.common.ReplyMessageHeaders;
-import io.eventuate.tram.commands.common.Success;
+import io.eventuate.tram.commands.common.*;
 import io.eventuate.tram.consumer.common.reactive.ReactiveMessageConsumer;
 import io.eventuate.tram.messaging.common.Message;
 import io.eventuate.tram.messaging.producer.MessageBuilder;
@@ -25,12 +21,7 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import javax.annotation.PostConstruct;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 import static java.util.Collections.singleton;
 
@@ -121,7 +112,7 @@ public class ReactiveSagaManagerImpl<Data>
               if (actions.getLocalException().isPresent()) return Mono.error(actions.getLocalException().get());
               else return Mono.just(actions);
             })
-            .flatMap(actions -> processActions(sagaInstance.getId(), sagaInstance, sagaData, Mono.just(actions)))
+            .flatMap(actions -> processActions(getSagaType(), sagaInstance.getId(), sagaInstance, sagaData, Mono.just(actions)))
             .then(Mono.fromSupplier(() -> sagaInstance));
   }
 
@@ -202,9 +193,9 @@ public class ReactiveSagaManagerImpl<Data>
 
               Data data = SagaDataSerde.deserializeSagaData(si.getSerializedSagaData());
 
-              Mono<SagaActions<Data>> actions = Mono.from(getStateDefinition().handleReply(currentState, getSagaData(si), message));
+              Mono<SagaActions<Data>> actions = Mono.from(getStateDefinition().handleReply(sagaType, sagaId, currentState, getSagaData(si), message));
 
-              return processActions(sagaId, si, data, actions);
+              return processActions(sagaType, sagaId, si, data, actions);
             })
             .then();
   }
@@ -213,12 +204,12 @@ public class ReactiveSagaManagerImpl<Data>
     return SagaDataSerde.deserializeSagaData(sagaInstance.getSerializedSagaData());
   }
 
-  private Mono<SagaActions<Data>> processActions(String sagaId, SagaInstance sagaInstance, Data sagaData, Mono<SagaActions<Data>> actions) {
+  private Mono<SagaActions<Data>> processActions(String sagaType, String sagaId, SagaInstance sagaInstance, Data sagaData, Mono<SagaActions<Data>> actions) {
     return actions.flatMap(acts -> {
       if (acts.getLocalException().isPresent()) {
         Mono<SagaActions<Data>> nextActions = Mono.from(getStateDefinition()
                 .handleReply(
-                        acts.getUpdatedState().get(),
+                        sagaType, sagaId, acts.getUpdatedState().get(),
                         acts.getUpdatedSagaData().get(),
                         MessageBuilder
                                 .withPayload("{}")
@@ -227,7 +218,7 @@ public class ReactiveSagaManagerImpl<Data>
                                 .build()
                 ));
 
-        return processActions(sagaId, sagaInstance, sagaData, nextActions);
+        return processActions(sagaType, sagaId, sagaInstance, sagaData, nextActions);
       } else {
         Mono<SagaActions<Data>> nextActions = sagaCommandProducer
                 .sendCommands(this.getSagaType(), sagaId, acts.getCommands(), this.makeSagaReplyChannel())
@@ -247,7 +238,7 @@ public class ReactiveSagaManagerImpl<Data>
                 }))
                 .flatMap(newActs ->
                   Mono.from(getStateDefinition()
-                          .handleReply(newActs.getUpdatedState().get(),
+                          .handleReply(sagaType, sagaId, newActs.getUpdatedState().get(),
                                   newActs.getUpdatedSagaData().get(),
                                   MessageBuilder
                                           .withPayload("{}")
@@ -255,7 +246,7 @@ public class ReactiveSagaManagerImpl<Data>
                                           .withHeader(ReplyMessageHeaders.REPLY_TYPE, Success.class.getName())
                                           .build())));
 
-        return nextActions.flatMap(na -> processActions(sagaId, sagaInstance, sagaData, Mono.just(na)));
+        return nextActions.flatMap(na -> processActions(sagaType, sagaId, sagaInstance, sagaData, Mono.just(na)));
       }
     });
   }

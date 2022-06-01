@@ -7,6 +7,8 @@ public class SagaExecutionState {
   private int currentlyExecuting;
   private boolean compensating;
   private boolean endState;
+  private boolean failed;
+
 
   @Override
   public String toString() {
@@ -53,9 +55,25 @@ public class SagaExecutionState {
     this.endState = endState;
   }
 
+  public void setFailed(boolean failed) {
+    this.failed = failed;
+  }
+
+  public boolean isFailed() {
+    return failed;
+  }
+
   public static SagaExecutionState makeEndState() {
     SagaExecutionState x = new SagaExecutionState();
     x.setEndState(true);
     return x;
   }
+
+  public static SagaExecutionState makeFailedEndState() {
+    SagaExecutionState x = new SagaExecutionState();
+    x.setEndState(true);
+    x.setFailed(true);
+    return x;
+  }
+
 }

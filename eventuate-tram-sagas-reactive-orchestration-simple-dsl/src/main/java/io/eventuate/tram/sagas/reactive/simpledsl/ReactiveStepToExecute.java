@@ -1,34 +1,18 @@
 package io.eventuate.tram.sagas.reactive.simpledsl;
 
 import io.eventuate.tram.sagas.orchestration.SagaActions;
+import io.eventuate.tram.sagas.simpledsl.AbstractStepToExecute;
 import io.eventuate.tram.sagas.simpledsl.SagaExecutionState;
 import org.reactivestreams.Publisher;
 import reactor.core.publisher.Mono;
 
-import java.util.Optional;
-
-import static io.eventuate.tram.sagas.simpledsl.SagaExecutionStateJsonSerde.encodeState;
-
-public class ReactiveStepToExecute<Data> {
-  private final Optional<ReactiveSagaStep<Data>> step;
-  private final int skipped;
-  private final boolean compensating;
+public class ReactiveStepToExecute<Data> extends AbstractStepToExecute<Data, ReactiveSagaStep<Data>> {
 
 
-  public ReactiveStepToExecute(Optional<ReactiveSagaStep<Data>> step, int skipped, boolean compensating) {
-    this.compensating = compensating;
-    this.step = step;
-    this.skipped = skipped;
+  public ReactiveStepToExecute(ReactiveSagaStep<Data> step, int skipped, boolean compensating) {
+    super(step, skipped, compensating);
   }
 
-
-  private int size() {
-    return step.map(x -> 1).orElse(0) + skipped;
-  }
-
-  public boolean isEmpty() {
-    return !step.isPresent();
-  }
 
   public Publisher<SagaActions<Data>> executeStep(Data data, SagaExecutionState currentState) {
     SagaExecutionState newState = currentState.nextState(size());
@@ -36,18 +20,14 @@ public class ReactiveStepToExecute<Data> {
     boolean compensating = currentState.isCompensating();
 
     return Mono
-            .from(step.get().makeStepOutcome(data, this.compensating))
-            .map(step -> {
-              step.visit(builder::withIsLocal, builder::withCommands);
-              return step;
+            .from(step.makeStepOutcome(data, this.compensating))
+            .map(outcome -> {
+              outcome.visit(builder::withIsLocal, builder::withCommands);
+              return outcome;
             })
             .then(Mono.fromSupplier(() ->
-              builder
-                      .withUpdatedSagaData(data)
-                      .withUpdatedState(encodeState(newState))
-                      .withIsEndState(newState.isEndState())
-                      .withIsCompensating(compensating)
-                      .build()));
+                    makeSagaActions(builder, data, newState, compensating)));
   }
+
 
 }

@@ -102,13 +102,13 @@ public class SagaManagerImpl<Data>
       throw e;
     });
 
-    processActions(sagaId, sagaInstance, sagaData, actions);
+    processActions(saga.getSagaType(), sagaId, sagaInstance, sagaData, actions);
 
     return sagaInstance;
   }
 
 
-  private void performEndStateActions(String sagaId, SagaInstance sagaInstance, boolean compensating, Data sagaData) {
+  private void performEndStateActions(String sagaId, SagaInstance sagaInstance, boolean compensating, boolean failed, Data sagaData) {
     for (DestinationAndResource dr : sagaInstance.getDestinationsAndResources()) {
       Map<String, String> headers = new HashMap<>();
       headers.put(SagaCommandHeaders.SAGA_ID, sagaId);
@@ -116,6 +116,8 @@ public class SagaManagerImpl<Data>
       commandProducer.send(dr.getDestination(), dr.getResource(), new SagaUnlockCommand(), makeSagaReplyChannel(), headers);
     }
 
+    if (failed)
+      saga.onSagaFailed(sagaId, sagaData);
     if (compensating)
       saga.onSagaRolledBack(sagaId, sagaData);
     else
@@ -182,23 +184,23 @@ public class SagaManagerImpl<Data>
 
     logger.info("Current state={}", currentState);
 
-    SagaActions<Data> actions = getStateDefinition().handleReply(currentState, sagaData, message);
+    SagaActions<Data> actions = getStateDefinition().handleReply(sagaType, sagaId, currentState, sagaData, message);
 
     logger.info("Handled reply. Sending commands {}", actions.getCommands());
 
-    processActions(sagaId, sagaInstance, sagaData, actions);
+    processActions(sagaType, sagaId, sagaInstance, sagaData, actions);
 
 
   }
 
-  private void processActions(String sagaId, SagaInstance sagaInstance, Data sagaData, SagaActions<Data> actions) {
+  private void processActions(String sagaType, String sagaId, SagaInstance sagaInstance, Data sagaData, SagaActions<Data> actions) {
 
 
     while (true) {
 
       if (actions.getLocalException().isPresent()) {
 
-        actions = getStateDefinition().handleReply(actions.getUpdatedState().get(), actions.getUpdatedSagaData().get(), MessageBuilder
+        actions = getStateDefinition().handleReply(sagaType, sagaId, actions.getUpdatedState().get(), actions.getUpdatedSagaData().get(), MessageBuilder
                 .withPayload("{}")
                 .withHeader(ReplyMessageHeaders.REPLY_OUTCOME, CommandReplyOutcome.FAILURE.name())
                 .withHeader(ReplyMessageHeaders.REPLY_TYPE, Failure.class.getName())
@@ -216,7 +218,7 @@ public class SagaManagerImpl<Data>
         sagaInstance.setSerializedSagaData(SagaDataSerde.serializeSagaData(actions.getUpdatedSagaData().orElse(sagaData)));
 
         if (actions.isEndState()) {
-          performEndStateActions(sagaId, sagaInstance, actions.isCompensating(), sagaData);
+          performEndStateActions(sagaId, sagaInstance, actions.isCompensating(), actions.isFailed(), sagaData);
         }
 
         sagaInstanceRepository.update(sagaInstance);
@@ -224,7 +226,7 @@ public class SagaManagerImpl<Data>
         if (!actions.isLocal())
           break;
 
-        actions = getStateDefinition().handleReply(actions.getUpdatedState().get(), actions.getUpdatedSagaData().get(), MessageBuilder
+        actions = getStateDefinition().handleReply(sagaType, sagaId, actions.getUpdatedState().get(), actions.getUpdatedSagaData().get(), MessageBuilder
                 .withPayload("{}")
                 .withHeader(ReplyMessageHeaders.REPLY_OUTCOME, CommandReplyOutcome.SUCCESS.name())
                 .withHeader(ReplyMessageHeaders.REPLY_TYPE, Success.class.getName())
@@ -238,6 +240,7 @@ public class SagaManagerImpl<Data>
       sagaInstance.setStateName(stateName);
       sagaInstance.setEndState(actions.isEndState());
       sagaInstance.setCompensating(actions.isCompensating());
+      sagaInstance.setFailed(actions.isFailed());
     });
   }
 

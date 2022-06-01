@@ -27,6 +27,7 @@ CREATE TABLE eventuate.saga_instance(
   last_request_id VARCHAR(100),
   end_state TINYINT,
   compensating TINYINT,
+  failed TINYINT,
   saga_data_type VARCHAR(1000) NOT NULL,
   saga_data_json VARCHAR(1000) NOT NULL,
   PRIMARY KEY(saga_type, saga_id)

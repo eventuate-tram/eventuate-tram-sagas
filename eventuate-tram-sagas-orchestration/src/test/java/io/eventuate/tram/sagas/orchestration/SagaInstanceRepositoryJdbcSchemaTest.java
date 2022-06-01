@@ -1,6 +1,5 @@
 package io.eventuate.tram.sagas.orchestration;
 
-import io.eventuate.tram.sagas.common.SagaInstanceRepositorySql;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -33,7 +32,7 @@ public abstract class SagaInstanceRepositoryJdbcSchemaTest {
   protected abstract SagaInstanceRepositorySql getSagaInstanceRepositoryJdbcSql();
 
   private String getExpectedInsertIntoSagaInstance() {
-    return String.format("INSERT INTO %ssaga_instance(saga_type, saga_id, state_name, last_request_id, saga_data_type, saga_data_json, end_state, compensating) VALUES(?, ?, ?, ?, ?, ?, ?, ?)", getExpectedPrefix());
+    return String.format("INSERT INTO %ssaga_instance(saga_type, saga_id, state_name, last_request_id, saga_data_type, saga_data_json, end_state, compensating, failed) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?)", getExpectedPrefix());
   }
 
   private String getExpectedInsertIntoSagaInstanceParticipants() {
@@ -49,7 +48,7 @@ public abstract class SagaInstanceRepositoryJdbcSchemaTest {
   }
 
   private String getExpectedUpdateSagaInstance() {
-    return String.format("UPDATE %ssaga_instance SET state_name = ?, last_request_id = ?, saga_data_type = ?, saga_data_json = ?, end_state = ?, compensating = ? where saga_type = ? AND saga_id = ?", getExpectedPrefix());
+    return String.format("UPDATE %ssaga_instance SET state_name = ?, last_request_id = ?, saga_data_type = ?, saga_data_json = ?, end_state = ?, compensating = ?, failed = ? where saga_type = ? AND saga_id = ?", getExpectedPrefix());
   }
 
   protected abstract String getExpectedPrefix();

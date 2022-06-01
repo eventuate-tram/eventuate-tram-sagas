@@ -21,6 +21,7 @@ CREATE TABLE saga_instance(
   last_request_id VARCHAR(100),
   end_state INT(1),
   compensating INT(1),
+  failed INT(1),
   saga_data_type VARCHAR(1000) NOT NULL,
   saga_data_json VARCHAR(1000) NOT NULL,
   PRIMARY KEY(saga_type, saga_id)

@@ -10,8 +10,8 @@ import io.eventuate.tram.messaging.common.Message;
 import io.eventuate.tram.messaging.consumer.MessageConsumer;
 import io.eventuate.tram.messaging.consumer.MessageHandler;
 import io.eventuate.tram.messaging.producer.MessageBuilder;
-import io.eventuate.tram.sagas.common.SagaReplyHeaders;
 import io.eventuate.tram.sagas.common.SagaLockManager;
+import io.eventuate.tram.sagas.common.SagaReplyHeaders;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -186,7 +186,7 @@ public class SagaManagerImplTest {
     when(sagaInstanceRepository.find(sagaType, sagaId))
             .thenReturn(sagaInstance);
 
-    when(sagaDefinition.handleReply(anyString(), any(TestSagaData.class), any(Message.class)))
+    when(sagaDefinition.handleReply(eq(sagaType), eq(sagaId), anyString(), any(TestSagaData.class), any(Message.class)))
             .thenReturn(makeSecondSagaActions(compensating));
 
     when(sagaCommandProducer.sendCommands(anyString(), anyString(), anyList(), anyString())).thenReturn
