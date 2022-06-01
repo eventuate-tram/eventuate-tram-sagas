@@ -5,10 +5,9 @@ import io.eventuate.tram.sagas.orchestration.SagaActions;
 import io.eventuate.tram.sagas.orchestration.SagaDefinition;
 
 import java.util.List;
-import java.util.Optional;
 
 public class SimpleSagaDefinition<Data>
-        extends AbstractSimpleSagaDefinition<Data, SagaStep<Data>, StepToExecute<Data>>
+        extends AbstractSimpleSagaDefinition<Data, SagaStep<Data>, StepToExecute<Data>, SagaActionsProvider<Data>>
         implements SagaDefinition<Data> {
 
 
@@ -18,14 +17,7 @@ public class SimpleSagaDefinition<Data>
 
   @Override
   public SagaActions<Data> start(Data sagaData) {
-    SagaExecutionState currentState = new SagaExecutionState(-1, false);
-
-    Optional<StepToExecute<Data>> stepToExecute = nextStepToExecute(currentState, sagaData);
-
-    if (!stepToExecute.isPresent()) {
-      return makeEndStateSagaActions(currentState);
-    } else
-      return stepToExecute.get().executeStep(sagaData, currentState);
+    return toSagaActions(firstStepToExecute(sagaData));
   }
 
   @Override
@@ -40,24 +32,23 @@ public class SimpleSagaDefinition<Data>
       return null;
     }));
 
-    if (currentStep.isSuccessfulReply(compensating, message)) {
-      return executeNextStep(sagaData, state);
-    } else if (compensating) {
-      return handleFailedCompensatingTransaction(sagaType, sagaId, state, message);
-    } else {
-      return executeNextStep(sagaData, state.startCompensating());
-    }
+    SagaActionsProvider<Data> sap = sagaActionsForNextStep(sagaType, sagaId, sagaData, message, state, currentStep, compensating);
+    return toSagaActions(sap);
+  }
+
+  private SagaActions<Data> toSagaActions(SagaActionsProvider<Data> sap) {
+    return sap.getSagaActions() == null ? sap.getSagaActionsFunction().get() : sap.getSagaActions();
   }
 
 
-  protected SagaActions<Data> executeNextStep(Data data, SagaExecutionState state) {
-    Optional<StepToExecute<Data>> stepToExecute = nextStepToExecute(state, data);
-    if (!stepToExecute.isPresent()) {
-      return makeEndStateSagaActions(state);
-    } else {
-      // do something
-      return stepToExecute.get().executeStep(data, state);
-    }
+  @Override
+  protected SagaActionsProvider<Data> makeSagaActionsProvider(SagaActions<Data> sagaActions) {
+    return new SagaActionsProvider<>(sagaActions);
+  }
+
+  @Override
+  protected SagaActionsProvider<Data> makeSagaActionsProvider(StepToExecute<Data> stepToExecute, Data data, SagaExecutionState state) {
+    return new SagaActionsProvider<>(() -> stepToExecute.executeStep(data, state));
   }
 
 
@@ -65,5 +56,7 @@ public class SimpleSagaDefinition<Data>
   protected StepToExecute<Data> makeStepToExecute(int skipped, boolean compensating, SagaStep<Data> step) {
       return new StepToExecute<>(step, skipped, compensating);
   }
+
+
 
 }

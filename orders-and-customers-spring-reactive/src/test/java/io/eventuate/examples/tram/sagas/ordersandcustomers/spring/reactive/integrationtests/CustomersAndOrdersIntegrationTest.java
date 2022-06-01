@@ -16,13 +16,9 @@ import io.eventuate.util.test.async.Eventually;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
-import org.springframework.data.r2dbc.repository.config.EnableR2dbcRepositories;
-import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import java.util.Optional;
@@ -78,7 +74,7 @@ public class CustomersAndOrdersIntegrationTest {
 
   @Test
   public void shouldRejectBecauseOfNonExistingUser() {
-    Order order = orderSagaService.createOrder(new OrderDetails(1L, new Money("12.34"))).block();
+    Order order = orderSagaService.createOrder(new OrderDetails(System.currentTimeMillis(), new Money("12.34"))).block();
 
     assertOrderState(order.getId(), Optional.of(OrderState.REJECTED), Optional.of(RejectionReason.UNKNOWN_CUSTOMER));
   }

@@ -10,10 +10,9 @@ import org.reactivestreams.Publisher;
 import reactor.core.publisher.Mono;
 
 import java.util.List;
-import java.util.Optional;
 
 public class SimpleReactiveSagaDefinition<Data>
-        extends AbstractSimpleSagaDefinition<Data, ReactiveSagaStep<Data>, ReactiveStepToExecute<Data>>
+        extends AbstractSimpleSagaDefinition<Data, ReactiveSagaStep<Data>, ReactiveStepToExecute<Data>, ReactiveSagaActionsProvider<Data>>
           implements ReactiveSagaDefinition<Data> {
 
 
@@ -23,15 +22,7 @@ public class SimpleReactiveSagaDefinition<Data>
 
   @Override
   public Publisher<SagaActions<Data>> start(Data sagaData) {
-    SagaExecutionState currentState = new SagaExecutionState(-1, false);
-
-    Optional<ReactiveStepToExecute<Data>> stepToExecute = nextStepToExecute(currentState, sagaData);
-
-    if (!stepToExecute.isPresent()) {
-      return Mono.just(makeEndStateSagaActions(currentState));
-    } else {
-      return stepToExecute.get().executeStep(sagaData, currentState);
-    }
+    return toSagaActions(firstStepToExecute(sagaData));
   }
 
   @Override
@@ -49,30 +40,29 @@ public class SimpleReactiveSagaDefinition<Data>
             })
             .orElse(Mono.empty())
             .then(Mono.defer(() -> {
-              if (currentStep.isSuccessfulReply(compensating, message)) {
-                return Mono.from(executeNextStep(sagaData, state));
-              } else if (compensating) {
-                return Mono.just(handleFailedCompensatingTransaction(sagaType, sagaId, state, message));
-              } else {
-                return Mono.from(executeNextStep(sagaData, state.startCompensating()));
-              }
+              ReactiveSagaActionsProvider<Data> sap = sagaActionsForNextStep(sagaType, sagaId, sagaData, message, state, currentStep, compensating);
+              return toSagaActions(sap);
             }));
   }
 
+  private Mono<SagaActions<Data>> toSagaActions(ReactiveSagaActionsProvider<Data> sap) {
+    return sap.getSagaActions() != null ? Mono.just(sap.getSagaActions()) : Mono.from(sap.getSagaActionsFunction().get());
+  }
 
   @Override
   protected ReactiveStepToExecute<Data> makeStepToExecute(int skipped, boolean compensating, ReactiveSagaStep<Data> step) {
     return new ReactiveStepToExecute<>(step, skipped, compensating) ;
   }
 
-  private Publisher<SagaActions<Data>> executeNextStep(Data data, SagaExecutionState state) {
-    Optional<ReactiveStepToExecute<Data>> stepToExecute = nextStepToExecute(state, data);
-    if (!stepToExecute.isPresent()) {
-      return Mono.just(makeEndStateSagaActions(state));
-    } else {
-      // do something
-      return stepToExecute.get().executeStep(data, state);
-    }
+  @Override
+  protected ReactiveSagaActionsProvider<Data> makeSagaActionsProvider(SagaActions<Data> sagaActions) {
+    return new ReactiveSagaActionsProvider<>(sagaActions);
   }
+
+  @Override
+  protected ReactiveSagaActionsProvider<Data> makeSagaActionsProvider(ReactiveStepToExecute<Data> stepToExecute, Data data, SagaExecutionState state) {
+    return new ReactiveSagaActionsProvider<>(() -> stepToExecute.executeStep(data, state));
+  }
+
 
 }

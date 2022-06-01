@@ -9,6 +9,10 @@ public class SagaExecutionState {
   private boolean endState;
   private boolean failed;
 
+  public static SagaExecutionState startingState() {
+    return new SagaExecutionState(-1, false);
+  }
+
 
   @Override
   public String toString() {
