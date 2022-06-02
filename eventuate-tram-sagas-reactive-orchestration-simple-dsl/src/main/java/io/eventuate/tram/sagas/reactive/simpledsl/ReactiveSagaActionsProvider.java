@@ -6,21 +6,14 @@ import org.reactivestreams.Publisher;
 
 import java.util.function.Supplier;
 
-public class ReactiveSagaActionsProvider<Data> extends AbstractSagaActionsProvider<Data> {
-
-    private final Supplier<Publisher<SagaActions<Data>>> sagaActionsFunction;
+public class ReactiveSagaActionsProvider<Data> extends AbstractSagaActionsProvider<Data, Publisher<SagaActions<Data>>> {
 
     public ReactiveSagaActionsProvider(SagaActions<Data> sagaActions) {
         super(sagaActions);
-        this.sagaActionsFunction = null;
     }
 
-    public ReactiveSagaActionsProvider(Supplier<Publisher<SagaActions<Data>>> sagaActionsFunction) {
-        super(null);
-        this.sagaActionsFunction = sagaActionsFunction;
+    public ReactiveSagaActionsProvider(Supplier<Publisher<SagaActions<Data>>> sagaActionsSupplier) {
+        super(sagaActionsSupplier);
     }
 
-    public Supplier<Publisher<SagaActions<Data>>> getSagaActionsFunction() {
-        return sagaActionsFunction;
-    }
 }

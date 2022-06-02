@@ -12,7 +12,7 @@ import java.util.function.BiFunction;
 
 public abstract class AbstractSimpleSagaDefinition<Data, Step extends ISagaStep<Data>,
         ToExecute extends AbstractStepToExecute<Data, Step>,
-        Provider extends AbstractSagaActionsProvider<Data>> {
+        Provider extends AbstractSagaActionsProvider<Data,?>> {
 
     protected Logger logger = LoggerFactory.getLogger(this.getClass());
 

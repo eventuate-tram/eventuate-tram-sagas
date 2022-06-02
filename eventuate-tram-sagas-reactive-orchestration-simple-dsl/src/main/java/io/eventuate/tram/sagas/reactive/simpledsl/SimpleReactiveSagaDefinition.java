@@ -39,14 +39,11 @@ public class SimpleReactiveSagaDefinition<Data>
               return Mono.from(source);
             })
             .orElse(Mono.empty())
-            .then(Mono.defer(() -> {
-              ReactiveSagaActionsProvider<Data> sap = sagaActionsForNextStep(sagaType, sagaId, sagaData, message, state, currentStep, compensating);
-              return toSagaActions(sap);
-            }));
+            .then(Mono.defer(() -> toSagaActions(sagaActionsForNextStep(sagaType, sagaId, sagaData, message, state, currentStep, compensating))));
   }
 
   private Mono<SagaActions<Data>> toSagaActions(ReactiveSagaActionsProvider<Data> sap) {
-    return sap.getSagaActions() != null ? Mono.just(sap.getSagaActions()) : Mono.from(sap.getSagaActionsFunction().get());
+    return Mono.from(sap.toSagaActions(Mono::just, Mono::from));
   }
 
   @Override

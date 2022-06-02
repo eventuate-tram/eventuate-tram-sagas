@@ -6,6 +6,8 @@ import io.eventuate.tram.sagas.orchestration.SagaDefinition;
 
 import java.util.List;
 
+import static java.util.function.Function.identity;
+
 public class SimpleSagaDefinition<Data>
         extends AbstractSimpleSagaDefinition<Data, SagaStep<Data>, StepToExecute<Data>, SagaActionsProvider<Data>>
         implements SagaDefinition<Data> {
@@ -37,7 +39,7 @@ public class SimpleSagaDefinition<Data>
   }
 
   private SagaActions<Data> toSagaActions(SagaActionsProvider<Data> sap) {
-    return sap.getSagaActions() == null ? sap.getSagaActionsFunction().get() : sap.getSagaActions();
+    return sap.toSagaActions(identity(), identity());
   }
 
 

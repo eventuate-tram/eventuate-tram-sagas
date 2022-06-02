@@ -4,21 +4,14 @@ import io.eventuate.tram.sagas.orchestration.SagaActions;
 
 import java.util.function.Supplier;
 
-public class SagaActionsProvider<Data> extends AbstractSagaActionsProvider<Data> {
-
-    private final Supplier<SagaActions<Data>> sagaActionsFunction;
+public class SagaActionsProvider<Data> extends AbstractSagaActionsProvider<Data, SagaActions<Data>> {
 
     public SagaActionsProvider(SagaActions<Data> sagaActions) {
         super(sagaActions);
-        sagaActionsFunction = null;
     }
 
-    public SagaActionsProvider(Supplier<SagaActions<Data>> sagaActionsFunction) {
-        super(null);
-        this.sagaActionsFunction = sagaActionsFunction;
+    public SagaActionsProvider(Supplier<SagaActions<Data>> sagaActionsSupport) {
+        super(sagaActionsSupport);
     }
 
-    public Supplier<SagaActions<Data>> getSagaActionsFunction() {
-        return sagaActionsFunction;
-    }
 }
