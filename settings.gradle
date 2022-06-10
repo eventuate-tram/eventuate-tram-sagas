@@ -1,3 +1,5 @@
+rootProject.name="eventuate-tram-sagas"
+
 include 'eventuate-tram-sagas-common'
 include 'eventuate-tram-sagas-reactive-common'
 include 'eventuate-tram-sagas-spring-common'
