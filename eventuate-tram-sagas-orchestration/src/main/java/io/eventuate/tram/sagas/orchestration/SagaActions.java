@@ -1,7 +1,5 @@
 package io.eventuate.tram.sagas.orchestration;
 
-import io.eventuate.tram.commands.consumer.CommandWithDestination;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -9,7 +7,7 @@ import java.util.Optional;
 public class SagaActions<Data> {
 
 
-  private final List<CommandWithDestination> commands;
+  private final List<CommandWithDestinationAndType> commands;
   private final Optional<Data> updatedSagaData;
   private final Optional<String> updatedState;
   private boolean endState;
@@ -18,7 +16,7 @@ public class SagaActions<Data> {
   private Optional<RuntimeException> localException;
   private boolean failed;
 
-  public SagaActions(List<CommandWithDestination> commands,
+  public SagaActions(List<CommandWithDestinationAndType> commands,
                      Optional<Data> updatedSagaData,
                      Optional<String> updatedState, boolean endState, boolean compensating, boolean failed, boolean local, Optional<RuntimeException> localException) {
     this.commands = commands;
@@ -31,7 +29,7 @@ public class SagaActions<Data> {
     this.failed = failed;
   }
 
-  public List<CommandWithDestination> getCommands() {
+  public List<CommandWithDestinationAndType> getCommands() {
     return commands;
   }
 
@@ -55,6 +53,11 @@ public class SagaActions<Data> {
     return local;
   }
 
+  public boolean isAllNotifications() {
+    return !commands.isEmpty() && commands.stream().allMatch(CommandWithDestinationAndType::isNotification);
+  }
+
+
   public boolean isFailed() {
     return failed;
   }
@@ -64,7 +67,7 @@ public class SagaActions<Data> {
   }
 
   public static class Builder<Data> {
-    private List<CommandWithDestination> commands = new ArrayList<>();
+    private List<CommandWithDestinationAndType> commands = new ArrayList<CommandWithDestinationAndType>();
     private Optional<Data> updatedSagaData = Optional.empty();
     private Optional<String> updatedState = Optional.empty();
     private boolean endState;
@@ -80,7 +83,7 @@ public class SagaActions<Data> {
       return new SagaActions<>(commands, updatedSagaData, updatedState, endState, compensating, failed, local, localException);
     }
 
-    public Builder<Data> withCommand(CommandWithDestination command) {
+    public Builder<Data> withCommand(CommandWithDestinationAndType command) {
       commands.add(command);
       return this;
     }
@@ -95,7 +98,7 @@ public class SagaActions<Data> {
       return this;
     }
 
-    public Builder<Data> withCommands(List<CommandWithDestination> commands) {
+    public Builder<Data> withCommands(List<CommandWithDestinationAndType> commands) {
       this.commands.addAll(commands);
       return this;
     }

@@ -16,7 +16,7 @@ public class ConditionalSagaTest {
     andGiven().
       successReply().
     expect().
-      command(new Do2Command()).
+      command(new ReserveCreditCommand()).
       to("participant2").
     andGiven().
       successReply().
@@ -34,7 +34,7 @@ public class ConditionalSagaTest {
     andGiven().
       successReply().
     expect().
-      command(new Do2Command()).
+      command(new ReserveCreditCommand()).
       to("participant2").
     andGiven().
       failureReply().
@@ -52,7 +52,7 @@ public class ConditionalSagaTest {
     given().
        saga(new ConditionalSaga(), new ConditionalSagaData(false)).
     expect().
-      command(new Do2Command()).
+      command(new ReserveCreditCommand()).
       to("participant2").
     andGiven().
       successReply().
@@ -65,7 +65,7 @@ public class ConditionalSagaTest {
     given().
        saga(new ConditionalSaga(), new ConditionalSagaData(false)).
     expect().
-      command(new Do2Command()).
+      command(new ReserveCreditCommand()).
       to("participant2").
     andGiven().
       failureReply().

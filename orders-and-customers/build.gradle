@@ -4,5 +4,8 @@ dependencies {
     compile project(":eventuate-tram-sagas-orchestration")
     compile project(":eventuate-tram-sagas-orchestration-simple-dsl")
     compile 'javax.persistence:javax.persistence-api:2.2'
+
+    testCompile project(":eventuate-tram-sagas-unit-testing-support")
+
 }
 

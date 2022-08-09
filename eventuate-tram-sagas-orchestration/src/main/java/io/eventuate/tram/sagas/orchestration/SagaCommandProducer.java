@@ -16,13 +16,17 @@ public class SagaCommandProducer {
     this.commandProducer = commandProducer;
   }
 
-  public String sendCommands(String sagaType, String sagaId, List<CommandWithDestination> commands, String sagaReplyChannel) {
+  public String sendCommands(String sagaType, String sagaId, List<CommandWithDestinationAndType> commands, String sagaReplyChannel) {
     String messageId = null;
-    for (CommandWithDestination command : commands) {
+    for (CommandWithDestinationAndType cwdt : commands) {
+      CommandWithDestination command = cwdt.getCommandWithDestination();
       Map<String, String> headers = new HashMap<>(command.getExtraHeaders());
       headers.put(SagaCommandHeaders.SAGA_TYPE, sagaType);
       headers.put(SagaCommandHeaders.SAGA_ID, sagaId);
-      messageId = commandProducer.send(command.getDestinationChannel(), command.getResource(), command.getCommand(), sagaReplyChannel, headers);
+      if (cwdt.isNotification())
+        messageId = commandProducer.sendNotification(command.getDestinationChannel(), command.getCommand(), headers);
+      else
+        messageId = commandProducer.send(command.getDestinationChannel(), command.getResource(), command.getCommand(), sagaReplyChannel, headers);
     }
     return messageId;
 

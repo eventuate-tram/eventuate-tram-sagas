@@ -36,6 +36,6 @@ public class ConditionalSagaData {
   }
 
   public CommandWithDestination do2() {
-    return new CommandWithDestination("participant2", null, new Do2Command());
+    return new CommandWithDestination("participant2", null, new ReserveCreditCommand());
   }
 }

@@ -1,7 +1,7 @@
 package io.eventuate.tram.sagas.simpledsl;
 
-import io.eventuate.tram.commands.consumer.CommandWithDestination;
 import io.eventuate.tram.messaging.common.Message;
+import io.eventuate.tram.sagas.orchestration.CommandWithDestinationAndType;
 
 
 public interface ParticipantInvocation<Data> {
@@ -10,5 +10,5 @@ public interface ParticipantInvocation<Data> {
 
   boolean isInvocable(Data data);
 
-  CommandWithDestination makeCommandToSend(Data data);
+  CommandWithDestinationAndType makeCommandToSend(Data data);
 }

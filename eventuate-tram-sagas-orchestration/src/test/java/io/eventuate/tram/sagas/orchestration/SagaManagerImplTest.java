@@ -3,7 +3,6 @@ package io.eventuate.tram.sagas.orchestration;
 import io.eventuate.common.id.Int128;
 import io.eventuate.tram.commands.common.CommandReplyOutcome;
 import io.eventuate.tram.commands.common.ReplyMessageHeaders;
-import io.eventuate.tram.commands.consumer.CommandWithDestination;
 import io.eventuate.tram.commands.producer.CommandProducer;
 import io.eventuate.tram.messaging.common.ChannelMapping;
 import io.eventuate.tram.messaging.common.Message;
@@ -73,10 +72,10 @@ public class SagaManagerImplTest {
   private TestCommand command1 = new TestCommand();
   private TestCommand command2 = new TestCommand();
 
-  private CommandWithDestination commandForParticipant1 = new CommandWithDestination(participantChannel1, testResource,
+  private CommandWithDestinationAndType commandForParticipant1 = CommandWithDestinationAndType.command(participantChannel1, testResource,
           SagaManagerImplTest.this.command1);
 
-  private CommandWithDestination commandForParticipant2 = new CommandWithDestination(participantChannel2, testResource,
+  private CommandWithDestinationAndType commandForParticipant2 = CommandWithDestinationAndType.command(participantChannel2, testResource,
           SagaManagerImplTest.this.command2);
 
   private SagaInstance sagaInstance;

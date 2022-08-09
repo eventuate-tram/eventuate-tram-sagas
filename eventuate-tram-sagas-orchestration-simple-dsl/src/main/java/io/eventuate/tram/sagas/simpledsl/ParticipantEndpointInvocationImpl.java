@@ -3,8 +3,8 @@ package io.eventuate.tram.sagas.simpledsl;
 import io.eventuate.tram.commands.common.Command;
 import io.eventuate.tram.commands.common.CommandReplyOutcome;
 import io.eventuate.tram.commands.common.ReplyMessageHeaders;
-import io.eventuate.tram.commands.consumer.CommandWithDestination;
 import io.eventuate.tram.messaging.common.Message;
+import io.eventuate.tram.sagas.orchestration.CommandWithDestinationAndType;
 
 import java.util.Optional;
 import java.util.function.Function;
@@ -28,7 +28,7 @@ public class ParticipantEndpointInvocationImpl<Data, C extends Command> extends 
   }
 
   @Override
-  public CommandWithDestination makeCommandToSend(Data data) {
-    return new CommandWithDestination(commandEndpoint.getCommandChannel(), null, commandProvider.apply(data));
+  public CommandWithDestinationAndType makeCommandToSend(Data data) {
+    return CommandWithDestinationAndType.command(commandEndpoint.getCommandChannel(), null, commandProvider.apply(data)); // TODO notifications
   }
 }

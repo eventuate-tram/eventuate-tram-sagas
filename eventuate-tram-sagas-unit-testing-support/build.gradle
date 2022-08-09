@@ -1,6 +1,4 @@
-
 dependencies {
     compile project(":eventuate-tram-sagas-orchestration")
-
-    testCompile project(":eventuate-tram-sagas-unit-testing-support")
+    compile "junit:junit:4.12"
 }

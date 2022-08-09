@@ -57,4 +57,8 @@ public class StepBuilder<Data> implements WithCompensationBuilder<Data> {
   public <C extends Command> InvokeParticipantStepBuilder<Data> withCompensation(Predicate<Data> compensationPredicate, CommandEndpoint<C> commandEndpoint, Function<Data, C> commandProvider) {
     return new InvokeParticipantStepBuilder<>(parent).withCompensation(compensationPredicate, commandEndpoint, commandProvider);
   }
+
+  public InvokeParticipantStepBuilder<Data> notifyParticipant(Function<Data, CommandWithDestination> notificationAction) {
+    return new InvokeParticipantStepBuilder<>(parent).withNotificationAction(Optional.empty(), notificationAction);
+  }
 }

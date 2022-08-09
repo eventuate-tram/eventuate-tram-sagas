@@ -7,7 +7,7 @@ import static io.eventuate.tram.sagas.testing.SagaUnitTestSupport.given;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 
-public class LocalSagaTest {
+public class NotificationBasedCreateOrderSagaTest {
 
   private LocalSagaSteps steps;
 
@@ -21,7 +21,7 @@ public class LocalSagaTest {
     given().
        saga(new LocalSaga(steps), new LocalSagaData()).
     expect().
-      command(new Do2Command()).
+      command(new ReserveCreditCommand()).
       to("participant2").
     andGiven().
       successReply().
@@ -34,7 +34,7 @@ public class LocalSagaTest {
     given().
        saga(new LocalSaga(steps), new LocalSagaData()).
     expect().
-      command(new Do2Command()).
+      command(new ReserveCreditCommand()).
       to("participant2").
     andGiven().
       failureReply().
@@ -60,12 +60,12 @@ public class LocalSagaTest {
     given().
             saga(new LocalSaga(steps), data).
             expect().
-            command(new Do2Command()).
+            command(new ReserveCreditCommand()).
             to("participant2").
             andGiven().
             successReply().
             expect().
-            command(new Undo2Command()).
+            command(new ReleaseCreditCommand()).
             to("participant2").
             andGiven().
             successReply().

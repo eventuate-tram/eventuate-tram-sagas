@@ -26,6 +26,7 @@ include 'eventuate-tram-sagas-common-in-memory'
 include 'eventuate-tram-sagas-spring-in-memory'
 include 'eventuate-tram-sagas-micronaut-in-memory'
 include "eventuate-tram-sagas-event-sourcing-support"
+include 'eventuate-tram-sagas-unit-testing-support'
 include 'eventuate-tram-sagas-testing-support'
 include 'eventuate-tram-sagas-spring-testing-support'
 include 'eventuate-tram-sagas-spring-testing-support-cloud-contract'

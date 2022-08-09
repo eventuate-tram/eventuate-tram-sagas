@@ -28,6 +28,12 @@ public class InvokeParticipantStepBuilder<Data> implements WithCompensationBuild
     return this;
   }
 
+  public InvokeParticipantStepBuilder<Data> withNotificationAction(Optional<Predicate<Data>> participantInvocationPredicate, Function<Data, CommandWithDestination> notificationAction) {
+    this.action = Optional.of(new ParticipantInvocationImpl<>(participantInvocationPredicate, notificationAction, true));
+    return this;
+  }
+
+
   <C extends Command> InvokeParticipantStepBuilder<Data> withAction(Optional<Predicate<Data>> participantInvocationPredicate, CommandEndpoint<C> commandEndpoint, Function<Data, C> commandProvider) {
     this.action = Optional.of(new ParticipantEndpointInvocationImpl<>(participantInvocationPredicate, commandEndpoint, commandProvider));
     return this;
@@ -36,6 +42,11 @@ public class InvokeParticipantStepBuilder<Data> implements WithCompensationBuild
   @Override
   public InvokeParticipantStepBuilder<Data> withCompensation(Function<Data, CommandWithDestination> compensation) {
     this.compensation = Optional.of(new ParticipantInvocationImpl<>(Optional.empty(), compensation));
+    return this;
+  }
+
+  public InvokeParticipantStepBuilder<Data> withCompensationNotification(Function<Data, CommandWithDestination> compensation) {
+    this.compensation = Optional.of(new ParticipantInvocationImpl<>(Optional.empty(), compensation, true));
     return this;
   }
 

@@ -3,7 +3,9 @@ package io.eventuate.tram.sagas.simpledsl;
 import io.eventuate.tram.commands.common.ReplyMessageHeaders;
 import io.eventuate.tram.messaging.common.Message;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.Map;
+import java.util.Optional;
 import java.util.function.BiConsumer;
 
 public class ParticipantInvocationStep<Data> implements SagaStep<Data> {
@@ -47,7 +49,7 @@ public class ParticipantInvocationStep<Data> implements SagaStep<Data> {
   @Override
   public StepOutcome makeStepOutcome(Data data, boolean compensating) {
     return StepOutcome.makeRemoteStepOutcome(getParticipantInvocation(compensating)
-            .map(x -> x.makeCommandToSend(data))
+            .map(pi -> pi.makeCommandToSend(data))
             .map(Collections::singletonList)
             .orElseGet(Collections::emptyList));
   }

@@ -223,16 +223,22 @@ public class SagaManagerImpl<Data>
 
         sagaInstanceRepository.update(sagaInstance);
 
-        if (!actions.isLocal())
+        if (actions.isAllNotifications() || actions.isLocal()) {
+          actions = simulateSuccessfulReplyToLocalActionOrNotification(sagaType, sagaId, actions);
+        } else {
           break;
+        }
 
-        actions = getStateDefinition().handleReply(sagaType, sagaId, actions.getUpdatedState().get(), actions.getUpdatedSagaData().get(), MessageBuilder
-                .withPayload("{}")
-                .withHeader(ReplyMessageHeaders.REPLY_OUTCOME, CommandReplyOutcome.SUCCESS.name())
-                .withHeader(ReplyMessageHeaders.REPLY_TYPE, Success.class.getName())
-                .build());
       }
     }
+  }
+
+  private SagaActions<Data> simulateSuccessfulReplyToLocalActionOrNotification(String sagaType, String sagaId, SagaActions<Data> actions) {
+    return getStateDefinition().handleReply(sagaType, sagaId, actions.getUpdatedState().get(), actions.getUpdatedSagaData().get(), MessageBuilder
+            .withPayload("{}")
+            .withHeader(ReplyMessageHeaders.REPLY_OUTCOME, CommandReplyOutcome.SUCCESS.name())
+            .withHeader(ReplyMessageHeaders.REPLY_TYPE, Success.class.getName())
+            .build());
   }
 
   private void updateState(SagaInstance sagaInstance, SagaActions<Data> actions) {

@@ -1,10 +1,6 @@
-package io.eventuate.examples.tram.sagas.ordersandcustomers.spring.orders.sagas.createorder;
+package io.eventuate.examples.tram.sagas.ordersandcustomers.orders.sagas.createorder;
 
 import io.eventuate.examples.tram.sagas.ordersandcustomers.commondomain.Money;
-import io.eventuate.examples.tram.sagas.ordersandcustomers.orders.sagas.createorder.CreateOrderSaga;
-import io.eventuate.examples.tram.sagas.ordersandcustomers.orders.sagas.createorder.CreateOrderSagaCompletedSuccesfully;
-import io.eventuate.examples.tram.sagas.ordersandcustomers.orders.sagas.createorder.CreateOrderSagaData;
-import io.eventuate.examples.tram.sagas.ordersandcustomers.orders.sagas.createorder.CreateOrderSagaRolledBack;
 import io.eventuate.examples.tram.sagas.ordersandcustomers.orders.sagas.participants.ApproveOrderCommand;
 import io.eventuate.examples.tram.sagas.ordersandcustomers.orders.sagas.participants.ReserveCreditCommand;
 import io.eventuate.examples.tram.sagas.ordersandcustomers.orders.service.OrderDetails;

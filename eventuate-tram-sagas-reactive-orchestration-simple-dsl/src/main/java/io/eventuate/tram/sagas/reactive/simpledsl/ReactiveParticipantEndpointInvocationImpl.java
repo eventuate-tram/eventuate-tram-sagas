@@ -3,8 +3,8 @@ package io.eventuate.tram.sagas.reactive.simpledsl;
 import io.eventuate.tram.commands.common.Command;
 import io.eventuate.tram.commands.common.CommandReplyOutcome;
 import io.eventuate.tram.commands.common.ReplyMessageHeaders;
-import io.eventuate.tram.commands.consumer.CommandWithDestination;
 import io.eventuate.tram.messaging.common.Message;
+import io.eventuate.tram.sagas.orchestration.CommandWithDestinationAndType;
 import io.eventuate.tram.sagas.simpledsl.CommandEndpoint;
 import org.reactivestreams.Publisher;
 import reactor.core.publisher.Mono;
@@ -33,9 +33,9 @@ public class ReactiveParticipantEndpointInvocationImpl<Data, C extends Command> 
   }
 
   @Override
-  public Publisher<CommandWithDestination> makeCommandToSend(Data data) {
+  public Publisher<CommandWithDestinationAndType> makeCommandToSend(Data data) {
     return Mono
             .from(commandProvider.apply(data))
-            .map(cmd -> new CommandWithDestination(commandEndpoint.getCommandChannel(), null, cmd));
+            .map(cmd -> CommandWithDestinationAndType.command(commandEndpoint.getCommandChannel(), null, cmd)); // TODO notifications
   }
 }

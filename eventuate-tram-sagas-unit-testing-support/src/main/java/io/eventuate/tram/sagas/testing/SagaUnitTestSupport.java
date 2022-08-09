@@ -6,16 +6,18 @@ import io.eventuate.tram.commands.producer.CommandProducerImpl;
 import io.eventuate.tram.messaging.common.Message;
 import io.eventuate.tram.messaging.consumer.MessageConsumer;
 import io.eventuate.tram.messaging.producer.MessageBuilder;
-import io.eventuate.tram.sagas.orchestration.*;
 import io.eventuate.tram.sagas.common.SagaLockManager;
+import io.eventuate.tram.sagas.orchestration.*;
 import org.junit.Assert;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 import static java.util.Collections.emptyList;
-import static org.junit.Assert.*;
 
 /**
  * Provides a DSL for writing unit tests for saga orchestrators
@@ -24,6 +26,7 @@ public class SagaUnitTestSupport<T> {
 
   private SagaManagerImpl sagaManager;
   private Command expectedCommand;
+  private Command expectedNotification;
 
   private List<MessageWithDestination> sentCommands = new ArrayList<>();
   private MessageWithDestination sentCommand;
@@ -100,23 +103,60 @@ public class SagaUnitTestSupport<T> {
 
   public SagaUnitTestSupport<T> command(Command command) {
     expectedCommand = command;
+    expectedNotification = null;
+    return this;
+  }
+
+  public SagaUnitTestSupport<T> notification(Command command) {
+    expectedCommand = null;
+    expectedNotification = command;
     return this;
   }
 
   public SagaUnitTestSupport<T> to(String commandChannel) {
-    assertEquals("Expected one command", 1, sentCommands.size());
+    Assert.assertEquals("Expected one command", 1, sentCommands.size());
     sentCommand = sentCommands.get(0);
-    assertEquals(commandChannel, sentCommand.getDestination());
-    assertEquals(expectedCommand.getClass().getName(), sentCommand.getMessage().getRequiredHeader(CommandMessageHeaders.COMMAND_TYPE));
-    // TODO 
+    Assert.assertEquals(commandChannel, sentCommand.getDestination());
+    Message sentMessage = sentCommand.getMessage();
+    if (expectedCommand != null) {
+      Assert.assertEquals(expectedCommand.getClass().getName(), sentMessage.getRequiredHeader(CommandMessageHeaders.COMMAND_TYPE));
+      Assert.assertNotNull(sentMessage.getRequiredHeader(CommandMessageHeaders.REPLY_TO));
+    } else {
+      Assert.assertEquals(expectedNotification.getClass().getName(), sentMessage.getRequiredHeader(CommandMessageHeaders.COMMAND_TYPE));
+      Assert.assertNull(sentMessage.getHeader(CommandMessageHeaders.REPLY_TO).orElse(null));
+
+    }
     sentCommands.clear();
     return this;
+  }
+
+  void verifySent(List<CommandWithDestinationAndType> commandsAndNotifications) {
+    sentCommand = null;
+    for (CommandWithDestinationAndType corn : commandsAndNotifications) {
+      MessageWithDestination sentMessage = sentCommands.stream()
+              .filter(sm -> corn.getCommandWithDestination().getCommand().getClass().getName().equals(sm.getMessage().getRequiredHeader(CommandMessageHeaders.COMMAND_TYPE))
+                          && corn.getCommandWithDestination().getDestinationChannel().equals(sm.getDestination()))
+              .findAny()
+              .orElseThrow(() -> new AssertionError(String.format("Did not find expected command %s in %s", corn, sentCommands)));
+
+      if (corn.isNotification())
+        Assert.assertNull(sentMessage.getMessage().getHeader(CommandMessageHeaders.REPLY_TO).orElse(null));
+      else {
+        Assert.assertNotNull(sentMessage.getMessage().getRequiredHeader(CommandMessageHeaders.REPLY_TO));
+        if (sentCommand != null)
+          Assert.fail(String.format("There can only be one command in %s", sentCommands));
+        sentCommand = sentMessage;
+      }
+    }
+    if (commandsAndNotifications.size() != sentCommands.size())
+      Assert.fail(String.format("Expected these commands %s but there are extra %s", commandsAndNotifications, sentCommands));
+    sentCommands.clear();
   }
 
   public SagaUnitTestSupport<T> withExtraHeaders(Map<String, String> expectedExtraHeaders) {
     Map<String, String> actualHeaders = sentCommand.getMessage().getHeaders();
     if (!actualHeaders.entrySet().containsAll(expectedExtraHeaders.entrySet()))
-      fail(String.format("Expected headers %s to contain %s", actualHeaders, expectedExtraHeaders));
+      Assert.fail(String.format("Expected headers %s to contain %s", actualHeaders, expectedExtraHeaders));
     return this;
   }
 
@@ -172,8 +212,8 @@ public class SagaUnitTestSupport<T> {
 
   public SagaUnitTestSupport<T> expectCompletedSuccessfully() {
     assertNoCommands();
-    assertTrue("Expected saga to have finished", sagaInstance.isEndState());
-    assertFalse("Expected saga to have finished successfully", sagaInstance.isCompensating());
+    Assert.assertTrue("Expected saga to have finished", sagaInstance.isEndState());
+    Assert.assertFalse("Expected saga to have finished successfully", sagaInstance.isCompensating());
     return this;
   }
 
@@ -186,24 +226,28 @@ public class SagaUnitTestSupport<T> {
         Assert.fail(String.format("Expected saga to have finished but found a command of %s sent to %s: %s", mwd.getMessage().getRequiredHeader(CommandMessageHeaders.COMMAND_TYPE), mwd.getDestination(), mwd.getMessage()));
         break;
       default:
-        assertEquals(emptyList(), sentCommands);
+        Assert.assertEquals(emptyList(), sentCommands);
     }
   }
 
   public SagaUnitTestSupport<T> expectRolledBack() {
     assertNoCommands();
-    assertTrue("Expected saga to have finished", sagaInstance.isEndState());
-    assertTrue("Expected saga to have rolled back", sagaInstance.isCompensating());
+    Assert.assertTrue("Expected saga to have finished", sagaInstance.isEndState());
+    Assert.assertTrue("Expected saga to have rolled back", sagaInstance.isCompensating());
     return this;
   }
 
   public void expectException(Exception expectedCreateException) {
-    assertEquals(expectedCreateException, createException.get());
+    Assert.assertEquals(expectedCreateException, createException.get());
   }
 
   public SagaUnitTestSupport<T> assertSagaData(Consumer<T> sagaDataConsumer) {
     sagaDataConsumer.accept(SagaDataSerde.deserializeSagaData(sagaInstance.getSerializedSagaData()));
     return this;
+  }
+
+  public MultipleCommandsExpected multiple() {
+    return new MultipleCommandsExpected(this);
   }
 
 }

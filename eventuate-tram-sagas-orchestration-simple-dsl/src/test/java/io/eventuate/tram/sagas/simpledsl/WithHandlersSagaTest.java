@@ -35,7 +35,7 @@ public class WithHandlersSagaTest {
     andGiven().
       successReply().
     expect().
-      command(new Do2Command()).
+      command(new ReserveCreditCommand()).
       to("participant2").
     andGiven().
       successReply().
@@ -61,7 +61,7 @@ public class WithHandlersSagaTest {
     andGiven().
       successReply().
     expect().
-      command(new Do2Command()).
+      command(new ReserveCreditCommand()).
       to("participant2").
     andGiven().
       failureReply().
@@ -88,7 +88,7 @@ public class WithHandlersSagaTest {
     given().
        saga(new WithHandlersSaga(handlers), new ConditionalSagaData(false)).
     expect().
-      command(new Do2Command()).
+      command(new ReserveCreditCommand()).
       to("participant2").
     andGiven().
       successReply().
@@ -108,7 +108,7 @@ public class WithHandlersSagaTest {
     given().
        saga(new WithHandlersSaga(handlers), new ConditionalSagaData(false)).
     expect().
-      command(new Do2Command()).
+      command(new ReserveCreditCommand()).
       to("participant2").
     andGiven().
       failureReply().
