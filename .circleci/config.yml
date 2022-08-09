@@ -113,6 +113,9 @@ workflows:
           requires:
             - build-and-test-intel
             - build-and-test-arm
+            - build-and-test-mssql
+            - build-and-test-postgres
+            - build-and-test-activemq
       - build-and-test/build-and-test:
           name: test-multi-arch-intel
           script: ./build-and-test-all-mysql-kafka.sh
@@ -140,9 +143,6 @@ workflows:
           requires:
             - test-multi-arch-intel
             - test-multi-arch-arm
-            - build-and-test-mssql
-            - build-and-test-postgres
-            - build-and-test-activemq
           script: ./deploy-artifacts.sh
       - deploy-multi-arch:
           context:
@@ -150,6 +150,3 @@ workflows:
           requires:
             - test-multi-arch-intel
             - test-multi-arch-arm
-            - build-and-test-mssql
-            - build-and-test-postgres
-            - build-and-test-activemq
