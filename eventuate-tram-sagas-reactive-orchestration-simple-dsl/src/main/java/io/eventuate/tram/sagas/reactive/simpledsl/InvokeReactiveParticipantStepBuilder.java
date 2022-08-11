@@ -31,6 +31,13 @@ public class InvokeReactiveParticipantStepBuilder<Data> implements ReactiveWithC
     return this;
   }
 
+  InvokeReactiveParticipantStepBuilder<Data> withNotificationAction(Optional<Predicate<Data>> participantInvocationPredicate,
+                                                        Function<Data, Publisher<CommandWithDestination>> notificationAction) {
+    this.action = Optional.of(new ReactiveParticipantInvocationImpl<>(participantInvocationPredicate, notificationAction, true));
+    return this;
+  }
+
+
   <C extends Command> InvokeReactiveParticipantStepBuilder<Data> withAction(Optional<Predicate<Data>> participantInvocationPredicate,
                                                                             CommandEndpoint<C> commandEndpoint,
                                                                             Function<Data, Publisher<C>> commandProvider) {
@@ -41,6 +48,11 @@ public class InvokeReactiveParticipantStepBuilder<Data> implements ReactiveWithC
   @Override
   public InvokeReactiveParticipantStepBuilder<Data> withCompensation(Function<Data, Publisher<CommandWithDestination>> compensation) {
     this.compensation = Optional.of(new ReactiveParticipantInvocationImpl<>(Optional.empty(), compensation));
+    return this;
+  }
+
+  public InvokeReactiveParticipantStepBuilder<Data> withCompensationNotification(Function<Data, Publisher<CommandWithDestination>> compensation) {
+    this.compensation = Optional.of(new ReactiveParticipantInvocationImpl<>(Optional.empty(), compensation, true));
     return this;
   }
 
@@ -85,5 +97,6 @@ public class InvokeReactiveParticipantStepBuilder<Data> implements ReactiveWithC
   private void addStep() {
     parent.addStep(new ReactiveParticipantInvocationStep<>(action, compensation, actionReplyHandlers, compensationReplyHandlers));
   }
+
 
 }

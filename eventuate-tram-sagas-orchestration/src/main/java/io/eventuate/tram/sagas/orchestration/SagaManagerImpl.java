@@ -223,10 +223,10 @@ public class SagaManagerImpl<Data>
 
         sagaInstanceRepository.update(sagaInstance);
 
-        if (actions.isAllNotifications() || actions.isLocal()) {
-          actions = simulateSuccessfulReplyToLocalActionOrNotification(sagaType, sagaId, actions);
-        } else {
+        if (actions.isReplyExpected()) {
           break;
+        } else {
+          actions = simulateSuccessfulReplyToLocalActionOrNotification(sagaType, sagaId, actions);
         }
 
       }

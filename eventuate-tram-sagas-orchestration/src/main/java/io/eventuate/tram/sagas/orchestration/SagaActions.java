@@ -10,11 +10,11 @@ public class SagaActions<Data> {
   private final List<CommandWithDestinationAndType> commands;
   private final Optional<Data> updatedSagaData;
   private final Optional<String> updatedState;
-  private boolean endState;
-  private boolean compensating;
-  private boolean local;
+  private final boolean endState;
+  private final boolean compensating;
+  private final boolean local;
   private Optional<RuntimeException> localException;
-  private boolean failed;
+  private final boolean failed;
 
   public SagaActions(List<CommandWithDestinationAndType> commands,
                      Optional<Data> updatedSagaData,
@@ -49,14 +49,9 @@ public class SagaActions<Data> {
     return compensating;
   }
 
-  public boolean isLocal() {
-    return local;
+  public boolean isReplyExpected() {
+    return (commands.isEmpty() || commands.stream().anyMatch(CommandWithDestinationAndType::isCommand)) && !local;
   }
-
-  public boolean isAllNotifications() {
-    return !commands.isEmpty() && commands.stream().allMatch(CommandWithDestinationAndType::isNotification);
-  }
-
 
   public boolean isFailed() {
     return failed;

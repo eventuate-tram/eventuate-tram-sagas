@@ -28,8 +28,7 @@ public class ReactiveSagaCommandProducer {
               headers.put(SagaCommandHeaders.SAGA_TYPE, sagaType);
               headers.put(SagaCommandHeaders.SAGA_ID, sagaId);
                 if (cwdt.isNotification())
-                    // return commandProducer.sendNotification(command.getDestinationChannel(), command.getCommand(), headers);
-                    return Mono.error(new UnsupportedOperationException("Reactive notifications not yet implemented")); // TODO notifications - implement me
+                    return commandProducer.sendNotification(command.getDestinationChannel(), command.getCommand(), headers);
                 else
                     return commandProducer.send(command.getDestinationChannel(), command.getResource(), command.getCommand(), sagaReplyChannel, headers);
             })

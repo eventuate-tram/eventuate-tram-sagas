@@ -4,22 +4,23 @@ import org.junit.Before;
 import org.junit.Test;
 
 import static io.eventuate.tram.sagas.testing.SagaUnitTestSupport.given;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 
-public class NotificationBasedCreateOrderSagaTest {
+public class LocalSagaTest {
 
   private LocalSagaSteps steps;
 
   @Before
-  public void setUp() throws Exception {
+  public void setUp() {
     steps = mock(LocalSagaSteps.class);
   }
 
   @Test
   public void shouldExecuteAllStepsSuccessfully() {
     given().
-       saga(new LocalSaga(steps), new LocalSagaData()).
+       saga(makeSaga(), new LocalSagaData()).
     expect().
       command(new ReserveCreditCommand()).
       to("participant2").
@@ -32,7 +33,7 @@ public class NotificationBasedCreateOrderSagaTest {
   @Test
   public void shouldRollbackFromStep2() {
     given().
-       saga(new LocalSaga(steps), new LocalSagaData()).
+       saga(makeSaga(), new LocalSagaData()).
     expect().
       command(new ReserveCreditCommand()).
       to("participant2").
@@ -49,16 +50,15 @@ public class NotificationBasedCreateOrderSagaTest {
     RuntimeException expectedCreateException = new RuntimeException("Failed local step");
     doThrow(expectedCreateException).when(steps).localStep1(data);
     given().
-        saga(new LocalSaga(steps), data).
+        saga(makeSaga(), data).
             expectException(expectedCreateException)
     ;
   }
   @Test
   public void shouldHandleFailureOfLastLocalStep() {
-    LocalSagaData data = new LocalSagaData();
-    doThrow(new RuntimeException()).when(steps).localStep3(data);
+    doThrow(new RuntimeException()).when(steps).localStep3(any());
     given().
-            saga(new LocalSaga(steps), data).
+            saga(makeSaga(), new LocalSagaData()).
             expect().
             command(new ReserveCreditCommand()).
             to("participant2").
@@ -71,6 +71,10 @@ public class NotificationBasedCreateOrderSagaTest {
             successReply().
             expectRolledBack()
     ;
+  }
+
+  private LocalSaga makeSaga() {
+    return new LocalSaga(steps);
   }
 
 

@@ -25,6 +25,9 @@ public class ReactiveStepBuilder<Data> implements ReactiveWithCompensationBuilde
   public InvokeReactiveParticipantStepBuilder<Data> invokeParticipant(Function<Data, Publisher<CommandWithDestination>> action) {
     return new InvokeReactiveParticipantStepBuilder<>(parent).withAction(Optional.empty(), action);
   }
+  public InvokeReactiveParticipantStepBuilder<Data> notifyParticipant(Function<Data, Publisher<CommandWithDestination>> action) {
+    return new InvokeReactiveParticipantStepBuilder<>(parent).withNotificationAction(Optional.empty(), action);
+  }
 
   public InvokeReactiveParticipantStepBuilder<Data> invokeParticipant(Predicate<Data> participantInvocationPredicate,
                                                                       Function<Data, Publisher<CommandWithDestination>> action) {
@@ -65,4 +68,5 @@ public class ReactiveStepBuilder<Data> implements ReactiveWithCompensationBuilde
                                                                                          CommandEndpoint<C> commandEndpoint, Function<Data, Publisher<C>> commandProvider) {
     return new InvokeReactiveParticipantStepBuilder<>(parent).withCompensation(compensationPredicate, commandEndpoint, commandProvider);
   }
+
 }

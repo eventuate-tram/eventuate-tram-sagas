@@ -14,6 +14,21 @@ public class SagaInstance {
   private Boolean compensating = false;
   private Boolean failed = false;
 
+  @Override
+  public String toString() {
+    return "SagaInstance{" +
+            "sagaType='" + sagaType + '\'' +
+            ", id='" + id + '\'' +
+            ", lastRequestId='" + lastRequestId + '\'' +
+            ", serializedSagaData=" + serializedSagaData +
+            ", stateName='" + stateName + '\'' +
+            ", destinationsAndResources=" + destinationsAndResources +
+            ", endState=" + endState +
+            ", compensating=" + compensating +
+            ", failed=" + failed +
+            '}';
+  }
+
   public void setSagaType(String sagaType) {
     this.sagaType = sagaType;
   }

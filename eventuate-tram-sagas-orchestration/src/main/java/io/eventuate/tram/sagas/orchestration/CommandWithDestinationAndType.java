@@ -41,4 +41,8 @@ public class CommandWithDestinationAndType {
     public boolean isNotification() {
         return notification;
     }
+
+    boolean isCommand() {
+      return !isNotification();
+    }
 }
