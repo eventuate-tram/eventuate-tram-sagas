@@ -1,6 +1,7 @@
 package io.eventuate.tram.sagas.micronaut.participant;
 
 import io.eventuate.tram.commands.common.CommandNameMapping;
+import io.eventuate.tram.commands.consumer.CommandReplyProducer;
 import io.eventuate.tram.messaging.consumer.MessageConsumer;
 import io.eventuate.tram.messaging.producer.MessageProducer;
 import io.eventuate.tram.sagas.common.SagaLockManager;
@@ -15,7 +16,9 @@ public class SagaParticipantFactory {
   public SagaCommandDispatcherFactory sagaCommandDispatcherFactory(MessageConsumer messageConsumer,
                                                                    MessageProducer messageProducer,
                                                                    SagaLockManager sagaLockManager,
-                                                                   CommandNameMapping commandNameMapping) {
-    return new SagaCommandDispatcherFactory(messageConsumer, messageProducer, sagaLockManager, commandNameMapping);
+                                                                   CommandNameMapping commandNameMapping, CommandReplyProducer commandReplyProducer) {
+    return new SagaCommandDispatcherFactory(messageConsumer, messageProducer, sagaLockManager, commandNameMapping, commandReplyProducer);
   }
+
+
 }

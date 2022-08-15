@@ -4,11 +4,11 @@ import io.eventuate.common.json.mapper.JSonMapper;
 import io.eventuate.tram.commands.common.Command;
 import io.eventuate.tram.commands.common.CommandNameMapping;
 import io.eventuate.tram.commands.consumer.CommandMessage;
+import io.eventuate.tram.commands.consumer.CommandReplyProducer;
 import io.eventuate.tram.messaging.common.Message;
 import io.eventuate.tram.messaging.consumer.MessageConsumer;
-import io.eventuate.tram.messaging.producer.MessageProducer;
-import io.eventuate.tram.sagas.testing.commandhandling.SagaParticipantStubCommandHandler;
 import io.eventuate.tram.sagas.testing.commandhandling.ReconfigurableCommandHandlers;
+import io.eventuate.tram.sagas.testing.commandhandling.SagaParticipantStubCommandHandler;
 import io.eventuate.tram.sagas.testing.commandhandling.UnhandledMessageTrackingCommandDispatcher;
 
 import javax.annotation.PostConstruct;
@@ -25,22 +25,20 @@ import static io.eventuate.tram.commands.consumer.CommandHandlerReplyBuilder.wit
  */
 public class SagaParticipantStubManager {
   private final ReconfigurableCommandHandlers commandHandlers;
-  private Set<String> commandChannels;
+  private final Set<String> commandChannels;
   private final UnhandledMessageTrackingCommandDispatcher commandDispatcher;
   private String currentCommandChannel;
 
 
   public SagaParticipantStubManager(SagaParticipantChannels sagaParticipantChannels,
                                     MessageConsumer messageConsumer,
-                                    MessageProducer messageProducer,
-                                    CommandNameMapping commandNameMapping) {
+                                    CommandNameMapping commandNameMapping, CommandReplyProducer commandReplyProducer) {
     this.commandChannels = sagaParticipantChannels.getChannels();
     this.commandHandlers = new ReconfigurableCommandHandlers(this.commandChannels);
     this.commandDispatcher = new UnhandledMessageTrackingCommandDispatcher("SagaParticipantStubManager-command-dispatcher-" + System.currentTimeMillis(),
             commandHandlers,
             messageConsumer,
-            messageProducer,
-            commandNameMapping);
+            commandNameMapping, commandReplyProducer);
 
     /// TODO handle scenario where a command is recieved for which there is not a handler.
   }
@@ -88,7 +86,7 @@ public class SagaParticipantStubManager {
   }
 
 
-  public class SagaParticipantStubManagerHelper<C>  {
+  public class SagaParticipantStubManagerHelper<C extends Command>  {
     private Class<C> expectedCommandClass;
     private final Predicate<Message> expectedCommand;
     private SagaParticipantStubManager sagaParticipantStubManager;

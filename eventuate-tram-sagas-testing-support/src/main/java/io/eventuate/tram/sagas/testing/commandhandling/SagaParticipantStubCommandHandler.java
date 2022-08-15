@@ -2,21 +2,19 @@ package io.eventuate.tram.sagas.testing.commandhandling;
 
 import io.eventuate.tram.commands.common.Command;
 import io.eventuate.tram.commands.consumer.CommandHandler;
+import io.eventuate.tram.commands.consumer.CommandHandlerArgs;
 import io.eventuate.tram.commands.consumer.CommandMessage;
-import io.eventuate.tram.commands.consumer.PathVariables;
 import io.eventuate.tram.messaging.common.Message;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
 import static java.util.Collections.singletonList;
-import static org.junit.Assert.fail;
 
-public class SagaParticipantStubCommandHandler<C> extends CommandHandler {
+public class SagaParticipantStubCommandHandler<C extends Command> extends CommandHandler {
 
   private String commandChannel;
   private final Predicate<Message> expectedCommand;
@@ -24,7 +22,7 @@ public class SagaParticipantStubCommandHandler<C> extends CommandHandler {
   private final List<CommandMessage<C>> receivedCommands = new ArrayList<>();
 
   public SagaParticipantStubCommandHandler(String commandChannel, Class<C> expectedCommandClass, Predicate<Message> expectedCommand, Function<CommandMessage<C>, Message> replyBuilder) {
-    super(commandChannel, Optional.empty(), expectedCommandClass, (cm, pv) -> {
+    super(commandChannel, Optional.empty(), expectedCommandClass, args -> {
       // Dummy - override invoke method
       return null;
     });
@@ -34,7 +32,8 @@ public class SagaParticipantStubCommandHandler<C> extends CommandHandler {
   }
 
   @Override
-  public List<Message> invokeMethod(CommandMessage cm, Map<String, String> pathVars) {
+  public List<Message> invokeMethod(CommandHandlerArgs args) {
+    CommandMessage cm = args.getCommandMessage();
     receivedCommands.add(cm);
     return singletonList(replyBuilder.apply(cm));
   }

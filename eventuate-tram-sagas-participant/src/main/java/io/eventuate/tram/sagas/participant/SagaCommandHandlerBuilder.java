@@ -1,5 +1,6 @@
 package io.eventuate.tram.sagas.participant;
 
+import io.eventuate.tram.commands.common.Command;
 import io.eventuate.tram.commands.consumer.CommandHandlers;
 import io.eventuate.tram.commands.consumer.CommandMessage;
 import io.eventuate.tram.commands.consumer.PathVariables;
@@ -12,7 +13,7 @@ import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
-public class SagaCommandHandlerBuilder<C> implements AbstractSagaCommandHandlersBuilder{
+public class SagaCommandHandlerBuilder<C extends Command> implements AbstractSagaCommandHandlersBuilder {
   private final SagaCommandHandlersBuilder parent;
   private final SagaCommandHandler h;
 
@@ -23,22 +24,22 @@ public class SagaCommandHandlerBuilder<C> implements AbstractSagaCommandHandlers
   }
 
   @Override
-  public <C> SagaCommandHandlerBuilder<C> onMessageReturningMessages(Class<C> commandClass, Function<CommandMessage<C>, List<Message>> handler) {
+  public <C extends Command> SagaCommandHandlerBuilder<C> onMessageReturningMessages(Class<C> commandClass, Function<CommandMessage<C>, List<Message>> handler) {
     return parent.onMessageReturningMessages(commandClass, handler);
   }
 
   @Override
-  public <C> SagaCommandHandlerBuilder<C> onMessageReturningOptionalMessage(Class<C> commandClass, Function<CommandMessage<C>, Optional<Message>> handler) {
+  public <C extends Command> SagaCommandHandlerBuilder<C> onMessageReturningOptionalMessage(Class<C> commandClass, Function<CommandMessage<C>, Optional<Message>> handler) {
     return parent.onMessageReturningOptionalMessage(commandClass, handler);
   }
 
   @Override
-  public <C> SagaCommandHandlerBuilder<C> onMessage(Class<C> commandClass, Function<CommandMessage<C>, Message> handler) {
+  public <C extends Command> SagaCommandHandlerBuilder<C> onMessage(Class<C> commandClass, Function<CommandMessage<C>, Message> handler) {
     return parent.onMessage(commandClass, handler);
   }
 
   @Override
-  public <C> SagaCommandHandlerBuilder<C> onMessage(Class<C> commandClass, Consumer<CommandMessage<C>> handler) {
+  public <C extends Command> SagaCommandHandlerBuilder<C> onMessage(Class<C> commandClass, Consumer<CommandMessage<C>> handler) {
     return parent.onMessage(commandClass, handler);
   }
 

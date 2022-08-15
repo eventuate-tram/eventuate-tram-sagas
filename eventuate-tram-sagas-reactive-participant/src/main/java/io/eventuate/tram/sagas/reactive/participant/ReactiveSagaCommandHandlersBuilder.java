@@ -1,6 +1,7 @@
 package io.eventuate.tram.sagas.reactive.participant;
 
 
+import io.eventuate.tram.commands.common.Command;
 import io.eventuate.tram.commands.consumer.CommandMessage;
 import io.eventuate.tram.messaging.common.Message;
 import io.eventuate.tram.reactive.commands.consumer.ReactiveCommandHandler;
@@ -14,7 +15,7 @@ import java.util.function.Function;
 public class ReactiveSagaCommandHandlersBuilder implements AbstractReactiveSagaCommandHandlersBuilder {
   private String channel;
 
-  private List<ReactiveCommandHandler> handlers = new ArrayList<>();
+  private final List<ReactiveCommandHandler> handlers = new ArrayList<>();
 
   public static ReactiveSagaCommandHandlersBuilder fromChannel(String channel) {
     return new ReactiveSagaCommandHandlersBuilder().andFromChannel(channel);
@@ -26,9 +27,9 @@ public class ReactiveSagaCommandHandlersBuilder implements AbstractReactiveSagaC
   }
 
   @Override
-  public <C> ReactiveSagaCommandHandlerBuilder<C> onMessage(Class<C> commandClass,
-                                                            Function<CommandMessage<C>, Publisher<Message>> handler) {
-    ReactiveSagaCommandHandler h = new ReactiveSagaCommandHandler(channel, commandClass, handler);
+  public <C extends Command> ReactiveSagaCommandHandlerBuilder<C> onMessage(Class<C> commandClass,
+                                                                            Function<CommandMessage<C>, Publisher<Message>> handler) {
+    ReactiveSagaCommandHandler h = new ReactiveSagaCommandHandler(channel, commandClass, args -> handler.apply(args.getCommandMessage()));
 
     this.handlers.add(h);
     return new ReactiveSagaCommandHandlerBuilder<C>(this, h);

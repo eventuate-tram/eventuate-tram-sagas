@@ -1,8 +1,8 @@
 package io.eventuate.tram.sagas.micronaut.testing;
 
 import io.eventuate.tram.commands.common.CommandNameMapping;
+import io.eventuate.tram.commands.consumer.CommandReplyProducer;
 import io.eventuate.tram.messaging.consumer.MessageConsumer;
-import io.eventuate.tram.messaging.producer.MessageProducer;
 import io.eventuate.tram.sagas.testing.SagaParticipantChannels;
 import io.eventuate.tram.sagas.testing.SagaParticipantStubManager;
 import io.micronaut.context.annotation.Factory;
@@ -15,8 +15,9 @@ public class SagaParticipantStubManagerFactory {
   @Singleton
   public SagaParticipantStubManager sagaParticipantStubManager(SagaParticipantChannels sagaParticipantChannels,
                                                                MessageConsumer messageConsumer,
-                                                               MessageProducer messageProducer,
-                                                               CommandNameMapping commandNameMapping) {
-    return new SagaParticipantStubManager(sagaParticipantChannels, messageConsumer, messageProducer, commandNameMapping);
+                                                               CommandNameMapping commandNameMapping, CommandReplyProducer commandReplyProducer) {
+    return new SagaParticipantStubManager(sagaParticipantChannels, messageConsumer, commandNameMapping, commandReplyProducer);
   }
+
+
 }

@@ -1,12 +1,13 @@
 package io.eventuate.tram.sagas.testing.commandhandling;
 
+import io.eventuate.tram.commands.common.Command;
 import io.eventuate.tram.commands.common.CommandNameMapping;
 import io.eventuate.tram.commands.consumer.CommandDispatcher;
 import io.eventuate.tram.commands.consumer.CommandHandler;
 import io.eventuate.tram.commands.consumer.CommandHandlers;
+import io.eventuate.tram.commands.consumer.CommandReplyProducer;
 import io.eventuate.tram.messaging.common.Message;
 import io.eventuate.tram.messaging.consumer.MessageConsumer;
-import io.eventuate.tram.messaging.producer.MessageProducer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -26,9 +27,8 @@ public class UnhandledMessageTrackingCommandDispatcher extends CommandDispatcher
   public UnhandledMessageTrackingCommandDispatcher(String commandDispatcherId,
                                                    CommandHandlers commandHandlers,
                                                    MessageConsumer messageConsumer,
-                                                   MessageProducer messageProducer,
-                                                   CommandNameMapping commandNameMapping) {
-    super(commandDispatcherId, commandHandlers, messageConsumer, messageProducer, commandNameMapping);
+                                                   CommandNameMapping commandNameMapping, CommandReplyProducer commandReplyProducer) {
+    super(commandDispatcherId, commandHandlers, messageConsumer, commandNameMapping, commandReplyProducer);
     this.commandHandlers = commandHandlers;
   }
 
@@ -49,7 +49,7 @@ public class UnhandledMessageTrackingCommandDispatcher extends CommandDispatcher
     unhandledMessages.clear();
   }
 
-  public <C> void noteNewCommandHandler(SagaParticipantStubCommandHandler<C> commandHandler) {
+  public <C extends Command> void noteNewCommandHandler(SagaParticipantStubCommandHandler<C> commandHandler) {
     List<Message> handled = unhandledMessages.stream().filter(commandHandler::handles).collect(toList());
     if (!handled.isEmpty())
       logger.info("Processing unhandled messages {}", handled);

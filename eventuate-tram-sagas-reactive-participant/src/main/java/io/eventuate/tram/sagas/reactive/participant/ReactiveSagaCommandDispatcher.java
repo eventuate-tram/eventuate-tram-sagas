@@ -3,6 +3,7 @@ package io.eventuate.tram.sagas.reactive.participant;
 import io.eventuate.tram.commands.common.CommandMessageHeaders;
 import io.eventuate.tram.commands.consumer.CommandHandlerParams;
 import io.eventuate.tram.commands.consumer.CommandMessage;
+import io.eventuate.tram.commands.consumer.CommandReplyToken;
 import io.eventuate.tram.commands.consumer.PathVariables;
 import io.eventuate.tram.consumer.common.reactive.ReactiveMessageConsumer;
 import io.eventuate.tram.messaging.common.Message;
@@ -10,13 +11,14 @@ import io.eventuate.tram.messaging.producer.MessageBuilder;
 import io.eventuate.tram.reactive.commands.consumer.ReactiveCommandDispatcher;
 import io.eventuate.tram.reactive.commands.consumer.ReactiveCommandHandler;
 import io.eventuate.tram.reactive.commands.consumer.ReactiveCommandHandlers;
-import io.eventuate.tram.reactive.messaging.producer.common.ReactiveMessageProducer;
+import io.eventuate.tram.reactive.commands.consumer.ReactiveCommandReplyProducer;
 import io.eventuate.tram.sagas.common.*;
 import io.eventuate.tram.sagas.participant.SagaReplyMessage;
 import io.eventuate.tram.sagas.reactive.common.ReactiveSagaLockManager;
 import org.reactivestreams.Publisher;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+
 import java.util.Optional;
 
 public class ReactiveSagaCommandDispatcher extends ReactiveCommandDispatcher {
@@ -26,9 +28,9 @@ public class ReactiveSagaCommandDispatcher extends ReactiveCommandDispatcher {
   public ReactiveSagaCommandDispatcher(String commandDispatcherId,
                                        ReactiveCommandHandlers target,
                                        ReactiveMessageConsumer messageConsumer,
-                                       ReactiveMessageProducer messageProducer,
-                                       ReactiveSagaLockManager sagaLockManager) {
-    super(commandDispatcherId, target, messageConsumer, messageProducer);
+                                       ReactiveSagaLockManager sagaLockManager,
+                                       ReactiveCommandReplyProducer commandReplyProducer) {
+    super(commandDispatcherId, target, messageConsumer, commandReplyProducer);
 
     this.sagaLockManager = sagaLockManager;
   }
@@ -62,7 +64,7 @@ public class ReactiveSagaCommandDispatcher extends ReactiveCommandDispatcher {
 
 
   @Override
-  protected Publisher<Message> invoke(ReactiveCommandHandler commandHandler, CommandMessage cm, CommandHandlerParams commandHandlerParams) {
+  protected Publisher<Message> invoke(ReactiveCommandHandler commandHandler, CommandMessage cm, CommandHandlerParams commandHandlerParams, CommandReplyToken commandReplyToken) {
     Optional<String> lockedTarget = Optional.empty();
 
     Flux<Message> result = Flux.empty();
@@ -86,7 +88,7 @@ public class ReactiveSagaCommandDispatcher extends ReactiveCommandDispatcher {
       }
     }
 
-    result = result.thenMany(super.invoke(commandHandler, cm, commandHandlerParams)).cache();
+    result = result.thenMany(super.invoke(commandHandler, cm, commandHandlerParams, commandReplyToken)).cache();
     Flux<Message> finalizedResult = result;
 
     if (lockedTarget.isPresent())

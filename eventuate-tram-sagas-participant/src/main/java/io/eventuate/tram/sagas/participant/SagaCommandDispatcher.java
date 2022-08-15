@@ -2,15 +2,10 @@ package io.eventuate.tram.sagas.participant;
 
 import io.eventuate.tram.commands.common.CommandMessageHeaders;
 import io.eventuate.tram.commands.common.CommandNameMapping;
-import io.eventuate.tram.commands.consumer.CommandDispatcher;
-import io.eventuate.tram.commands.consumer.CommandHandler;
-import io.eventuate.tram.commands.consumer.CommandHandlers;
-import io.eventuate.tram.commands.consumer.CommandMessage;
-import io.eventuate.tram.commands.consumer.PathVariables;
+import io.eventuate.tram.commands.consumer.*;
 import io.eventuate.tram.messaging.common.Message;
 import io.eventuate.tram.messaging.consumer.MessageConsumer;
 import io.eventuate.tram.messaging.producer.MessageBuilder;
-import io.eventuate.tram.messaging.producer.MessageProducer;
 import io.eventuate.tram.sagas.common.*;
 
 import java.util.List;
@@ -25,10 +20,9 @@ public class SagaCommandDispatcher extends CommandDispatcher {
   public SagaCommandDispatcher(String commandDispatcherId,
                                CommandHandlers target,
                                MessageConsumer messageConsumer,
-                               MessageProducer messageProducer,
                                SagaLockManager sagaLockManager,
-                               CommandNameMapping commandNameMapping) {
-    super(commandDispatcherId, target, messageConsumer, messageProducer, commandNameMapping);
+                               CommandNameMapping commandNameMapping, CommandReplyProducer commandReplyProducer) {
+    super(commandDispatcherId, target, messageConsumer, commandNameMapping, commandReplyProducer);
     this.sagaLockManager = sagaLockManager;
   }
 
@@ -61,7 +55,7 @@ public class SagaCommandDispatcher extends CommandDispatcher {
 
 
   @Override
-  protected List<Message> invoke(CommandHandler commandHandler, CommandMessage cm, Map<String, String> pathVars) {
+  protected List<Message> invoke(CommandHandler commandHandler, CommandMessage cm, Map<String, String> pathVars, CommandReplyToken commandReplyToken) {
     Optional<String> lockedTarget = Optional.empty();
     if (commandHandler instanceof SagaCommandHandler) {
       SagaCommandHandler sch = (SagaCommandHandler) commandHandler;
@@ -77,7 +71,7 @@ public class SagaCommandDispatcher extends CommandDispatcher {
       }
     }
 
-    List<Message> messages = super.invoke(commandHandler, cm, pathVars);
+    List<Message> messages = super.invoke(commandHandler, cm, pathVars, commandReplyToken);
 
     if (lockedTarget.isPresent())
       return addLockedHeader(messages, lockedTarget.get());

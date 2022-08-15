@@ -1,5 +1,6 @@
 package io.eventuate.tram.sagas.reactive.participant;
 
+import io.eventuate.tram.commands.common.Command;
 import io.eventuate.tram.commands.consumer.CommandMessage;
 import io.eventuate.tram.commands.consumer.PathVariables;
 import io.eventuate.tram.messaging.common.Message;
@@ -11,7 +12,7 @@ import org.reactivestreams.Publisher;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 
-public class ReactiveSagaCommandHandlerBuilder<C> implements AbstractReactiveSagaCommandHandlersBuilder {
+public class ReactiveSagaCommandHandlerBuilder<C extends Command> implements AbstractReactiveSagaCommandHandlersBuilder {
   private final ReactiveSagaCommandHandlersBuilder parent;
   private final ReactiveSagaCommandHandler h;
 
@@ -22,7 +23,7 @@ public class ReactiveSagaCommandHandlerBuilder<C> implements AbstractReactiveSag
   }
 
   @Override
-  public <C> ReactiveSagaCommandHandlerBuilder<C> onMessage(Class<C> commandClass, Function<CommandMessage<C>, Publisher<Message>> handler) {
+  public <C extends Command> ReactiveSagaCommandHandlerBuilder<C> onMessage(Class<C> commandClass, Function<CommandMessage<C>, Publisher<Message>> handler) {
     return parent.onMessage(commandClass, handler);
   }
 

@@ -1,6 +1,7 @@
 package io.eventuate.tram.sagas.participant;
 
 
+import io.eventuate.tram.commands.common.Command;
 import io.eventuate.tram.commands.consumer.CommandHandler;
 import io.eventuate.tram.commands.consumer.CommandHandlers;
 import io.eventuate.tram.commands.consumer.CommandMessage;
@@ -16,7 +17,7 @@ import java.util.function.Function;
 public class SagaCommandHandlersBuilder implements AbstractSagaCommandHandlersBuilder {
   private String channel;
 
-  private List<CommandHandler> handlers = new ArrayList<>();
+  private final List<CommandHandler> handlers = new ArrayList<>();
 
   public static SagaCommandHandlersBuilder fromChannel(String channel) {
     return new SagaCommandHandlersBuilder().andFromChannel(channel);
@@ -28,39 +29,39 @@ public class SagaCommandHandlersBuilder implements AbstractSagaCommandHandlersBu
   }
 
   @Override
-  public <C> SagaCommandHandlerBuilder<C> onMessageReturningMessages(Class<C> commandClass,
-                                                                     Function<CommandMessage<C>, List<Message>> handler) {
-    SagaCommandHandler h = new SagaCommandHandler(channel, commandClass, handler);
+  public <C extends Command> SagaCommandHandlerBuilder<C> onMessageReturningMessages(Class<C> commandClass,
+                                                                                     Function<CommandMessage<C>, List<Message>> handler) {
+    SagaCommandHandler h = new SagaCommandHandler(channel, commandClass, args -> handler.apply(args.getCommandMessage()));
     this.handlers.add(h);
-    return new SagaCommandHandlerBuilder<C>(this, h);
+    return new SagaCommandHandlerBuilder<>(this, h);
   }
 
   @Override
-  public <C> SagaCommandHandlerBuilder<C> onMessageReturningOptionalMessage(Class<C> commandClass,
+  public <C extends Command> SagaCommandHandlerBuilder<C> onMessageReturningOptionalMessage(Class<C> commandClass,
                                                                             Function<CommandMessage<C>, Optional<Message>> handler) {
-    SagaCommandHandler h = new SagaCommandHandler(channel, commandClass, (c) -> handler.apply(c).map(Collections::singletonList).orElse(Collections.EMPTY_LIST));
+    SagaCommandHandler h = new SagaCommandHandler(channel, commandClass, args -> handler.apply(args.getCommandMessage()).map(Collections::singletonList).orElse(Collections.emptyList()));
     this.handlers.add(h);
-    return new SagaCommandHandlerBuilder<C>(this, h);
+    return new SagaCommandHandlerBuilder<>(this, h);
   }
 
   @Override
-  public <C> SagaCommandHandlerBuilder<C> onMessage(Class<C> commandClass,
+  public <C extends Command> SagaCommandHandlerBuilder<C> onMessage(Class<C> commandClass,
                                                     Function<CommandMessage<C>, Message> handler) {
     SagaCommandHandler h = new SagaCommandHandler(channel, commandClass,
-            (c) -> Collections.singletonList(handler.apply(c)));
+            args -> Collections.singletonList(handler.apply(args.getCommandMessage())));
     this.handlers.add(h);
-    return new SagaCommandHandlerBuilder<C>(this, h);
+    return new SagaCommandHandlerBuilder<>(this, h);
   }
 
   @Override
-  public <C> SagaCommandHandlerBuilder<C> onMessage(Class<C> commandClass, Consumer<CommandMessage<C>> handler) {
+  public <C extends Command> SagaCommandHandlerBuilder<C> onMessage(Class<C> commandClass, Consumer<CommandMessage<C>> handler) {
     SagaCommandHandler h = new SagaCommandHandler(channel, commandClass,
-            (c) -> {
-              handler.accept(c);
+            args -> {
+              handler.accept(args.getCommandMessage());
               return Collections.emptyList();
             });
     this.handlers.add(h);
-    return new SagaCommandHandlerBuilder<C>(this, h);
+    return new SagaCommandHandlerBuilder<>(this, h);
   }
 
   public CommandHandlers build() {
