@@ -5,12 +5,14 @@ import io.eventuate.tram.commands.common.Command;
 import io.eventuate.tram.commands.consumer.CommandHandler;
 import io.eventuate.tram.commands.consumer.CommandHandlers;
 import io.eventuate.tram.commands.consumer.CommandMessage;
+import io.eventuate.tram.commands.consumer.CommandReplyToken;
 import io.eventuate.tram.messaging.common.Message;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
@@ -58,6 +60,16 @@ public class SagaCommandHandlersBuilder implements AbstractSagaCommandHandlersBu
     SagaCommandHandler h = new SagaCommandHandler(channel, commandClass,
             args -> {
               handler.accept(args.getCommandMessage());
+              return Collections.emptyList();
+            });
+    this.handlers.add(h);
+    return new SagaCommandHandlerBuilder<>(this, h);
+  }
+
+  public <C extends Command> SagaCommandHandlerBuilder<C> onMessage(Class<C> commandClass, BiConsumer<CommandMessage<C>, CommandReplyToken> handler) {
+    SagaCommandHandler h = new SagaCommandHandler(channel, commandClass,
+            args -> {
+              handler.accept(args.getCommandMessage(), args.getCommandReplyToken());
               return Collections.emptyList();
             });
     this.handlers.add(h);
