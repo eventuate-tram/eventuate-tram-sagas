@@ -4,3 +4,4 @@ build/
 *.iml
 *.log
 out
+**/bin/**

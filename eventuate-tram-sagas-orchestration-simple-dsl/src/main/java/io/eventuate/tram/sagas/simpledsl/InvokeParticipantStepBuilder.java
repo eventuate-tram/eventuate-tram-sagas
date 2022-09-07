@@ -50,6 +50,11 @@ public class InvokeParticipantStepBuilder<Data> implements WithCompensationBuild
     return this;
   }
 
+  public InvokeParticipantStepBuilder<Data> withCompensationNotification(Predicate<Data> compensationPredicate, Function<Data, CommandWithDestination> compensation) {
+    this.compensation = Optional.of(new ParticipantInvocationImpl<>(Optional.of(compensationPredicate), compensation, true));
+    return this;
+  }
+
   @Override
   public InvokeParticipantStepBuilder<Data> withCompensation(Predicate<Data> compensationPredicate, Function<Data, CommandWithDestination> compensation) {
     this.compensation = Optional.of(new ParticipantInvocationImpl<>(Optional.of(compensationPredicate), compensation));

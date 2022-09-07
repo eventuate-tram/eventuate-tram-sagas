@@ -61,4 +61,8 @@ public class StepBuilder<Data> implements WithCompensationBuilder<Data> {
   public InvokeParticipantStepBuilder<Data> notifyParticipant(Function<Data, CommandWithDestination> notificationAction) {
     return new InvokeParticipantStepBuilder<>(parent).withNotificationAction(Optional.empty(), notificationAction);
   }
+
+  public InvokeParticipantStepBuilder<Data> notifyParticipant(Predicate<Data> participantInvocationPredicate, Function<Data, CommandWithDestination> notificationAction) {
+    return new InvokeParticipantStepBuilder<>(parent).withNotificationAction(Optional.of(participantInvocationPredicate), notificationAction);
+  }
 }
