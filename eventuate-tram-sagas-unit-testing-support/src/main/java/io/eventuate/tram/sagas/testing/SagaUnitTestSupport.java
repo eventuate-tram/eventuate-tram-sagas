@@ -246,8 +246,8 @@ public class SagaUnitTestSupport<T> {
     return this;
   }
 
-  public MultipleCommandsExpected multiple() {
-    return new MultipleCommandsExpected(this);
+  public MultipleCommandsExpected<T> multiple() {
+    return new MultipleCommandsExpected<>(this);
   }
 
 }

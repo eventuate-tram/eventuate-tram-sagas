@@ -4,6 +4,7 @@ import io.eventuate.tram.commands.common.CommandReplyOutcome;
 import io.eventuate.tram.commands.common.ReplyMessageHeaders;
 import io.eventuate.tram.messaging.common.Message;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
@@ -11,12 +12,16 @@ import java.util.function.Consumer;
 import static io.eventuate.tram.sagas.simpledsl.StepOutcome.makeLocalOutcome;
 
 public class LocalStep<Data> implements SagaStep<Data> {
-  private Consumer<Data> localFunction;
-  private Optional<Consumer<Data>> compensation;
+  private final Consumer<Data> localFunction;
+  private final Optional<Consumer<Data>> compensation;
+  private final List<LocalExceptionSaver<Data>> localExceptionSavers;
+  private final List<Class<RuntimeException>> rollbackExceptions;
 
-  public LocalStep(Consumer<Data> localFunction, Optional<Consumer<Data>> compensation) {
+  public LocalStep(Consumer<Data> localFunction, Optional<Consumer<Data>> compensation, List<LocalExceptionSaver<Data>> localExceptionSavers, List<Class<RuntimeException>> rollbackExceptions) {
     this.localFunction = localFunction;
     this.compensation = compensation;
+    this.localExceptionSavers = localExceptionSavers;
+    this.rollbackExceptions = rollbackExceptions;
   }
 
   @Override
@@ -51,7 +56,11 @@ public class LocalStep<Data> implements SagaStep<Data> {
       }
       return makeLocalOutcome(Optional.empty());
     } catch (RuntimeException e) {
-      return makeLocalOutcome(Optional.of(e));
+      localExceptionSavers.stream().filter(saver -> saver.shouldSave(e)).findFirst().ifPresent(saver -> saver.save(data, e));
+      if (rollbackExceptions.isEmpty() || rollbackExceptions.stream().anyMatch(c -> c.isInstance(e)))
+        return makeLocalOutcome(Optional.of(e));
+      else
+        throw e;
     }
   }
 
