@@ -32,8 +32,8 @@ public class SagaLockManagerIntegrationTest {
   @Test
   public void shouldClaimLock() {
 
-    String sagaId = idGenerator.genId(null).toString();
-    String target  = "/target/" + idGenerator.genId(null).toString();
+    String sagaId = idGenerator.genIdAsString();
+    String target  = "/target/" + idGenerator.genIdAsString();
 
     assertTrue(sagaLockManager.claimLock(sagaType, sagaId, target));
 
@@ -42,9 +42,9 @@ public class SagaLockManagerIntegrationTest {
   @Test
   public void shouldNotClaimLock() {
 
-    String sagaId1 = idGenerator.genId(null).toString();
-    String sagaId2 = idGenerator.genId(null).toString();
-    String target  = "/target/" + idGenerator.genId(null).toString();
+    String sagaId1 = idGenerator.genIdAsString();
+    String sagaId2 = idGenerator.genIdAsString();
+    String target  = "/target/" + idGenerator.genIdAsString();
 
     assertTrue(sagaLockManager.claimLock(sagaType, sagaId1, target));
     assertFalse(sagaLockManager.claimLock(sagaType, sagaId2, target));
@@ -53,9 +53,9 @@ public class SagaLockManagerIntegrationTest {
 
   @Test
   public void shouldStashMessage() {
-    String sagaId = idGenerator.genId(null).toString();
-    String target  = "/target/" + idGenerator.genId(null).toString();
-    String messageId = idGenerator.genId(null).toString();
+    String sagaId = idGenerator.genIdAsString();
+    String target  = "/target/" + idGenerator.genIdAsString();
+    String messageId = idGenerator.genIdAsString();
 
     Message message = MessageBuilder.withPayload("hello").withHeader(Message.ID, messageId).build();
     sagaLockManager.stashMessage(sagaType, sagaId, target, message);
@@ -64,10 +64,10 @@ public class SagaLockManagerIntegrationTest {
   @Test
   public void shouldReleaseLockAndUnstashMessage() {
 
-    String sagaId1 = idGenerator.genId(null).toString();
-    String sagaId2 = idGenerator.genId(null).toString();
-    String target  = "/target/" + idGenerator.genId(null).toString();
-    String messageId = idGenerator.genId(null).toString();
+    String sagaId1 = idGenerator.genIdAsString();
+    String sagaId2 = idGenerator.genIdAsString();
+    String target  = "/target/" + idGenerator.genIdAsString();
+    String messageId = idGenerator.genIdAsString();
 
     assertTrue(sagaLockManager.claimLock(sagaType, sagaId1, target));
     assertFalse(sagaLockManager.claimLock(sagaType, sagaId2, target));

@@ -30,7 +30,7 @@ public class SagaInstanceRepositoryJdbc implements SagaInstanceRepository {
 
   @Override
   public void save(SagaInstance sagaInstance) {
-    sagaInstance.setId(idGenerator.genId(null).asString());
+    sagaInstance.setId(idGenerator.genIdAsString());
     logger.info("Saving {} {}", sagaInstance.getSagaType(), sagaInstance.getId());
 
     eventuateJdbcStatementExecutor.update(sagaInstanceRepositorySql.getInsertIntoSagaInstanceSql(),
