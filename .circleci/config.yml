@@ -69,7 +69,7 @@ jobs:
             # https://github.com/docker/buildx/issues/493#issuecomment-754834977
             # https://github.com/tonistiigi/binfmt#installing-emulators
 
-            docker run --privileged --rm tonistiigi/binfmt --install arm64,arm
+            docker run --privileged --rm tonistiigi/binfmt:qemu-v6.2.0 --install arm64,arm
 
             ./build-multi-arch-images.sh
   deploy-multi-arch:
@@ -92,7 +92,7 @@ workflows:
           script: |
             docker context create tls-env
             docker buildx create tls-env --use
-            docker run --privileged --rm tonistiigi/binfmt --install arm64,arm
+            docker run --privileged --rm tonistiigi/binfmt:qemu-v6.2.0 --install arm64,arm
             export DOCKER_HOST_NAME=$(hostname)
             ./build-and-test-all-multi-arch-locally-mysql-kafka.sh
       - build-and-test/build-and-test:
@@ -102,7 +102,7 @@ workflows:
           script: |
             docker context create tls-env
             docker buildx create tls-env --use
-            docker run --privileged --rm tonistiigi/binfmt --install amd64
+            docker run --privileged --rm tonistiigi/binfmt:qemu-v6.2.0 --install amd64
             hostname -I
             export DOCKER_HOST_NAME=$(hostname -I | sed -e 's/ .*//g')
             echo $DOCKER_HOST_NAME
