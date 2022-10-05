@@ -34,6 +34,7 @@ public class CustomersAndOrdersIntegrationTest {
   @Configuration
   @Import({OrderConfiguration.class, CustomerConfiguration.class})
   public static class Config {
+
   }
 
   private static final String CUSTOMER_NAME = "John";
@@ -61,6 +62,8 @@ public class CustomersAndOrdersIntegrationTest {
   @Test
   public void shouldReject() {
     Customer customer = customerService.createCustomer(CUSTOMER_NAME, new Money("10.00")).block();
+
+    System.out.println("CustomerID=" + customer.getId());
 
     Order order = orderSagaService.createOrder(new OrderDetails(customer.getId(), new Money("12.34"))).block();
 
