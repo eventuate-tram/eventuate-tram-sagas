@@ -1,5 +1,7 @@
 #! /bin/bash -e
 
+./gradlew testClasses
+
 export EVENTUATE_COMMON_VERSION=$(sed < gradle.properties -e '/eventuateCommonImageVersion=/!d' -e 's/.*=//')
 
 ./mysql/build-docker-multi-arch.sh

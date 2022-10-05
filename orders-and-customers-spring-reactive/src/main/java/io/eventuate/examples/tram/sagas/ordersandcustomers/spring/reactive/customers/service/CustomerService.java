@@ -46,7 +46,7 @@ public class CustomerService {
                       .collectList()
                       .flatMap(creditReservations -> handleCreditReservation(creditReservations, customer, orderId, customerId, orderTotal));
             })
-            .switchIfEmpty(Mono.error(new CustomerNotFoundException()))
+            .switchIfEmpty(Mono.error(new CustomerNotFoundException(customerId)))
             .doOnError(throwable -> logger.error("credit reservation failed", throwable));
   }
 

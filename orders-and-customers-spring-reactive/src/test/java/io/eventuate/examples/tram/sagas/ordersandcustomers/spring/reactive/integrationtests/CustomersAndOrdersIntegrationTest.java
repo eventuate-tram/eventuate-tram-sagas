@@ -51,6 +51,8 @@ public class CustomersAndOrdersIntegrationTest {
   public void shouldApprove() {
     Customer customer = customerService.createCustomer(CUSTOMER_NAME, new Money("15.00")).block();
 
+    System.out.println("CustomerID=" + customer.getId());
+
     Order order = orderSagaService.createOrder(new OrderDetails(customer.getId(), new Money("12.34"))).block();
 
     assertOrderState(order.getId(), Optional.of(OrderState.APPROVED), Optional.empty());
