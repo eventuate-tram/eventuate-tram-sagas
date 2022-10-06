@@ -9,19 +9,22 @@ import io.eventuate.examples.tram.sagas.ordersandcustomers.spring.reactive.order
 import io.eventuate.tram.commands.consumer.CommandWithDestination;
 import io.eventuate.tram.sagas.reactive.orchestration.ReactiveSagaDefinition;
 import io.eventuate.tram.sagas.reactive.simpledsl.SimpleReactiveSaga;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import reactor.core.publisher.Mono;
 
 import static io.eventuate.tram.commands.consumer.CommandWithDestinationBuilder.send;
 
 public class CreateOrderSaga implements SimpleReactiveSaga<CreateOrderSagaData> {
+  private final Logger logger = LoggerFactory.getLogger(getClass());
 
-  private OrderService orderService;
+  private final OrderService orderService;
 
   public CreateOrderSaga(OrderService orderService) {
     this.orderService = orderService;
   }
 
-  private ReactiveSagaDefinition<CreateOrderSagaData> sagaDefinition =
+  private final ReactiveSagaDefinition<CreateOrderSagaData> sagaDefinition =
           step()
             .invokeLocal(this::create)
             .withCompensation(this::reject)
@@ -52,6 +55,7 @@ public class CreateOrderSaga implements SimpleReactiveSaga<CreateOrderSagaData> 
     return orderService
             .createOrder(data.getOrderDetails())
             .map(o -> {
+              logger.info("saga createOrder() with ID={}", o.getId());
               data.setOrderId(o.getId());
               return o;
             });

@@ -15,6 +15,8 @@ import io.eventuate.examples.tram.sagas.ordersandcustomers.spring.reactive.order
 import io.eventuate.util.test.async.Eventually;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Configuration;
@@ -30,6 +32,8 @@ import static org.junit.Assert.assertEquals;
 @SpringBootTest(classes = CustomersAndOrdersIntegrationTest.Config.class,
         webEnvironment = SpringBootTest.WebEnvironment.NONE)
 public class CustomersAndOrdersIntegrationTest {
+
+  private final Logger logger = LoggerFactory.getLogger(getClass());
 
   @Configuration
   @Import({OrderConfiguration.class, CustomerConfiguration.class})
@@ -52,7 +56,7 @@ public class CustomersAndOrdersIntegrationTest {
   public void shouldApprove() {
     Customer customer = customerService.createCustomer(CUSTOMER_NAME, new Money("15.00")).block();
 
-    System.out.println("CustomerID=" + customer.getId());
+    logger.info("shouldApprove CustomerID={}", customer.getId());
 
     Order order = orderSagaService.createOrder(new OrderDetails(customer.getId(), new Money("12.34"))).block();
 
@@ -63,7 +67,7 @@ public class CustomersAndOrdersIntegrationTest {
   public void shouldReject() {
     Customer customer = customerService.createCustomer(CUSTOMER_NAME, new Money("10.00")).block();
 
-    System.out.println("CustomerID=" + customer.getId());
+    logger.info("shouldReject CustomerID={}", customer.getId());
 
     Order order = orderSagaService.createOrder(new OrderDetails(customer.getId(), new Money("12.34"))).block();
 
@@ -79,7 +83,11 @@ public class CustomersAndOrdersIntegrationTest {
 
   @Test
   public void shouldRejectBecauseOfNonExistingUser() {
-    Order order = orderSagaService.createOrder(new OrderDetails(System.currentTimeMillis(), new Money("12.34"))).block();
+    long customerId = System.currentTimeMillis();
+
+    logger.info("shouldRejectBecauseOfNonExistingUser CustomerID={}", customerId);
+
+    Order order = orderSagaService.createOrder(new OrderDetails(customerId, new Money("12.34"))).block();
 
     assertOrderState(order.getId(), Optional.of(OrderState.REJECTED), Optional.of(RejectionReason.UNKNOWN_CUSTOMER));
   }
