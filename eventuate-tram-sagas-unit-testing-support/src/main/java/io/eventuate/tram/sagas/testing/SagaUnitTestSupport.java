@@ -77,7 +77,7 @@ public class SagaUnitTestSupport<T> {
       sentCommands.add(new MessageWithDestination(destination, message));
     }, commandNameMapping);
 
-    SagaCommandProducer sagaCommandProducer = new SagaCommandProducer(commandProducer);
+    SagaCommandProducer sagaCommandProducer = new SagaCommandProducerImpl(commandProducer);
 
     MessageConsumer messageConsumer = null;
     SagaLockManager sagaLockManager = null;

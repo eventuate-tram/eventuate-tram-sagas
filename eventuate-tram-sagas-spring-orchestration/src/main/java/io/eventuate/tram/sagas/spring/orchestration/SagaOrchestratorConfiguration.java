@@ -28,7 +28,7 @@ public class SagaOrchestratorConfiguration {
 
   @Bean
   public SagaCommandProducer sagaCommandProducer(CommandProducer commandProducer) {
-    return new SagaCommandProducer(commandProducer);
+    return new SagaCommandProducerImpl(commandProducer);
   }
 
   @Bean

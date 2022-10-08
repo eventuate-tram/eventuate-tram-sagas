@@ -29,7 +29,7 @@ public class InMemorySagaOrchestrationAndParticipants {
                                                                 InMemoryCommandProducer inMemoryCommandProducer,
                                                                 List<Saga<?>> sagas,
                                                                 Function<InMemorySagaOrchestrationAndParticipants, CommandHandlers> commandHandlersSupplier) {
-        SagaCommandProducer sagaCommandProducer = new SagaCommandProducer(inMemoryCommandProducer.commandProducer);
+        SagaCommandProducer sagaCommandProducer = new SagaCommandProducerImpl(inMemoryCommandProducer.commandProducer);
 
         SagaLockManager sagaLockManager = new SagaLockManager() {
 

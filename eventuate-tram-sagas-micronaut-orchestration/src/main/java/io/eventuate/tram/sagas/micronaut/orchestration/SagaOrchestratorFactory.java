@@ -1,7 +1,6 @@
 package io.eventuate.tram.sagas.micronaut.orchestration;
 
 import io.eventuate.common.id.ApplicationIdGenerator;
-import io.eventuate.common.id.IdGenerator;
 import io.eventuate.common.jdbc.EventuateJdbcStatementExecutor;
 import io.eventuate.common.jdbc.EventuateSchema;
 import io.eventuate.tram.commands.producer.CommandProducer;
@@ -23,7 +22,7 @@ public class SagaOrchestratorFactory {
 
   @Singleton
   public SagaCommandProducer sagaCommandProducer(CommandProducer commandProducer) {
-    return new SagaCommandProducer(commandProducer);
+    return new SagaCommandProducerImpl(commandProducer);
   }
 
   @Singleton
