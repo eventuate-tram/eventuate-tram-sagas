@@ -93,7 +93,7 @@ public class CustomersAndOrdersIntegrationTest {
   }
 
   private void assertOrderState(Long id, Optional<OrderState> expectedState, Optional<RejectionReason> expectedRejectionReason) {
-    Eventually.eventually(60, 500, TimeUnit.MILLISECONDS, () -> {
+    Eventually.eventually(90, 500, TimeUnit.MILLISECONDS, () -> {
       Order order = orderRepository.findById(id).block();
 
       assertEquals(expectedState.map(Enum::name).orElse(null), order.getState());
