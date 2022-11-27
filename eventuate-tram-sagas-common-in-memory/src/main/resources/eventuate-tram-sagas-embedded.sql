@@ -14,9 +14,9 @@ CREATE TABLE IF NOT EXISTS eventuate.saga_instance(
   saga_id VARCHAR(100) NOT NULL,
   state_name VARCHAR(100) NOT NULL,
   last_request_id VARCHAR(100),
-  end_state INT(1),
-  compensating INT(1),
-  failed INT(1),
+  end_state TINYINT,
+  compensating TINYINT,
+  failed TINYINT,
   saga_data_type VARCHAR(1000) NOT NULL,
   saga_data_json VARCHAR(1000) NOT NULL,
   PRIMARY KEY(saga_type, saga_id)
