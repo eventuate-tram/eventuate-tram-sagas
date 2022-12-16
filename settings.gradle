@@ -43,4 +43,7 @@ include 'orders-and-customers-micronaut-local-saga-in-memory-integration-tests'
 include 'eventuate-tram-sagas-spring-orchestration-simple-dsl-starter'
 include 'eventuate-tram-sagas-spring-reactive-participant-starter'
 include 'eventuate-tram-sagas-spring-participant-starter'
+
+include 'eventuate-tram-sagas-spring-flyway'
+
 include 'eventuate-tram-sagas-bom'
