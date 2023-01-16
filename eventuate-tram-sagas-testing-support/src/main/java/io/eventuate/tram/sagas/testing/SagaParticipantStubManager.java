@@ -11,7 +11,6 @@ import io.eventuate.tram.sagas.testing.commandhandling.ReconfigurableCommandHand
 import io.eventuate.tram.sagas.testing.commandhandling.SagaParticipantStubCommandHandler;
 import io.eventuate.tram.sagas.testing.commandhandling.UnhandledMessageTrackingCommandDispatcher;
 
-import javax.annotation.PostConstruct;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.function.Predicate;
@@ -43,8 +42,6 @@ public class SagaParticipantStubManager {
     /// TODO handle scenario where a command is recieved for which there is not a handler.
   }
 
-
-  @PostConstruct
   public void initialize() {
     commandDispatcher.initialize();
   }
@@ -84,7 +81,6 @@ public class SagaParticipantStubManager {
             .orElseThrow(() -> new RuntimeException(String.format("no handler for channel %s command class %s", channel, commandClass)));
 
   }
-
 
   public class SagaParticipantStubManagerHelper<C extends Command>  {
     private Class<C> expectedCommandClass;

@@ -5,3 +5,4 @@ build/
 *.log
 out
 **/bin/**
+.java-version
