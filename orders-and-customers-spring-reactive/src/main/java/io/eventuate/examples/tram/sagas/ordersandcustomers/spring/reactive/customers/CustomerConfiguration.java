@@ -30,7 +30,7 @@ public class CustomerConfiguration {
     return new CustomerCommandHandler(customerService);
   }
 
-  @Bean
+  @Bean(initMethod = "initialize")
   public ReactiveCommandDispatcher consumerCommandDispatcher(CustomerCommandHandler target,
                                                              ReactiveSagaCommandDispatcherFactory sagaCommandDispatcherFactory) {
 
