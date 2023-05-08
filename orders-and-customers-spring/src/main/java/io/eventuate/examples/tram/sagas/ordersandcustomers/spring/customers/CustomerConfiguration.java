@@ -36,7 +36,7 @@ public class CustomerConfiguration {
 
   // TODO Exception handler for CustomerCreditLimitExceededException
 
-  @Bean
+  @Bean(initMethod = "initialize")
   public CommandDispatcher consumerCommandDispatcher(CustomerCommandHandler target,
                                                      SagaLockManager sagaLockManager, SagaCommandDispatcherFactory sagaCommandDispatcherFactory) {
 

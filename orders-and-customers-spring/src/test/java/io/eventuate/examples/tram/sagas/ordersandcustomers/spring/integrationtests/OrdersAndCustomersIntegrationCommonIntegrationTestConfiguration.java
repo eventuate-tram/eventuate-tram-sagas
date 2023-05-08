@@ -51,7 +51,7 @@ public class OrdersAndCustomersIntegrationCommonIntegrationTestConfiguration {
     return new SagaEventsConsumer();
   }
 
-  @Bean
+  @Bean(initMethod = "initialize")
   public DomainEventDispatcher domainEventDispatcher(TramCommandsAndEventsIntegrationData tramCommandsAndEventsIntegrationData, SagaEventsConsumer sagaEventsConsumer, DomainEventDispatcherFactory domainEventDispatcherFactory) {
     return domainEventDispatcherFactory.make(tramCommandsAndEventsIntegrationData.getEventDispatcherId(), sagaEventsConsumer.domainEventHandlers());
   }
