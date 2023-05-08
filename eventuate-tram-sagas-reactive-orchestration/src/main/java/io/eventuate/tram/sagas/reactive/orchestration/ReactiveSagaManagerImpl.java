@@ -20,7 +20,6 @@ import org.slf4j.LoggerFactory;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-import javax.annotation.PostConstruct;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -135,8 +134,6 @@ public class ReactiveSagaManagerImpl<Data>
     return saga.getSagaType();
   }
 
-
-  @PostConstruct
   public void subscribeToReplyChannel() {
     messageConsumer.subscribe(saga.getSagaType() + "-consumer", singleton(makeSagaReplyChannel()),
             this::handleMessage);
@@ -145,7 +142,6 @@ public class ReactiveSagaManagerImpl<Data>
   private String makeSagaReplyChannel() {
     return getSagaType() + "-reply";
   }
-
 
   public Publisher<Void> handleMessage(Message message) {
     logger.debug("handle message invoked {}", message);
@@ -156,7 +152,6 @@ public class ReactiveSagaManagerImpl<Data>
       return Mono.empty();
     }
   }
-
 
   private Mono<Void> handleReply(Message message) {
 
@@ -222,7 +217,6 @@ public class ReactiveSagaManagerImpl<Data>
       return processActions(sagaType, sagaId, sagaInstance, sagaData, nextActions);
     }
   }
-
 
   private Mono<SagaActions<Data>> simulateSuccessfulReplyToLocalActionOrNotification(String sagaType, String sagaId, SagaActions<Data> actions) {
     return Mono.from(getStateDefinition()

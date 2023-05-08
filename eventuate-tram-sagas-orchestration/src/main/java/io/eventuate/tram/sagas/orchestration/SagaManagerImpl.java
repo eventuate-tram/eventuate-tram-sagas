@@ -9,7 +9,6 @@ import io.eventuate.tram.sagas.common.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.annotation.PostConstruct;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -139,8 +138,6 @@ public class SagaManagerImpl<Data>
     return saga.getSagaType();
   }
 
-
-  @PostConstruct
   public void subscribeToReplyChannel() {
     messageConsumer.subscribe(saga.getSagaType() + "-consumer", singleton(makeSagaReplyChannel()),
             this::handleMessage);

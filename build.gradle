@@ -24,9 +24,6 @@ apply plugin: "io.eventuate.plugins.gradle.publish.EventuatePublishDockerImages"
 
 allprojects {
 
-    sourceCompatibility = 1.8
-    targetCompatibility = 1.8
-
     repositories {
         mavenCentral()
         eventuateMavenRepoUrl.split(',').each { repoUrl -> maven { url repoUrl } }
@@ -39,6 +36,14 @@ allprojects {
           testCompile "org.mockito:mockito-core:2.23.0"
       }
 
+}
+
+subprojects { project ->
+    java {
+        toolchain {
+            languageVersion.set(JavaLanguageVersion.of(project.ext.get("springBootVersion").startsWith("3") ? 17 : 8))
+        }
+    }
 }
 
 gradle.projectsEvaluated {

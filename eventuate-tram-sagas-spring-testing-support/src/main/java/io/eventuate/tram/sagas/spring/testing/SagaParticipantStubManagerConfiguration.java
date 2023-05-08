@@ -15,7 +15,7 @@ import org.springframework.context.annotation.Import;
 @Import({TramCommandProducerConfiguration.class, TramEventsPublisherConfiguration.class,})
 public class SagaParticipantStubManagerConfiguration {
 
-  @Bean
+  @Bean(initMethod = "initialize")
   public SagaParticipantStubManager sagaParticipantStubManager(SagaParticipantChannels sagaParticipantChannels,
                                                                MessageConsumer messageConsumer,
                                                                CommandNameMapping commandNameMapping,

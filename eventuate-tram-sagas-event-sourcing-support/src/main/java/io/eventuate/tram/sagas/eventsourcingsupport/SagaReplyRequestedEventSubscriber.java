@@ -6,7 +6,6 @@ import io.eventuate.SubscriberOptions;
 import io.eventuate.sync.EventuateAggregateStore;
 import io.eventuate.tram.commands.common.CommandMessageHeaders;
 import io.eventuate.tram.commands.consumer.CommandHandlerReplyBuilder;
-import io.eventuate.tram.messaging.common.ChannelMapping;
 import io.eventuate.tram.messaging.common.Message;
 import io.eventuate.tram.messaging.producer.MessageBuilder;
 import io.eventuate.tram.messaging.producer.MessageProducer;
