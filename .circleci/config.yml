@@ -96,6 +96,15 @@ workflows:
             export DOCKER_HOST_NAME=$(hostname)
             ./build-and-test-all-multi-arch-locally-mysql-kafka.sh
       - build-and-test/build-and-test:
+          name: build-and-test-mysql-spring-boot-3
+          skip_multi_arch_env_vars: "true"
+          script: |
+            docker context create tls-env
+            docker buildx create tls-env --use
+            docker run --privileged --rm tonistiigi/binfmt:qemu-v6.2.0 --install arm64,arm
+            export DOCKER_HOST_NAME=$(hostname)
+            ./build-and-test-all-multi-arch-locally-mysql-kafka.sh -P springBootVersion=3.0.1
+      - build-and-test/build-and-test:
           name: build-and-test-arm
           resource_class: arm.medium
           skip_multi_arch_env_vars: "true"
@@ -128,9 +137,6 @@ workflows:
           resource_class: arm.medium
           requires:
             - build-multi-arch-images
-      - build-and-test/build-and-test:
-          name: build-and-test-mysql-spring-boot-3
-          script: ./build-and-test-all-mysql-kafka-spring-boot-3.sh
       - build-and-test/build-and-test:
           name: build-and-test-mssql
           script: ./build-and-test-all-mssql.sh
