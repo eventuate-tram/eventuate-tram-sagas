@@ -18,6 +18,8 @@ public class ReactiveSagaCommandDispatcherFactory {
   }
 
   public ReactiveSagaCommandDispatcher make(String commandDispatcherId, ReactiveCommandHandlers target) {
-    return new ReactiveSagaCommandDispatcher(commandDispatcherId, target, messageConsumer, sagaLockManager, commandReplyProducer);
+    ReactiveSagaCommandDispatcher reactiveSagaCommandDispatcher = new ReactiveSagaCommandDispatcher(commandDispatcherId, target, messageConsumer, sagaLockManager, commandReplyProducer);
+    reactiveSagaCommandDispatcher.initialize();
+    return reactiveSagaCommandDispatcher;
   }
 }

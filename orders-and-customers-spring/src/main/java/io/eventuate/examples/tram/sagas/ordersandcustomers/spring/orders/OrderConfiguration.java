@@ -68,7 +68,7 @@ public class OrderConfiguration {
     return new OrderCommandHandler(orderDao);
   }
 
-  @Bean(initMethod = "initialize")
+  @Bean
   public CommandDispatcher orderCommandDispatcher(OrderCommandHandler target, SagaCommandDispatcherFactory sagaCommandDispatcherFactory) {
     return sagaCommandDispatcherFactory.make("orderCommandDispatcher", target.commandHandlerDefinitions());
   }

@@ -24,6 +24,8 @@ public class SagaCommandDispatcherFactory {
   }
 
   public SagaCommandDispatcher make(String commandDispatcherId, CommandHandlers target) {
-    return new SagaCommandDispatcher(commandDispatcherId, target, messageConsumer, sagaLockManager, commandNameMapping, commandReplyProducer);
+    SagaCommandDispatcher sagaCommandDispatcher = new SagaCommandDispatcher(commandDispatcherId, target, messageConsumer, sagaLockManager, commandNameMapping, commandReplyProducer);
+    sagaCommandDispatcher.initialize();
+    return sagaCommandDispatcher;
   }
 }
