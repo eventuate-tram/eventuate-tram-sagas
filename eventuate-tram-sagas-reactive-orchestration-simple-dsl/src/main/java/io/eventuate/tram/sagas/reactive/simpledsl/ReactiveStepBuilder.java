@@ -53,7 +53,7 @@ public class ReactiveStepBuilder<Data> implements ReactiveWithCompensationBuilde
   @Override
   public InvokeReactiveParticipantStepBuilder<Data> withCompensation(Predicate<Data> compensationPredicate,
                                                                      Function<Data, Publisher<CommandWithDestination>> compensation) {
-    return new InvokeReactiveParticipantStepBuilder<>(parent).withCompensation(compensation);
+    return new InvokeReactiveParticipantStepBuilder<>(parent).withCompensation(compensationPredicate, compensation);
   }
 
 
