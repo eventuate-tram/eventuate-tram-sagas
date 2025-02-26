@@ -1,5 +1,5 @@
 
 dependencies {
-    compile project(":eventuate-tram-sagas-orchestration-simple-dsl")
-    compile project(":eventuate-tram-sagas-micronaut-orchestration")
+    api project(":eventuate-tram-sagas-orchestration-simple-dsl")
+    api project(":eventuate-tram-sagas-micronaut-orchestration")
 }

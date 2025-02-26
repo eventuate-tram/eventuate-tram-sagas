@@ -1,6 +1,6 @@
 
 dependencies {
-    compile project(":eventuate-tram-sagas-orchestration")
-    compile project(":eventuate-tram-sagas-reactive-common")
-    compile "io.eventuate.tram.core:eventuate-tram-reactive-events:$eventuateTramVersion"
+    api project(":eventuate-tram-sagas-orchestration")
+    api project(":eventuate-tram-sagas-reactive-common")
+    api "io.eventuate.tram.core:eventuate-tram-reactive-events:$eventuateTramVersion"
 }

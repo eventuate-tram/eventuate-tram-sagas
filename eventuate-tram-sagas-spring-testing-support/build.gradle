@@ -1,6 +1,6 @@
 
 dependencies {
-    compile project(":eventuate-tram-sagas-testing-support")
+    api project(":eventuate-tram-sagas-testing-support")
 
-    compile "org.springframework.boot:spring-boot-starter-test:$springBootVersion"
+    api "org.springframework.boot:spring-boot-starter-test:$springBootVersion"
 }

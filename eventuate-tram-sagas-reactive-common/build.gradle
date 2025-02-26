@@ -1,7 +1,7 @@
 
 dependencies {
-    compile project(":eventuate-tram-sagas-common")
+    api project(":eventuate-tram-sagas-common")
 
-    compile "io.eventuate.tram.core:eventuate-tram-reactive-commands:$eventuateTramVersion"
-    compile "io.eventuate.common:eventuate-common-reactive-jdbc:$eventuateCommonVersion"
+    api "io.eventuate.tram.core:eventuate-tram-reactive-commands:$eventuateTramVersion"
+    api "io.eventuate.common:eventuate-common-reactive-jdbc:$eventuateCommonVersion"
 }

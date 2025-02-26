@@ -1,4 +1,3 @@
-version: "3"
 services:
   zookeeper:
     image: eventuateio/eventuate-zookeeper:${EVENTUATE_COMMON_VERSION?}

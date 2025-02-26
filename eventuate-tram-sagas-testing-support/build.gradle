@@ -1,6 +1,6 @@
 
 dependencies {
-    compile project(":eventuate-tram-sagas-unit-testing-support")
+    api project(":eventuate-tram-sagas-unit-testing-support")
 
-    compile "io.eventuate.tram.core:eventuate-tram-testing-support:$eventuateTramVersion"
+    api "io.eventuate.tram.core:eventuate-tram-testing-support:$eventuateTramVersion"
 }

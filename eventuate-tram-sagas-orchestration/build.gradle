@@ -1,6 +1,6 @@
 
 dependencies {
-    compile project(":eventuate-tram-sagas-common")
-    compile "io.eventuate.tram.core:eventuate-tram-events:$eventuateTramVersion"
-    compile "javax.annotation:javax.annotation-api:1.3.2"
+    api project(":eventuate-tram-sagas-common")
+    api "io.eventuate.tram.core:eventuate-tram-events:$eventuateTramVersion"
+    api "javax.annotation:javax.annotation-api:1.3.2"
 }

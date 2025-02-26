@@ -1,4 +1,4 @@
 
 dependencies {
-    compile project(":eventuate-tram-sagas-common")
+    api project(":eventuate-tram-sagas-common")
 }

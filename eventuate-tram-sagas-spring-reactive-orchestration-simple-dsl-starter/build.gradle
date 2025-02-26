@@ -1,9 +1,9 @@
 
 dependencies {
 
-    compile "io.eventuate.tram.core:eventuate-tram-spring-reactive-commands-starter:$eventuateTramVersion"
-    compile "io.eventuate.tram.core:eventuate-tram-spring-reactive-events-starter:$eventuateTramVersion"
+    api "io.eventuate.tram.core:eventuate-tram-spring-reactive-commands-starter:$eventuateTramVersion"
+    api "io.eventuate.tram.core:eventuate-tram-spring-reactive-events-starter:$eventuateTramVersion"
 
-    compile project(":eventuate-tram-sagas-reactive-orchestration-simple-dsl")
-    compile project(":eventuate-tram-sagas-spring-reactive-orchestration")
+    api project(":eventuate-tram-sagas-reactive-orchestration-simple-dsl")
+    api project(":eventuate-tram-sagas-spring-reactive-orchestration")
 }

@@ -1,10 +1,10 @@
 
 dependencies {
-    compile project(":eventuate-tram-sagas-orchestration")
+    api project(":eventuate-tram-sagas-orchestration")
 
-    testCompile project(":eventuate-tram-sagas-unit-testing-support")
-    testCompile project(":eventuate-tram-sagas-participant")
-    testCompile "io.eventuate.tram.core:eventuate-tram-in-memory:$eventuateTramVersion"
-    testCompile "io.eventuate.util:eventuate-util-test:$eventuateUtilVersion"
+    testImplementation project(":eventuate-tram-sagas-unit-testing-support")
+    testImplementation project(":eventuate-tram-sagas-participant")
+    testImplementation "io.eventuate.tram.core:eventuate-tram-in-memory:$eventuateTramVersion"
+    testImplementation "io.eventuate.util:eventuate-util-test:$eventuateUtilVersion"
 
 }

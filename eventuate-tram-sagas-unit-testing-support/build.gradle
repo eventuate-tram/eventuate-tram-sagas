@@ -1,4 +1,4 @@
 dependencies {
-    compile project(":eventuate-tram-sagas-orchestration")
-    compile "junit:junit:4.12"
+    api project(":eventuate-tram-sagas-orchestration")
+    api "junit:junit:4.12"
 }

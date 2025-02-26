@@ -13,17 +13,17 @@ dependencyManagement {
 }
 
 dependencies {
-    compile project(":eventuate-tram-sagas-orchestration")
-    compile project(":eventuate-tram-sagas-micronaut-common")
+    api project(":eventuate-tram-sagas-orchestration")
+    api project(":eventuate-tram-sagas-micronaut-common")
 
-    compile "io.eventuate.tram.core:eventuate-tram-micronaut-events:$eventuateTramVersion"
-    compile "io.eventuate.tram.core:eventuate-tram-micronaut-commands:$eventuateTramVersion"
-    compile "io.eventuate.common:eventuate-common-micronaut-jdbc:$eventuateCommonVersion"
+    api "io.eventuate.tram.core:eventuate-tram-micronaut-events:$eventuateTramVersion"
+    api "io.eventuate.tram.core:eventuate-tram-micronaut-commands:$eventuateTramVersion"
+    api "io.eventuate.common:eventuate-common-micronaut-jdbc:$eventuateCommonVersion"
 
     annotationProcessor "io.micronaut:micronaut-inject-java"
     annotationProcessor "io.micronaut:micronaut-validation"
     annotationProcessor "io.micronaut.configuration:micronaut-openapi"
-    compile "io.micronaut:micronaut-inject"
-    compile "io.micronaut:micronaut-validation"
-    compile "io.micronaut:micronaut-runtime"
+    api "io.micronaut:micronaut-inject"
+    api "io.micronaut:micronaut-validation"
+    api "io.micronaut:micronaut-runtime"
 }

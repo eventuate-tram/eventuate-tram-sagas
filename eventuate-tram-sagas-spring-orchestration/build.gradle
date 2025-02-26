@@ -1,12 +1,12 @@
 
 dependencies {
-    compile project(":eventuate-tram-sagas-orchestration")
-    compile project(":eventuate-tram-sagas-spring-common")
+    api project(":eventuate-tram-sagas-orchestration")
+    api project(":eventuate-tram-sagas-spring-common")
 
-    compile "io.eventuate.tram.core:eventuate-tram-spring-events:$eventuateTramVersion"
-    compile "io.eventuate.common:eventuate-common-spring-jdbc:$eventuateCommonVersion"
+    api "io.eventuate.tram.core:eventuate-tram-spring-events:$eventuateTramVersion"
+    api "io.eventuate.common:eventuate-common-spring-jdbc:$eventuateCommonVersion"
 
-    testCompile "org.springframework.boot:spring-boot-starter-test:$springBootVersion"
-    testCompile "io.eventuate.common:eventuate-common-id:$eventuateCommonVersion"
-    testCompile project(":eventuate-tram-sagas-spring-in-memory")
+    testImplementation "org.springframework.boot:spring-boot-starter-test:$springBootVersion"
+    testImplementation "io.eventuate.common:eventuate-common-id:$eventuateCommonVersion"
+    testImplementation project(":eventuate-tram-sagas-spring-in-memory")
 }

@@ -1,13 +1,13 @@
 
 dependencies {
-    compile "io.eventuate.tram.core:eventuate-tram-spring-reactive-jdbc-kafka:${eventuateTramVersion}"
-    compile "io.eventuate.tram.core:eventuate-tram-spring-reactive-commands:${eventuateTramVersion}"
-    compile project(":eventuate-tram-sagas-spring-reactive-participant-starter")
-    compile project(":eventuate-tram-sagas-spring-reactive-orchestration-simple-dsl-starter")
-    compile "org.springframework.boot:spring-boot-starter:${springBootVersion}"
+    api "io.eventuate.tram.core:eventuate-tram-spring-reactive-jdbc-kafka:${eventuateTramVersion}"
+    api "io.eventuate.tram.core:eventuate-tram-spring-reactive-commands:${eventuateTramVersion}"
+    api project(":eventuate-tram-sagas-spring-reactive-participant-starter")
+    api project(":eventuate-tram-sagas-spring-reactive-orchestration-simple-dsl-starter")
+    api "org.springframework.boot:spring-boot-starter:${springBootVersion}"
 
-    testCompile "io.eventuate.util:eventuate-util-test:$eventuateUtilVersion"
-    testCompile "org.springframework.boot:spring-boot-starter-test:${springBootVersion}"
+    testImplementation "io.eventuate.util:eventuate-util-test:$eventuateUtilVersion"
+    testImplementation "org.springframework.boot:spring-boot-starter-test:${springBootVersion}"
 }
 
 test {

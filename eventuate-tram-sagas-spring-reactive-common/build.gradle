@@ -1,11 +1,11 @@
 
 dependencies {
-    compile project(":eventuate-tram-sagas-reactive-common")
+    api project(":eventuate-tram-sagas-reactive-common")
 
-    compile "io.eventuate.common:eventuate-common-spring-reactive-jdbc:$eventuateCommonVersion"
-    compile "io.eventuate.tram.core:eventuate-tram-spring-reactive-commands:$eventuateTramVersion"
+    api "io.eventuate.common:eventuate-common-spring-reactive-jdbc:$eventuateCommonVersion"
+    api "io.eventuate.tram.core:eventuate-tram-spring-reactive-commands:$eventuateTramVersion"
 
-    testCompile "org.springframework.boot:spring-boot-starter-test:$springBootVersion"
+    testImplementation "org.springframework.boot:spring-boot-starter-test:$springBootVersion"
 }
 
 test {

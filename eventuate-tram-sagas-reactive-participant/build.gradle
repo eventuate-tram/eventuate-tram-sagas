@@ -1,9 +1,9 @@
 
 dependencies {
-    compile "io.eventuate.tram.core:eventuate-tram-reactive-commands:$eventuateTramVersion"
+    api "io.eventuate.tram.core:eventuate-tram-reactive-commands:$eventuateTramVersion"
 
-    compile project(":eventuate-tram-sagas-participant")
-    compile project(":eventuate-tram-sagas-reactive-common")
+    api project(":eventuate-tram-sagas-participant")
+    api project(":eventuate-tram-sagas-reactive-common")
 
-    compile "io.projectreactor:reactor-core:$reactorVersion"
+    api "io.projectreactor:reactor-core:$reactorVersion"
 }
