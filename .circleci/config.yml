@@ -56,8 +56,7 @@ jobs:
     working_directory: ~/eventuate-tram-sagas
     steps:
       - checkout
-      - setup_remote_docker:
-          version: 20.10.11
+      - setup_remote_docker
       - run:
           name: docker buildx build
           command: |
