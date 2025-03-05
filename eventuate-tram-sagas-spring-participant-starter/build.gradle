@@ -1,6 +1,6 @@
 
 dependencies {
     api "io.eventuate.tram.core:eventuate-tram-spring-messaging-starter:$eventuateTramVersion"
-
+    api "io.eventuate.tram.core:eventuate-tram-spring-commands-starter:$eventuateTramVersion"
     api project(":eventuate-tram-sagas-spring-participant")
 }
