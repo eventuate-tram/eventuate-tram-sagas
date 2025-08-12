@@ -20,6 +20,11 @@ allprojects {
 }
 
 apply plugin: "io.eventuate.plugins.gradle.publish.EventuatePublish"
+apply plugin: "io.eventuate.plugins.gradle.publish.PublishMultiArchContainerImages"
+
+publishMultiArch {
+    image "eventuateio/eventuate-tram-sagas-mysql"
+}
 apply plugin: "io.eventuate.plugins.gradle.publish.EventuatePublishDockerImages"
 
 allprojects {

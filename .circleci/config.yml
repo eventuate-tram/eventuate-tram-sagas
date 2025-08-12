@@ -153,7 +153,9 @@ workflows:
             - test-multi-arch-intel
             - test-multi-arch-arm
           script: ./deploy-artifacts.sh
-      - deploy-multi-arch:
+      - build-and-test/build-and-test:
+          name: deploy-multi-arch
+          script: ./deploy-multi-arch.sh
           context:
             - publish
           requires:
