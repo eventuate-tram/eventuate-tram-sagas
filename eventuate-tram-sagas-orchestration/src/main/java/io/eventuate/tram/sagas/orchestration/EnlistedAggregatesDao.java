@@ -37,7 +37,7 @@ public class EnlistedAggregatesDao {
     return new HashSet<>(eventuateJdbcStatementExecutor.query("Select aggregate_type, aggregate_id from saga_enlisted_aggregates where saga_id = ?",
             (rs, rowNum) -> {
               try {
-                return new EnlistedAggregate(ClassUtils.getClass(rs.getString("aggregate_type")), rs.getString("aggregate_id"));
+                return new EnlistedAggregate((Class<Object>) ClassUtils.getClass(rs.getString("aggregate_type")), rs.getString("aggregate_id"));
               } catch (ClassNotFoundException e) {
                 logger.error("Class not found", e);
                 throw new RuntimeException("Class not found", e);

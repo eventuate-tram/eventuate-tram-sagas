@@ -48,10 +48,10 @@ public class ReactiveSagaInstanceRepositoryJdbc implements ReactiveSagaInstanceR
 
   private Mono<Void> saveDestinationsAndResources(SagaInstance sagaInstance) {
 
-    List<Mono<Integer>> result = new ArrayList<>();
+    List<Mono<Long>> result = new ArrayList<>();
 
     for (DestinationAndResource dr : sagaInstance.getDestinationsAndResources()) {
-        Mono<Integer> update = eventuateJdbcStatementExecutor.update(sagaInstanceRepositorySql.getInsertIntoSagaInstanceParticipantsSql(),
+        Mono<Long> update = eventuateJdbcStatementExecutor.update(sagaInstanceRepositorySql.getInsertIntoSagaInstanceParticipantsSql(),
                 sagaInstance.getSagaType(),
                 sagaInstance.getId(),
                 dr.getDestination(),
@@ -63,7 +63,7 @@ public class ReactiveSagaInstanceRepositoryJdbc implements ReactiveSagaInstanceR
                   dr.getDestination(),
                   dr.getResource());
 
-          return Mono.just(0);
+          return Mono.just(0L);
         });
 
         result.add(update);

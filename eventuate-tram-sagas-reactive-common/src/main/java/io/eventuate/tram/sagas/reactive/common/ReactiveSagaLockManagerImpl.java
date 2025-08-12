@@ -101,7 +101,7 @@ public class ReactiveSagaLockManagerImpl implements ReactiveSagaLockManager {
                     .flatMap(count -> assertEqualToOne(count, Mono.empty())));
   }
 
-  private <T> Mono<T> assertEqualToOne(int n, Mono<T> onSuccess) {
+  private <T> Mono<T> assertEqualToOne(long n, Mono<T> onSuccess) {
     if (n == 1) return onSuccess;
     else return Mono.error(new RuntimeException("Expected to update one row but updated: " + n));
   }

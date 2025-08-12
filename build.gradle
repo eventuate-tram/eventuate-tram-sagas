@@ -40,7 +40,15 @@ allprojects {
 subprojects { project ->
     java {
         toolchain {
-            languageVersion.set(/*~~(Attempted to update to Java version to 11  but was unsuccessful, please update manually)~~>*//*~~(Attempted to update to Java version to 17  but was unsuccessful, please update manually)~~>*/JavaLanguageVersion.of(project.ext.get("springBootVersion").startsWith("3") ? 17 : 8))
+            languageVersion.set(JavaLanguageVersion.of(17))
+        }
+    }
+
+    dependencies {
+        if (!project.name.endsWith("-bom")) {
+            testImplementation "org.junit.jupiter:junit-jupiter:$junitVersion"
+            testRuntimeOnly "org.junit.platform:junit-platform-launcher:$junitPlatformLauncherVersion"
+            testImplementation "org.mockito:mockito-junit-jupiter:$mockitoVersion"
         }
     }
 }
