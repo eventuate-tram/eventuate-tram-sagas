@@ -1,6 +1,6 @@
 #! /bin/bash -e
 
-./gradlew $* testClasses
+./gradlew $* testClasses --parallel
 
 export EVENTUATE_COMMON_VERSION=$(sed < gradle.properties -e '/eventuateCommonImageVersion=/!d' -e 's/.*=//')
 
