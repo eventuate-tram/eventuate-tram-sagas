@@ -8,3 +8,6 @@ dependencies {
     testImplementation project(":eventuate-tram-sagas-spring-in-memory")
     testImplementation "org.springframework.boot:spring-boot-starter-test:$springBootVersion"
 }
+tasks.withType(Test).configureEach {
+    useJUnitPlatform()
+}

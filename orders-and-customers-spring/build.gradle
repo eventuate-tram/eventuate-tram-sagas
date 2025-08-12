@@ -17,4 +17,7 @@ dependencies {
     testImplementation project(":eventuate-tram-sagas-spring-in-memory")
 
 }
+tasks.withType(Test).configureEach {
+    useJUnitPlatform()
+}
 

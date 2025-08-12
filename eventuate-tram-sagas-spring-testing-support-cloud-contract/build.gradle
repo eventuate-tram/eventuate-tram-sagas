@@ -21,4 +21,9 @@ dependencies {
     api "io.eventuate.tram.core:eventuate-tram-spring-testing-support-cloud-contract:$eventuateTramVersion"
     api project(":eventuate-tram-sagas-spring-orchestration-simple-dsl")
     api 'org.springframework.cloud:spring-cloud-starter-contract-verifier'
+
+    implementation "org.apache.httpcomponents.client5:httpclient5:5.4.4"
+}
+tasks.withType(Test).configureEach {
+    useJUnitPlatform()
 }

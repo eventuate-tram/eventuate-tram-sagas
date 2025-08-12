@@ -4,3 +4,6 @@ dependencies {
     api "io.eventuate.tram.core:eventuate-tram-spring-commands-starter:$eventuateTramVersion"
     api project(":eventuate-tram-sagas-spring-participant")
 }
+tasks.withType(Test).configureEach {
+    useJUnitPlatform()
+}

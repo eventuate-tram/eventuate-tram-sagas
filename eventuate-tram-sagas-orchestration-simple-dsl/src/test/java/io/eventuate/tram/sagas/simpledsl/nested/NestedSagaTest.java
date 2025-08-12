@@ -3,12 +3,12 @@ package io.eventuate.tram.sagas.simpledsl.nested;
 import io.eventuate.tram.inmemory.InMemoryMessaging;
 import io.eventuate.tram.sagas.orchestration.SagaInstance;
 import io.eventuate.util.test.async.Eventually;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
 
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class NestedSagaTest {
 
@@ -19,7 +19,7 @@ public class NestedSagaTest {
     private final OuterSaga outerSaga = new OuterSaga();
     private InnerSaga innerSaga;
 
-    @Before
+    @BeforeEach
     public void setup() {
         innerSaga = new InnerSaga(inMemoryCommandProducer.commandReplyProducer);
         inMemorySagaOrchestrationAndParticipants = InMemorySagaOrchestrationAndParticipants.make(

@@ -2,3 +2,6 @@ dependencies {
     api project(":eventuate-tram-sagas-spring-reactive-common")
     api project(":eventuate-tram-sagas-reactive-participant")
 }
+tasks.withType(Test).configureEach {
+    useJUnitPlatform()
+}

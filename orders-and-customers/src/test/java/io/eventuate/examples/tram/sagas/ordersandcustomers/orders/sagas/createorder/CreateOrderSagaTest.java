@@ -7,18 +7,21 @@ import io.eventuate.examples.tram.sagas.ordersandcustomers.orders.service.OrderD
 import io.eventuate.examples.tram.sagas.ordersandcustomers.orders.service.RejectOrderCommand;
 import io.eventuate.tram.events.publisher.DomainEventPublisher;
 import io.eventuate.tram.sagas.testing.SagaUnitTestSupport;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnit;
-import org.mockito.junit.MockitoRule;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 
 import static io.eventuate.tram.sagas.testing.SagaUnitTestSupport.given;
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 
+@ExtendWith(MockitoExtension.class)
+@MockitoSettings(strictness = Strictness.WARN)
 public class CreateOrderSagaTest {
 
   private long orderId = 101;
@@ -28,9 +31,6 @@ public class CreateOrderSagaTest {
 
   @Mock
   private DomainEventPublisher domainEventPublisher;
-
-  @Rule
-  public MockitoRule rule = MockitoJUnit.rule();
 
   @Test
   public void shouldCreateOrder() {

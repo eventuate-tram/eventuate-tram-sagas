@@ -4,13 +4,13 @@ package io.eventuate.examples.tram.sagas.ordersandcustomers.orders.domain;
 import io.eventuate.examples.tram.sagas.ordersandcustomers.orders.service.OrderDetails;
 import io.eventuate.tram.events.publisher.ResultWithEvents;
 
-import javax.persistence.Access;
-import javax.persistence.AccessType;
-import javax.persistence.Embedded;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import jakarta.persistence.Access;
+import jakarta.persistence.AccessType;
+import jakarta.persistence.Embedded;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 import java.util.Collections;
 
 @Entity

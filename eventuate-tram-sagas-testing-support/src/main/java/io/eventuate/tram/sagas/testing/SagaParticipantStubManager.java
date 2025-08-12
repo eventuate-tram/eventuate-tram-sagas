@@ -60,7 +60,7 @@ public class SagaParticipantStubManager {
 
   private void validateChannel(String commandChannel) {
     if (!commandChannels.contains(commandChannel))
-      throw new IllegalArgumentException(String.format("%s is not one of the specified channels: %s", commandChannel, commandChannels));
+      throw new IllegalArgumentException("%s is not one of the specified channels: %s".formatted(commandChannel, commandChannels));
   }
 
   public <C extends Command> SagaParticipantStubManagerHelper<C> when(C expectedCommand) {
@@ -78,7 +78,7 @@ public class SagaParticipantStubManager {
               handler.verifyCommandReceived();
               return true;
             })
-            .orElseThrow(() -> new RuntimeException(String.format("no handler for channel %s command class %s", channel, commandClass)));
+            .orElseThrow(() -> new RuntimeException("no handler for channel %s command class %s".formatted(channel, commandClass)));
 
   }
 

@@ -13,19 +13,16 @@ import io.eventuate.examples.tram.sagas.ordersandcustomers.spring.orders.SagaSta
 import io.eventuate.tram.sagas.orchestration.SagaInstance;
 import io.eventuate.tram.sagas.orchestration.SagaInstanceRepository;
 import io.eventuate.util.test.async.Eventually;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
-import org.springframework.test.context.junit4.SpringRunner;
 
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-@RunWith(SpringRunner.class)
 @SpringBootTest(classes = OrdersAndCustomersInMemoryFailingCompensatingTransactionIntegrationTest.Config.class)
 public class OrdersAndCustomersInMemoryFailingCompensatingTransactionIntegrationTest {
 

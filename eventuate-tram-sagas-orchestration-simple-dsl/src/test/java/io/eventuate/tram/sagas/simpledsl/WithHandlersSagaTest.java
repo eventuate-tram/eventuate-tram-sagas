@@ -1,8 +1,8 @@
 package io.eventuate.tram.sagas.simpledsl;
 
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
 import static io.eventuate.tram.sagas.testing.SagaUnitTestSupport.given;
@@ -14,12 +14,12 @@ public class WithHandlersSagaTest {
 
   private Handlers handlers;
 
-  @Before
+  @BeforeEach
   public void setup() {
     this.handlers = mock(Handlers.class);
   }
 
-  @After
+  @AfterEach
   public void tearDown() {
     verifyNoMoreInteractions(handlers);
   }

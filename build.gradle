@@ -32,8 +32,7 @@ allprojects {
 
     if (!project.name.endsWith("-bom"))
       dependencies {
-          testImplementation "junit:junit:4.12"
-          testImplementation "org.mockito:mockito-core:2.23.0"
+          testImplementation "org.mockito:mockito-core:4.11.0"
       }
 
 }
@@ -41,7 +40,7 @@ allprojects {
 subprojects { project ->
     java {
         toolchain {
-            languageVersion.set(JavaLanguageVersion.of(project.ext.get("springBootVersion").startsWith("3") ? 17 : 8))
+            languageVersion.set(/*~~(Attempted to update to Java version to 11  but was unsuccessful, please update manually)~~>*//*~~(Attempted to update to Java version to 17  but was unsuccessful, please update manually)~~>*/JavaLanguageVersion.of(project.ext.get("springBootVersion").startsWith("3") ? 17 : 8))
         }
     }
 }
@@ -104,4 +103,7 @@ dockerCompose {
         projectName = null
         useComposeFiles = ["docker-compose-mysql-kafka.yml", "docker-compose-postgres.yml", "docker-compose-mssql.yml"]
     }
+}
+tasks.withType(Test).configureEach {
+    useJUnitPlatform()
 }

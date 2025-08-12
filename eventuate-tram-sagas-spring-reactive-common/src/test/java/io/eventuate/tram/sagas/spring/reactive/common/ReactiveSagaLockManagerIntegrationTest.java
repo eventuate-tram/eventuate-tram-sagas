@@ -8,23 +8,18 @@ import io.eventuate.common.reactive.jdbc.EventuateReactiveJdbcStatementExecutor;
 import io.eventuate.tram.messaging.common.Message;
 import io.eventuate.tram.messaging.producer.MessageBuilder;
 import io.eventuate.tram.sagas.reactive.common.ReactiveSagaLockManager;
-import org.junit.Assert;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.junit4.SpringRunner;
 
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 
-@RunWith(SpringRunner.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.NONE, classes= ReactiveSagaLockManagerIntegrationTestConfiguration.class)
 public class ReactiveSagaLockManagerIntegrationTest {
 
@@ -78,15 +73,15 @@ public class ReactiveSagaLockManagerIntegrationTest {
                     .collectList()
                     .block();
 
-    Assert.assertEquals(1, stashedMessages.size());
+    Assertions.assertEquals(1, stashedMessages.size());
 
     Map<String, Object> stashedMessage = stashedMessages.get(0);
 
-    Assert.assertEquals(message.getPayload(), stashedMessage.get("message_payload"));
-    Assert.assertEquals(JSonMapper.toJson(message.getHeaders()), stashedMessage.get("message_headers"));
-    Assert.assertEquals(sagaId, stashedMessage.get("saga_id"));
-    Assert.assertEquals(sagaType, stashedMessage.get("saga_type"));
-    Assert.assertEquals(target, stashedMessage.get("target"));
+    Assertions.assertEquals(message.getPayload(), stashedMessage.get("message_payload"));
+    Assertions.assertEquals(JSonMapper.toJson(message.getHeaders()), stashedMessage.get("message_headers"));
+    Assertions.assertEquals(sagaId, stashedMessage.get("saga_id"));
+    Assertions.assertEquals(sagaType, stashedMessage.get("saga_type"));
+    Assertions.assertEquals(target, stashedMessage.get("target"));
   }
 
   @Test

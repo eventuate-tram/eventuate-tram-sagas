@@ -1,11 +1,11 @@
 package io.eventuate.tram.sagas.orchestration;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.util.Collections;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.*;
 
 public class SagaInstanceFactoryTest {
@@ -26,7 +26,7 @@ public class SagaInstanceFactoryTest {
 
   private Saga<SagaData> saga;
 
-  @Before
+  @BeforeEach
   public void setUp() {
     sagaManagerFactory = mock(SagaManagerFactory.class);
 

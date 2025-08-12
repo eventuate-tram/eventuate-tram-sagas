@@ -13,22 +13,20 @@ import io.eventuate.examples.tram.sagas.ordersandcustomers.spring.reactive.order
 import io.eventuate.examples.tram.sagas.ordersandcustomers.spring.reactive.orders.domain.OrderRepository;
 import io.eventuate.examples.tram.sagas.ordersandcustomers.spring.reactive.orders.service.OrderSagaService;
 import io.eventuate.util.test.async.Eventually;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-@RunWith(SpringJUnit4ClassRunner.class)
 @SpringBootTest(classes = CustomersAndOrdersIntegrationTest.Config.class,
         webEnvironment = SpringBootTest.WebEnvironment.NONE)
 public class CustomersAndOrdersIntegrationTest {
@@ -74,11 +72,13 @@ public class CustomersAndOrdersIntegrationTest {
     assertOrderState(order.getId(), Optional.of(OrderState.REJECTED), Optional.of(RejectionReason.INSUFFICIENT_CREDIT));
   }
 
-  @Test(expected = OrderIsTooBigException.class)
+  @Test
   public void shouldThrowLocalException() {
-    Customer customer = customerService.createCustomer(CUSTOMER_NAME, new Money("10000000")).block();
+    assertThrows(OrderIsTooBigException.class, () -> {
+      Customer customer = customerService.createCustomer(CUSTOMER_NAME, new Money("10000000")).block();
 
-    orderSagaService.createOrder(new OrderDetails(customer.getId(), new Money("1000000"))).block();
+      orderSagaService.createOrder(new OrderDetails(customer.getId(), new Money("1000000"))).block();
+    });
   }
 
   @Test

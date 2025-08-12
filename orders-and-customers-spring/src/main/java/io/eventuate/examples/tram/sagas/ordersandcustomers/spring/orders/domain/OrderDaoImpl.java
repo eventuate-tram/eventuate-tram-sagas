@@ -16,7 +16,7 @@ public class OrderDaoImpl implements OrderDao {
     return orderRepository
             .findById(id)
             .orElseThrow(() ->
-                    new IllegalArgumentException(String.format("Order with id=%s is not found", id)));
+                    new IllegalArgumentException("Order with id=%s is not found".formatted(id)));
   }
 
   @Override

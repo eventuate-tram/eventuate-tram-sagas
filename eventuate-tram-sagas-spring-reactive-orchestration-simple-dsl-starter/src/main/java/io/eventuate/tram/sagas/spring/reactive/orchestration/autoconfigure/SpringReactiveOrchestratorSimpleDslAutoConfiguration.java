@@ -1,10 +1,10 @@
 package io.eventuate.tram.sagas.spring.reactive.orchestration.autoconfigure;
 
 import io.eventuate.tram.sagas.spring.reactive.orchestration.ReactiveSagaOrchestratorConfiguration;
-import org.springframework.context.annotation.Configuration;
+import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.context.annotation.Import;
 
-@Configuration
+@AutoConfiguration
 @Import(ReactiveSagaOrchestratorConfiguration.class)
 public class SpringReactiveOrchestratorSimpleDslAutoConfiguration {
 }

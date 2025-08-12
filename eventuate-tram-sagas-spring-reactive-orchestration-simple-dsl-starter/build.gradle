@@ -7,3 +7,6 @@ dependencies {
     api project(":eventuate-tram-sagas-reactive-orchestration-simple-dsl")
     api project(":eventuate-tram-sagas-spring-reactive-orchestration")
 }
+tasks.withType(Test).configureEach {
+    useJUnitPlatform()
+}

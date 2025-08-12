@@ -6,4 +6,9 @@ dependencies {
     api project(":eventuate-tram-sagas-reactive-common")
 
     api "io.projectreactor:reactor-core:$reactorVersion"
+
+    testImplementation "org.mockito:mockito-junit-jupiter:4.11.0"
+}
+tasks.withType(Test).configureEach {
+    useJUnitPlatform()
 }

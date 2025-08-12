@@ -1,54 +1,54 @@
 package io.eventuate.tram.sagas.orchestration;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 public abstract class SagaInstanceRepositoryJdbcSchemaTest {
   @Test
   public void testInsertIntoSagaInstance() {
-    Assert.assertEquals(getExpectedInsertIntoSagaInstance(), getSagaInstanceRepositoryJdbcSql().getInsertIntoSagaInstanceSql());
+    Assertions.assertEquals(getExpectedInsertIntoSagaInstance(), getSagaInstanceRepositoryJdbcSql().getInsertIntoSagaInstanceSql());
   }
 
   @Test
   public void testInsertIntoSagaInstanceParticipants() {
-    Assert.assertEquals(getExpectedInsertIntoSagaInstanceParticipants(), getSagaInstanceRepositoryJdbcSql().getInsertIntoSagaInstanceParticipantsSql());
+    Assertions.assertEquals(getExpectedInsertIntoSagaInstanceParticipants(), getSagaInstanceRepositoryJdbcSql().getInsertIntoSagaInstanceParticipantsSql());
   }
 
   @Test
   public void testSelectFromSagaInstance() {
-    Assert.assertEquals(getExpectedSelectFromSagaInstance(), getSagaInstanceRepositoryJdbcSql().getSelectFromSagaInstanceSql());
+    Assertions.assertEquals(getExpectedSelectFromSagaInstance(), getSagaInstanceRepositoryJdbcSql().getSelectFromSagaInstanceSql());
   }
 
   @Test
   public void testSelectFromSagaInstanceParticipants() {
-    Assert.assertEquals(getExpectedSelectFromSagaInstanceParticipants(), getSagaInstanceRepositoryJdbcSql().getSelectFromSagaInstanceParticipantsSql());
+    Assertions.assertEquals(getExpectedSelectFromSagaInstanceParticipants(), getSagaInstanceRepositoryJdbcSql().getSelectFromSagaInstanceParticipantsSql());
   }
 
   @Test
   public void testUpdateSagaInstance() {
-    Assert.assertEquals(getExpectedUpdateSagaInstance(), getSagaInstanceRepositoryJdbcSql().getUpdateSagaInstanceSql());
+    Assertions.assertEquals(getExpectedUpdateSagaInstance(), getSagaInstanceRepositoryJdbcSql().getUpdateSagaInstanceSql());
   }
 
   protected abstract SagaInstanceRepositorySql getSagaInstanceRepositoryJdbcSql();
 
   private String getExpectedInsertIntoSagaInstance() {
-    return String.format("INSERT INTO %ssaga_instance(saga_type, saga_id, state_name, last_request_id, saga_data_type, saga_data_json, end_state, compensating, failed) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?)", getExpectedPrefix());
+    return "INSERT INTO %ssaga_instance(saga_type, saga_id, state_name, last_request_id, saga_data_type, saga_data_json, end_state, compensating, failed) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?)".formatted(getExpectedPrefix());
   }
 
   private String getExpectedInsertIntoSagaInstanceParticipants() {
-    return String.format("INSERT INTO %ssaga_instance_participants(saga_type, saga_id, destination, resource) values(?,?,?,?)", getExpectedPrefix());
+    return "INSERT INTO %ssaga_instance_participants(saga_type, saga_id, destination, resource) values(?,?,?,?)".formatted(getExpectedPrefix());
   }
 
   private String getExpectedSelectFromSagaInstance() {
-    return String.format("SELECT * FROM %ssaga_instance WHERE saga_type = ? AND saga_id = ?", getExpectedPrefix());
+    return "SELECT * FROM %ssaga_instance WHERE saga_type = ? AND saga_id = ?".formatted(getExpectedPrefix());
   }
 
   private String getExpectedSelectFromSagaInstanceParticipants() {
-    return String.format("SELECT destination, resource FROM %ssaga_instance_participants WHERE saga_type = ? AND saga_id = ?", getExpectedPrefix());
+    return "SELECT destination, resource FROM %ssaga_instance_participants WHERE saga_type = ? AND saga_id = ?".formatted(getExpectedPrefix());
   }
 
   private String getExpectedUpdateSagaInstance() {
-    return String.format("UPDATE %ssaga_instance SET state_name = ?, last_request_id = ?, saga_data_type = ?, saga_data_json = ?, end_state = ?, compensating = ?, failed = ? where saga_type = ? AND saga_id = ?", getExpectedPrefix());
+    return "UPDATE %ssaga_instance SET state_name = ?, last_request_id = ?, saga_data_type = ?, saga_data_json = ?, end_state = ?, compensating = ?, failed = ? where saga_type = ? AND saga_id = ?".formatted(getExpectedPrefix());
   }
 
   protected abstract String getExpectedPrefix();

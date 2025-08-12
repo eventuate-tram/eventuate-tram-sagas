@@ -1,7 +1,7 @@
 package io.eventuate.tram.sagas.reactive.simpledsl;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import reactor.core.publisher.Mono;
 
 import static io.eventuate.tram.sagas.reactive.simpledsl.framework.ReactiveSagaUnitTestSupport.given;
@@ -11,7 +11,7 @@ import static org.mockito.Mockito.*;
 public abstract class AbstractReactiveLocalSagaTest {
     protected LocalSagaSteps steps;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         steps = mock(LocalSagaSteps.class);
 

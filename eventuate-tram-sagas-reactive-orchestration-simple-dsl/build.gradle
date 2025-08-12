@@ -2,4 +2,9 @@
 dependencies {
     api project(":eventuate-tram-sagas-reactive-orchestration")
     api project(":eventuate-tram-sagas-orchestration-simple-dsl")
+
+    implementation "org.junit.jupiter:junit-jupiter:5.13.4"
+}
+tasks.withType(Test).configureEach {
+    useJUnitPlatform()
 }

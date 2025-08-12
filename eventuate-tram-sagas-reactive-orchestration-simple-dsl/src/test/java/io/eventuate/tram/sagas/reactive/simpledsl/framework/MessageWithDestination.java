@@ -1,7 +1,7 @@
 package io.eventuate.tram.sagas.reactive.simpledsl.framework;
 
 import io.eventuate.tram.messaging.common.Message;
-import org.apache.commons.lang.builder.ToStringBuilder;
+import org.apache.commons.lang3.builder.ToStringBuilder;
 
 public class MessageWithDestination {
   private final String destination;

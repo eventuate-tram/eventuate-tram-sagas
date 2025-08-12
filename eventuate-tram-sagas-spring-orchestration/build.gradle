@@ -10,3 +10,6 @@ dependencies {
     testImplementation "io.eventuate.common:eventuate-common-id:$eventuateCommonVersion"
     testImplementation project(":eventuate-tram-sagas-spring-in-memory")
 }
+tasks.withType(Test).configureEach {
+    useJUnitPlatform()
+}

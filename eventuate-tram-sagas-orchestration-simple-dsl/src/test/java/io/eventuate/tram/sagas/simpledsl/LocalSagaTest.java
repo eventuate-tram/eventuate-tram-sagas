@@ -1,7 +1,7 @@
 package io.eventuate.tram.sagas.simpledsl;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import static io.eventuate.tram.sagas.testing.SagaUnitTestSupport.given;
 import static org.mockito.ArgumentMatchers.any;
@@ -12,7 +12,7 @@ public class LocalSagaTest {
 
   private LocalSagaSteps steps;
 
-  @Before
+  @BeforeEach
   public void setUp() {
     steps = mock(LocalSagaSteps.class);
   }

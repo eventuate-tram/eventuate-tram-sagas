@@ -57,8 +57,7 @@ public class SagaCommandDispatcher extends CommandDispatcher {
   @Override
   protected List<Message> invoke(CommandHandler commandHandler, CommandMessage cm, Map<String, String> pathVars, CommandReplyToken commandReplyToken) {
     Optional<String> lockedTarget = Optional.empty();
-    if (commandHandler instanceof SagaCommandHandler) {
-      SagaCommandHandler sch = (SagaCommandHandler) commandHandler;
+    if (commandHandler instanceof SagaCommandHandler sch) {
       if (sch.getPreLock().isPresent()) {
         LockTarget lockTarget = sch.getPreLock().get().apply(cm, new PathVariables(pathVars)); // TODO
         Message message = cm.getMessage();
@@ -94,7 +93,7 @@ public class SagaCommandDispatcher extends CommandDispatcher {
   }
 
   private Optional<LockTarget> getLock(List<Message> messages) {
-    return messages.stream().filter(m -> m instanceof SagaReplyMessage && ((SagaReplyMessage) m).hasLockTarget()).findFirst().flatMap(m -> ((SagaReplyMessage)m).getLockTarget());
+    return messages.stream().filter(m -> m instanceof SagaReplyMessage srm && srm.hasLockTarget()).findFirst().flatMap(m -> ((SagaReplyMessage)m).getLockTarget());
   }
 
   private List<Message> addLockedHeader(List<Message> messages, String lockedTarget) {

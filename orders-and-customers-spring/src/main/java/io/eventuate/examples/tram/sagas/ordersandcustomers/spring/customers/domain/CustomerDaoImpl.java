@@ -15,7 +15,7 @@ public class CustomerDaoImpl implements CustomerDao {
     return customerRepository
             .findById(id)
             .orElseThrow(() ->
-                    new IllegalArgumentException(String.format("Customer with id=%s is not found", id)));
+                    new IllegalArgumentException("Customer with id=%s is not found".formatted(id)));
   }
 
   @Override

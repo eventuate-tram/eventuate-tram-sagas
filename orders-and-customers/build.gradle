@@ -3,9 +3,14 @@ dependencies {
     api project(":eventuate-tram-sagas-participant")
     api project(":eventuate-tram-sagas-orchestration")
     api project(":eventuate-tram-sagas-orchestration-simple-dsl")
-    api 'javax.persistence:javax.persistence-api:2.2'
+    api 'jakarta.persistence:jakarta.persistence-api:3.1.0'
+
+    implementation "org.junit.jupiter:junit-jupiter:5.13.4"
 
     testImplementation project(":eventuate-tram-sagas-unit-testing-support")
 
+}
+tasks.withType(Test).configureEach {
+    useJUnitPlatform()
 }
 

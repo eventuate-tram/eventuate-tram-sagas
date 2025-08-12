@@ -6,15 +6,13 @@ import io.eventuate.common.reactive.jdbc.EventuateReactiveJdbcStatementExecutor;
 import io.eventuate.common.spring.jdbc.reactive.EventuateCommonReactiveDatabaseConfiguration;
 import io.eventuate.tram.sagas.reactive.orchestration.ReactiveSagaInstanceRepository;
 import io.eventuate.tram.sagas.reactive.orchestration.ReactiveSagaInstanceRepositoryJdbc;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
-import org.springframework.test.context.junit4.SpringRunner;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -22,9 +20,8 @@ import java.util.UUID;
 
 import static java.util.Arrays.asList;
 import static java.util.Collections.singleton;
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
-@RunWith(SpringRunner.class)
 @SpringBootTest(classes = ReactiveSagaInstanceRepositoryJdbcIntegrationTest.Config.class,  webEnvironment = SpringBootTest.WebEnvironment.NONE)
 @EnableAutoConfiguration
 public class ReactiveSagaInstanceRepositoryJdbcIntegrationTest {
@@ -100,9 +97,10 @@ public class ReactiveSagaInstanceRepositoryJdbcIntegrationTest {
     assertEquals(new HashSet<>(asList(new DestinationAndResource(destination, resource), new DestinationAndResource("newDestination", "newResource"))), destinationAndResources);
   }
 
-  @Test(expected = RuntimeException.class)
+  @Test
   public void shouldThrowExceptionWhenInstanceNotFound() {
-    sagaInstanceRepository.find(sagaType, "unknown").block();
+    assertThrows(RuntimeException.class, () ->
+      sagaInstanceRepository.find(sagaType, "unknown").block());
   }
 
   private SagaInstance createSagaInstance() {

@@ -2,8 +2,8 @@ package io.eventuate.tram.sagas.simpledsl.notifications;
 
 import io.eventuate.tram.sagas.simpledsl.ReleaseCreditCommand;
 import io.eventuate.tram.sagas.simpledsl.ReserveCreditCommand;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import static io.eventuate.tram.sagas.testing.SagaUnitTestSupport.given;
 import static org.mockito.ArgumentMatchers.any;
@@ -14,7 +14,7 @@ public class NotificationBasedCreateOrderSagaTest {
 
   private NotificationBasedCreateOrderSagaSteps steps;
 
-  @Before
+  @BeforeEach
   public void setUp() throws Exception {
     steps = mock(NotificationBasedCreateOrderSagaSteps.class);
   }

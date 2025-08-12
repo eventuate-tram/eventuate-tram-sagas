@@ -2,7 +2,7 @@ package io.eventuate.tram.sagas.orchestration;
 
 import io.eventuate.tram.sagas.common.SagaCommandHeaders;
 import io.eventuate.tram.sagas.common.SagaReplyHeaders;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class SagaCommandHeadersTest {
 

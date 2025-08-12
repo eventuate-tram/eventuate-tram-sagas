@@ -16,13 +16,13 @@ public class SagaInstanceRepositorySql {
     String sagaInstanceTable = eventuateSchema.qualifyTable("saga_instance");
     String sagaInstanceParticipantsTable = eventuateSchema.qualifyTable("saga_instance_participants");
 
-    insertIntoSagaInstanceSql = String.format("INSERT INTO %s(saga_type, saga_id, state_name, last_request_id, saga_data_type, saga_data_json, end_state, compensating, failed) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?)", sagaInstanceTable);
-    insertIntoSagaInstanceParticipantsSql = String.format("INSERT INTO %s(saga_type, saga_id, destination, resource) values(?,?,?,?)", sagaInstanceParticipantsTable);
+    insertIntoSagaInstanceSql = "INSERT INTO %s(saga_type, saga_id, state_name, last_request_id, saga_data_type, saga_data_json, end_state, compensating, failed) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?)".formatted(sagaInstanceTable);
+    insertIntoSagaInstanceParticipantsSql = "INSERT INTO %s(saga_type, saga_id, destination, resource) values(?,?,?,?)".formatted(sagaInstanceParticipantsTable);
 
-    selectFromSagaInstanceSql = String.format("SELECT * FROM %s WHERE saga_type = ? AND saga_id = ?", sagaInstanceTable);
-    selectFromSagaInstanceParticipantsSql = String.format("SELECT destination, resource FROM %s WHERE saga_type = ? AND saga_id = ?", sagaInstanceParticipantsTable);
+    selectFromSagaInstanceSql = "SELECT * FROM %s WHERE saga_type = ? AND saga_id = ?".formatted(sagaInstanceTable);
+    selectFromSagaInstanceParticipantsSql = "SELECT destination, resource FROM %s WHERE saga_type = ? AND saga_id = ?".formatted(sagaInstanceParticipantsTable);
 
-    updateSagaInstanceSql = String.format("UPDATE %s SET state_name = ?, last_request_id = ?, saga_data_type = ?, saga_data_json = ?, end_state = ?, compensating = ?, failed = ? where saga_type = ? AND saga_id = ?", sagaInstanceTable);
+    updateSagaInstanceSql = "UPDATE %s SET state_name = ?, last_request_id = ?, saga_data_type = ?, saga_data_json = ?, end_state = ?, compensating = ?, failed = ? where saga_type = ? AND saga_id = ?".formatted(sagaInstanceTable);
   }
 
   public String getInsertIntoSagaInstanceSql() {

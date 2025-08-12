@@ -11,13 +11,13 @@ import io.eventuate.examples.tram.sagas.ordersandcustomers.orders.service.OrderD
 import io.eventuate.examples.tram.sagas.ordersandcustomers.orders.service.OrderService;
 import io.eventuate.examples.tram.sagas.ordersandcustomers.spring.orders.domain.OrderRepository;
 import io.eventuate.util.test.async.Eventually;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.support.TransactionTemplate;
 
 import java.util.concurrent.TimeUnit;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public abstract class AbstractOrdersAndCustomersIntegrationTest {
 
@@ -49,11 +49,9 @@ public abstract class AbstractOrdersAndCustomersIntegrationTest {
   }
 
   protected void assertCreateOrderSagaCompletedSuccesfully(Order order) {
-    Eventually.eventually(() -> {
-      sagaEventsConsumer.assertEventReceived(CreateOrderSagaCompletedSuccesfully.class, event -> {
-        assertEquals(order.getId(), (Long)event.getOrderId());
-      });
-    });
+    Eventually.eventually(() ->
+      sagaEventsConsumer.assertEventReceived(CreateOrderSagaCompletedSuccesfully.class, event ->
+        assertEquals(order.getId(), (Long)event.getOrderId())));
   }
 
   protected Order createOrder(Customer customer) {
@@ -77,11 +75,9 @@ public abstract class AbstractOrdersAndCustomersIntegrationTest {
   }
 
   protected void assertCreateOrderSagaRolledBack(Order order) {
-    Eventually.eventually(() -> {
-      sagaEventsConsumer.assertEventReceived(CreateOrderSagaRolledBack.class, event -> {
-        assertEquals(order.getId(), (Long)event.getOrderId());
-      });
-    });
+    Eventually.eventually(() ->
+      sagaEventsConsumer.assertEventReceived(CreateOrderSagaRolledBack.class, event ->
+        assertEquals(order.getId(), (Long)event.getOrderId())));
   }
 
   private void assertOrderState(Long id, OrderState expectedState) {

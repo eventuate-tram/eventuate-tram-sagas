@@ -1,7 +1,6 @@
 package io.eventuate.tram.sagas.simpledsl;
 
 import io.eventuate.tram.sagas.orchestration.SagaDefinition;
-import org.junit.Test;
 
 public class LocalSaga implements SimpleSaga<LocalSagaData> {
 

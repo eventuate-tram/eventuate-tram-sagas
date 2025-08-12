@@ -73,7 +73,7 @@ public class SagaInstanceRepositoryJdbc implements SagaInstanceRepository {
             sagaInstanceRepositorySql.getSelectFromSagaInstanceSql(),
             (rs, rownum) -> sagaInstanceRepositorySql.mapToSagaInstance(sagaType, sagaId, destinationsAndResources, new JdbcSqlQueryRow(rs)),
             sagaType,
-            sagaId).stream().findFirst().orElseThrow( () -> new RuntimeException(String.format("Cannot find saga instance %s %s", sagaType, sagaId)));
+            sagaId).stream().findFirst().orElseThrow( () -> new RuntimeException("Cannot find saga instance %s %s".formatted(sagaType, sagaId)));
   }
 
   @Override

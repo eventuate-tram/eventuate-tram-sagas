@@ -1,5 +1,5 @@
 plugins {
-    id "io.spring.dependency-management" version "1.0.6.RELEASE"
+    id "io.spring.dependency-management" version "1.1.7"
 }
 
 
@@ -22,14 +22,14 @@ dependencies {
 
     api "io.eventuate.tram.core:eventuate-tram-micronaut-jdbc-kafka:$eventuateTramVersion"
     api "io.micronaut.sql:micronaut-hibernate-jpa"
-    annotationProcessor "javax.persistence:javax.persistence-api:2.2"
+    annotationProcessor "jakarta.persistence:jakarta.persistence-api:3.1.0"
     annotationProcessor "io.micronaut:micronaut-inject-java"
     annotationProcessor "io.micronaut:micronaut-validation"
     annotationProcessor "io.micronaut.configuration:micronaut-openapi"
     api "io.micronaut:micronaut-inject"
     api "io.micronaut:micronaut-validation"
     api "io.micronaut:micronaut-runtime"
-    annotationProcessor "javax.persistence:javax.persistence-api:2.2"
+    annotationProcessor "jakarta.persistence:jakarta.persistence-api:3.1.0"
     api 'io.micronaut.sql:micronaut-jdbc-hikari'
     annotationProcessor "io.micronaut:micronaut-inject-java"
     api "org.junit.jupiter:junit-jupiter-api"

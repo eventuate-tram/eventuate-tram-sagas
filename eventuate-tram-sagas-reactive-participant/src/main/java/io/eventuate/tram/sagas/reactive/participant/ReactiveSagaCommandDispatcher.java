@@ -69,8 +69,7 @@ public class ReactiveSagaCommandDispatcher extends ReactiveCommandDispatcher {
 
     Flux<Message> result = Flux.empty();
 
-    if (commandHandler instanceof ReactiveSagaCommandHandler) {
-      ReactiveSagaCommandHandler sch = (ReactiveSagaCommandHandler) commandHandler;
+    if (commandHandler instanceof ReactiveSagaCommandHandler sch) {
       if (sch.getPreLock().isPresent()) {
         LockTarget lockTarget = sch.getPreLock().get().apply(cm, new PathVariables(commandHandlerParams.getPathVars()));
         Message message = cm.getMessage();
@@ -113,7 +112,7 @@ public class ReactiveSagaCommandDispatcher extends ReactiveCommandDispatcher {
 
   private Mono<LockTarget> getLock(Flux<Message> messages) {
     return messages
-            .filter(m -> m instanceof SagaReplyMessage && ((SagaReplyMessage) m).hasLockTarget())
+            .filter(m -> m instanceof SagaReplyMessage srm && srm.hasLockTarget())
             .map(m -> ((SagaReplyMessage)m).getLockTarget().get())
             .next();
   }

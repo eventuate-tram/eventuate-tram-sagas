@@ -2,4 +2,9 @@
 dependencies {
     api "io.eventuate.tram.core:eventuate-tram-commands:$eventuateTramVersion"
     api "io.eventuate.common:eventuate-common-jdbc:$eventuateCommonVersion"
+
+    implementation "org.junit.jupiter:junit-jupiter:5.13.4"
+}
+tasks.withType(Test).configureEach {
+    useJUnitPlatform()
 }

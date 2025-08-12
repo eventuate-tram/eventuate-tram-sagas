@@ -5,17 +5,21 @@ import io.eventuate.tram.sagas.simpledsl.ReserveCreditCommand;
 import io.eventuate.tram.sagas.simpledsl.notifications.FulfillOrder;
 import io.eventuate.tram.sagas.simpledsl.notifications.ReleaseInventory;
 import io.eventuate.tram.sagas.simpledsl.notifications.ReserveInventory;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 
 import static io.eventuate.tram.sagas.testing.SagaUnitTestSupport.given;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doThrow;
 
-@RunWith(MockitoJUnitRunner.class)
+@MockitoSettings(strictness = Strictness.WARN)
+@ExtendWith(MockitoExtension.class)
 public class LocalExceptionCreateOrderSagaTest {
 
   @Mock
@@ -71,23 +75,26 @@ public class LocalExceptionCreateOrderSagaTest {
     ;
   }
 
-  static class UnexpectedException extends RuntimeException {}
+  static class UnexpectedException extends RuntimeException {
+  }
 
-  @Test(expected = UnexpectedException.class)
+  @Test
   public void shouldFailWithUnexpectedException() {
-    doThrow(new UnexpectedException()).when(steps).approveOrder(any());
-    given().
-            saga(new LocalExceptionCreateOrderSaga(steps), new LocalExceptionCreateOrderSagaData()).
-            expect().
-            command(new ReserveCreditCommand()).
-            to("customerService").
-            andGiven().
-            successReply().
-            expect().
-            command(new ReserveInventory()).
-            to("inventoryService").
-            andGiven().
-            successReply();
+    assertThrows(UnexpectedException.class, () -> {
+      doThrow(new UnexpectedException()).when(steps).approveOrder(any());
+      given().
+              saga(new LocalExceptionCreateOrderSaga(steps), new LocalExceptionCreateOrderSagaData()).
+              expect().
+              command(new ReserveCreditCommand()).
+              to("customerService").
+              andGiven().
+              successReply().
+              expect().
+              command(new ReserveInventory()).
+              to("inventoryService").
+              andGiven().
+              successReply();
+    });
   }
 
 }

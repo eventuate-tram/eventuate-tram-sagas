@@ -8,7 +8,7 @@ import io.eventuate.tram.messaging.consumer.MessageConsumer;
 import io.eventuate.tram.messaging.producer.MessageBuilder;
 import io.eventuate.tram.sagas.common.SagaLockManager;
 import io.eventuate.tram.sagas.orchestration.*;
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -114,16 +114,16 @@ public class SagaUnitTestSupport<T> {
   }
 
   public SagaUnitTestSupport<T> to(String commandChannel) {
-    Assert.assertEquals("Expected one command", 1, sentCommands.size());
+    Assertions.assertEquals(1, sentCommands.size(), "Expected one command");
     sentCommand = sentCommands.get(0);
-    Assert.assertEquals(commandChannel, sentCommand.getDestination());
+    Assertions.assertEquals(commandChannel, sentCommand.getDestination());
     Message sentMessage = sentCommand.getMessage();
     if (expectedCommand != null) {
-      Assert.assertEquals(expectedCommand.getClass().getName(), sentMessage.getRequiredHeader(CommandMessageHeaders.COMMAND_TYPE));
-      Assert.assertNotNull(sentMessage.getRequiredHeader(CommandMessageHeaders.REPLY_TO));
+      Assertions.assertEquals(expectedCommand.getClass().getName(), sentMessage.getRequiredHeader(CommandMessageHeaders.COMMAND_TYPE));
+      Assertions.assertNotNull(sentMessage.getRequiredHeader(CommandMessageHeaders.REPLY_TO));
     } else {
-      Assert.assertEquals(expectedNotification.getClass().getName(), sentMessage.getRequiredHeader(CommandMessageHeaders.COMMAND_TYPE));
-      Assert.assertNull(sentMessage.getHeader(CommandMessageHeaders.REPLY_TO).orElse(null));
+      Assertions.assertEquals(expectedNotification.getClass().getName(), sentMessage.getRequiredHeader(CommandMessageHeaders.COMMAND_TYPE));
+      Assertions.assertNull(sentMessage.getHeader(CommandMessageHeaders.REPLY_TO).orElse(null));
 
     }
     sentCommands.clear();
@@ -137,26 +137,26 @@ public class SagaUnitTestSupport<T> {
               .filter(sm -> corn.getCommandWithDestination().getCommand().getClass().getName().equals(sm.getMessage().getRequiredHeader(CommandMessageHeaders.COMMAND_TYPE))
                           && corn.getCommandWithDestination().getDestinationChannel().equals(sm.getDestination()))
               .findAny()
-              .orElseThrow(() -> new AssertionError(String.format("Did not find expected command %s in %s", corn, sentCommands)));
+              .orElseThrow(() -> new AssertionError("Did not find expected command %s in %s".formatted(corn, sentCommands)));
 
       if (corn.isNotification())
-        Assert.assertNull(sentMessage.getMessage().getHeader(CommandMessageHeaders.REPLY_TO).orElse(null));
+        Assertions.assertNull(sentMessage.getMessage().getHeader(CommandMessageHeaders.REPLY_TO).orElse(null));
       else {
-        Assert.assertNotNull(sentMessage.getMessage().getRequiredHeader(CommandMessageHeaders.REPLY_TO));
+        Assertions.assertNotNull(sentMessage.getMessage().getRequiredHeader(CommandMessageHeaders.REPLY_TO));
         if (sentCommand != null)
-          Assert.fail(String.format("There can only be one command in %s", sentCommands));
+          Assertions.fail("There can only be one command in %s".formatted(sentCommands));
         sentCommand = sentMessage;
       }
     }
     if (commandsAndNotifications.size() != sentCommands.size())
-      Assert.fail(String.format("Expected these commands %s but there are extra %s", commandsAndNotifications, sentCommands));
+      Assertions.fail("Expected these commands %s but there are extra %s".formatted(commandsAndNotifications, sentCommands));
     sentCommands.clear();
   }
 
   public SagaUnitTestSupport<T> withExtraHeaders(Map<String, String> expectedExtraHeaders) {
     Map<String, String> actualHeaders = sentCommand.getMessage().getHeaders();
     if (!actualHeaders.entrySet().containsAll(expectedExtraHeaders.entrySet()))
-      Assert.fail(String.format("Expected headers %s to contain %s", actualHeaders, expectedExtraHeaders));
+      Assertions.fail("Expected headers %s to contain %s".formatted(actualHeaders, expectedExtraHeaders));
     return this;
   }
 
@@ -212,8 +212,8 @@ public class SagaUnitTestSupport<T> {
 
   public SagaUnitTestSupport<T> expectCompletedSuccessfully() {
     assertNoCommands();
-    Assert.assertTrue("Expected saga to have finished", sagaInstance.isEndState());
-    Assert.assertFalse("Expected saga to have finished successfully", sagaInstance.isCompensating());
+    Assertions.assertTrue(sagaInstance.isEndState(), "Expected saga to have finished");
+    Assertions.assertFalse(sagaInstance.isCompensating(), "Expected saga to have finished successfully");
     return this;
   }
 
@@ -223,22 +223,22 @@ public class SagaUnitTestSupport<T> {
         break;
       case 1:
         MessageWithDestination mwd = sentCommands.get(0);
-        Assert.fail(String.format("Expected saga to have finished but found a command of %s sent to %s: %s", mwd.getMessage().getRequiredHeader(CommandMessageHeaders.COMMAND_TYPE), mwd.getDestination(), mwd.getMessage()));
+        Assertions.fail("Expected saga to have finished but found a command of %s sent to %s: %s".formatted(mwd.getMessage().getRequiredHeader(CommandMessageHeaders.COMMAND_TYPE), mwd.getDestination(), mwd.getMessage()));
         break;
       default:
-        Assert.assertEquals(emptyList(), sentCommands);
+        Assertions.assertEquals(emptyList(), sentCommands);
     }
   }
 
   public SagaUnitTestSupport<T> expectRolledBack() {
     assertNoCommands();
-    Assert.assertTrue("Expected saga to have finished", sagaInstance.isEndState());
-    Assert.assertTrue("Expected saga to have rolled back", sagaInstance.isCompensating());
+    Assertions.assertTrue(sagaInstance.isEndState(), "Expected saga to have finished");
+    Assertions.assertTrue(sagaInstance.isCompensating(), "Expected saga to have rolled back");
     return this;
   }
 
   public void expectException(Exception expectedCreateException) {
-    Assert.assertEquals(expectedCreateException, createException.get());
+    Assertions.assertEquals(expectedCreateException, createException.get());
   }
 
   public SagaUnitTestSupport<T> assertSagaData(Consumer<T> sagaDataConsumer) {

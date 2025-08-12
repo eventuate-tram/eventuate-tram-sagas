@@ -11,11 +11,13 @@ import io.eventuate.tram.reactive.commands.consumer.ReactiveCommandHandlers;
 import io.eventuate.tram.reactive.commands.consumer.ReactiveCommandReplyProducer;
 import io.eventuate.tram.reactive.messaging.producer.common.ReactiveMessageProducer;
 import io.eventuate.tram.sagas.reactive.common.ReactiveSagaLockManager;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -27,7 +29,8 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-@RunWith(MockitoJUnitRunner.class)
+@MockitoSettings(strictness = Strictness.WARN)
+@ExtendWith(MockitoExtension.class)
 public class ReactiveSagaCommandDispatcherTest {
 
   @Mock
@@ -39,7 +42,7 @@ public class ReactiveSagaCommandDispatcherTest {
   @Mock
   private ReactiveMessageConsumer messageConsumer;
 
-  @Before
+  @BeforeEach
   public void setUp() {
     when(messageHandlerConsumer.apply(any())).thenReturn(CommandHandlerReplyBuilder.withSuccess());
     when(producer.send(any(), any())).thenReturn(Mono.just(CommandHandlerReplyBuilder.withSuccess()));
@@ -74,5 +77,6 @@ public class ReactiveSagaCommandDispatcherTest {
     return new ReactiveCommandHandlers(Collections.singletonList(reactiveCommandHandler));
   }
 
-  public static class TestCommand implements Command {}
+  public static class TestCommand implements Command {
+  }
 }

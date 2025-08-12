@@ -2,7 +2,7 @@ package io.eventuate.tram.sagas.orchestration;
 
 import io.eventuate.tram.commands.common.Command;
 import io.eventuate.tram.commands.consumer.CommandWithDestination;
-import org.apache.commons.lang.builder.ToStringBuilder;
+import org.apache.commons.lang3.builder.ToStringBuilder;
 
 public class CommandWithDestinationAndType {
 

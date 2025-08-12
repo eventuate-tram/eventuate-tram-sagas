@@ -72,7 +72,7 @@ public class ReactiveSagaLockManagerImpl implements ReactiveSagaLockManager {
             .switchIfEmpty(Mono.error(new RuntimeException("owningSagaId is not present")))
             .flatMap(id -> {
               if (id.equals(sagaId)) return Mono.just(id);
-              else return Mono.error(new RuntimeException(String.format("Expected owner to be %s but is %s", sagaId, id)));
+              else return Mono.error(new RuntimeException("Expected owner to be %s but is %s".formatted(sagaId, id)));
             })
             .then(eventuateJdbcStatementExecutor
                     .query(sagaLockManagerSql.getSelectFromSagaStashTableSql(), target)

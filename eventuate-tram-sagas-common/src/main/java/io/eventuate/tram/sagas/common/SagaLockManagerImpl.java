@@ -71,12 +71,12 @@ public class SagaLockManagerImpl implements SagaLockManager {
   public Optional<Message> unlock(String sagaId, String target) {
     Optional<String> owningSagaId = selectForUpdate(target);
 
-    if (!owningSagaId.isPresent()) {
+    if (owningSagaId.isEmpty()) {
       throw new RuntimeException("owningSagaId is not present");
     }
 
     if (!owningSagaId.get().equals(sagaId)) {
-      throw new RuntimeException(String.format("Expected owner to be %s but is %s", sagaId, owningSagaId.get()));
+      throw new RuntimeException("Expected owner to be %s but is %s".formatted(sagaId, owningSagaId.get()));
     }
 
     logger.debug("Saga {} has unlocked {}", sagaId, target);

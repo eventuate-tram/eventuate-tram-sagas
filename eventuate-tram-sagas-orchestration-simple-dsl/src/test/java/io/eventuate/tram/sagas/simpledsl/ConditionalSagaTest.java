@@ -1,6 +1,6 @@
 package io.eventuate.tram.sagas.simpledsl;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import static io.eventuate.tram.sagas.testing.SagaUnitTestSupport.given;
 
