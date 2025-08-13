@@ -20,5 +20,4 @@ docker buildx build --platform linux/amd64,linux/arm64 \
   -f $SCRIPT_DIR/Dockerfile \
   --build-arg=EVENTUATE_COMMON_VERSION=${EVENTUATE_COMMON_VERSION?} \
   $OPTS \
-  --allow security.insecure \
   $SCRIPT_DIR
