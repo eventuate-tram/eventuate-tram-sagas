@@ -1,3 +1,5 @@
+import java.time.Duration
+
 buildscript {
     repositories {
         mavenCentral()
@@ -90,6 +92,9 @@ dockerCompose {
 
     environment.put "DOCKER_IMAGE_TAG", dockerImageTag
     retainContainersOnStartupFailure = true
+
+    waitForTcpPortsTimeout = Duration.ofMinutes(3)
+    waitForHealthyStateTimeout = Duration.ofMinutes(3)
 
     activemqInfrastructure {
         projectName = null
