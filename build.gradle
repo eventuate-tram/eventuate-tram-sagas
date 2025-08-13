@@ -89,6 +89,7 @@ dockerCompose {
     environment.put "EVENTUATE_MESSAGING_KAFKA_IMAGE_VERSION", eventuateMessagingKafkaImageVersion
 
     environment.put "DOCKER_IMAGE_TAG", dockerImageTag
+    retainContainersOnStartupFailure = true
 
     activemqInfrastructure {
         projectName = null
