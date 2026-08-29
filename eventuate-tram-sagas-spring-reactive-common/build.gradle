@@ -5,7 +5,7 @@ dependencies {
     api "io.eventuate.common:eventuate-common-spring-reactive-jdbc:$eventuateCommonVersion"
     api "io.eventuate.tram.core:eventuate-tram-spring-reactive-commands:$eventuateTramVersion"
 
-    testImplementation "org.springframework.boot:spring-boot-starter-test:$springBootVersion"
+    testImplementation "org.springframework.boot:spring-boot-starter-data-r2dbc-test:$springBootVersion"
 }
 
 test {

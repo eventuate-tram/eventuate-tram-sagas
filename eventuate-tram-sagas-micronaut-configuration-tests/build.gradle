@@ -27,8 +27,8 @@ dependencies {
     testImplementation "io.eventuate.tram.core:eventuate-tram-micronaut-consumer-kafka:$eventuateTramVersion"
     testImplementation "io.eventuate.tram.core:eventuate-tram-micronaut-events:$eventuateTramVersion"
 
-    api 'com.mysql:mysql-connector-j:8.0.33'
-    api ('org.postgresql:postgresql:9.4-1200-jdbc41') {
+    api "com.mysql:mysql-connector-j:$mysqlConnectorVersion"
+    api ("org.postgresql:postgresql:$postgresqlVersion") {
         exclude group: "org.slf4j", module: "slf4j-simple"
     }
 

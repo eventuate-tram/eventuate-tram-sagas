@@ -39,7 +39,7 @@ allprojects {
 
     if (!project.name.endsWith("-bom"))
       dependencies {
-          testImplementation "org.mockito:mockito-core:4.11.0"
+          testImplementation "org.mockito:mockito-core:$mockitoVersion"
       }
 
 }

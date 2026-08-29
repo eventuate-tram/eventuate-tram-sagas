@@ -6,7 +6,7 @@ dependencies {
     testImplementation project(":eventuate-tram-sagas-participant")
     testImplementation "io.eventuate.tram.core:eventuate-tram-in-memory:$eventuateTramVersion"
     testImplementation "io.eventuate.util:eventuate-util-test:$eventuateUtilVersion"
-    testImplementation "org.mockito:mockito-junit-jupiter:4.11.0"
+    testImplementation "org.mockito:mockito-junit-jupiter:$mockitoVersion"
 
 }
 tasks.withType(Test).configureEach {

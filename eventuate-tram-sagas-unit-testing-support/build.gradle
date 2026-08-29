@@ -1,7 +1,7 @@
 dependencies {
     api project(":eventuate-tram-sagas-orchestration")
 
-    implementation "org.junit.jupiter:junit-jupiter:5.13.4"
+    api "org.junit.jupiter:junit-jupiter:$junitVersion"
 }
 tasks.withType(Test).configureEach {
     useJUnitPlatform()
