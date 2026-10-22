@@ -18,6 +18,6 @@ export BUILDKIT_NO_CLIENT_TOKEN=true
 docker buildx build --platform linux/amd64,linux/arm64 \
   -t $IMAGE \
   -f $SCRIPT_DIR/Dockerfile \
-  --build-arg=EVENTUATE_COMMON_VERSION=${EVENTUATE_COMMON_VERSION?} \
+  --build-arg=EVENTUATE_COMMON_DATABASE_VERSION=${EVENTUATE_COMMON_DATABASE_VERSION?} \
   $OPTS \
   $SCRIPT_DIR

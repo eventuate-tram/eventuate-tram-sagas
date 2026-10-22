@@ -24,7 +24,7 @@ services:
     build:
       context: ./mssql
       args:
-        EVENTUATE_COMMON_VERSION: "$EVENTUATE_COMMON_VERSION"
+        EVENTUATE_COMMON_DATABASE_VERSION: "$EVENTUATE_COMMON_DATABASE_VERSION"
     image: eventuateio/eventuate-tram-sagas-mssql:$DOCKER_IMAGE_TAG
     ports:
       - 1433:1433
