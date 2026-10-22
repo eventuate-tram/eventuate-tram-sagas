@@ -3,7 +3,7 @@ dependencies {
     api project(":eventuate-tram-sagas-common")
 
     api "io.eventuate.tram.core:eventuate-tram-reactive-commands:$eventuateTramVersion"
-    api "io.eventuate.common:eventuate-common-reactive-jdbc:$eventuateCommonVersion"
+    api "io.eventuate.common.database:eventuate-common-reactive-jdbc:$eventuateCommonDatabaseVersion"
 }
 tasks.withType(Test).configureEach {
     useJUnitPlatform()

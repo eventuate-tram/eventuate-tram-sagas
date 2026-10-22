@@ -1,8 +1,8 @@
 package io.eventuate.tram.sagas.spring.common;
 
-import io.eventuate.common.jdbc.EventuateJdbcStatementExecutor;
-import io.eventuate.common.jdbc.EventuateSchema;
-import io.eventuate.common.spring.jdbc.EventuateCommonJdbcOperationsConfiguration;
+import io.eventuate.common.database.jdbc.EventuateJdbcStatementExecutor;
+import io.eventuate.common.database.jdbc.EventuateSchema;
+import io.eventuate.common.database.spring.jdbc.EventuateCommonJdbcOperationsConfiguration;
 import io.eventuate.tram.sagas.common.SagaLockManager;
 import io.eventuate.tram.sagas.common.SagaLockManagerImpl;
 import org.springframework.context.annotation.Bean;

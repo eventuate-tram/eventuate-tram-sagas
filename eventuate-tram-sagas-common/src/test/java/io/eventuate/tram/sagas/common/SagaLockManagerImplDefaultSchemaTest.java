@@ -1,6 +1,6 @@
 package io.eventuate.tram.sagas.common;
 
-import io.eventuate.common.jdbc.EventuateSchema;
+import io.eventuate.common.database.jdbc.EventuateSchema;
 
 public class SagaLockManagerImplDefaultSchemaTest extends SagaLockManagerImplSchemaTest {
 

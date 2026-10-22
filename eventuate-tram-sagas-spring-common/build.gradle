@@ -2,7 +2,7 @@
 dependencies {
     api project(":eventuate-tram-sagas-common")
 
-    api "io.eventuate.common:eventuate-common-spring-jdbc:$eventuateCommonVersion"
+    api "io.eventuate.common.database:eventuate-common-spring-jdbc:$eventuateCommonDatabaseVersion"
     api "io.eventuate.tram.core:eventuate-tram-spring-commands:$eventuateTramVersion"
 
     testImplementation project(":eventuate-tram-sagas-spring-in-memory")

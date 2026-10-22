@@ -1,8 +1,8 @@
 package io.eventuate.tram.sagas.common;
 
-import io.eventuate.common.jdbc.EventuateDuplicateKeyException;
-import io.eventuate.common.jdbc.EventuateJdbcStatementExecutor;
-import io.eventuate.common.jdbc.EventuateSchema;
+import io.eventuate.common.database.jdbc.EventuateDuplicateKeyException;
+import io.eventuate.common.database.jdbc.EventuateJdbcStatementExecutor;
+import io.eventuate.common.database.jdbc.EventuateSchema;
 import io.eventuate.common.json.mapper.JSonMapper;
 import io.eventuate.tram.messaging.common.Message;
 import io.eventuate.tram.messaging.producer.MessageBuilder;

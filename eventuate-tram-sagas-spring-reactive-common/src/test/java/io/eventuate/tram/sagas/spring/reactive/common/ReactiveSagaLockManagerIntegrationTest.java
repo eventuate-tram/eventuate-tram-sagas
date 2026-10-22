@@ -2,9 +2,9 @@ package io.eventuate.tram.sagas.spring.reactive.common;
 
 import io.eventuate.common.id.ApplicationIdGenerator;
 import io.eventuate.common.id.IdGenerator;
-import io.eventuate.common.jdbc.EventuateSchema;
+import io.eventuate.common.database.jdbc.EventuateSchema;
 import io.eventuate.common.json.mapper.JSonMapper;
-import io.eventuate.common.reactive.jdbc.EventuateReactiveJdbcStatementExecutor;
+import io.eventuate.common.database.reactive.jdbc.EventuateReactiveJdbcStatementExecutor;
 import io.eventuate.tram.messaging.common.Message;
 import io.eventuate.tram.messaging.producer.MessageBuilder;
 import io.eventuate.tram.sagas.reactive.common.ReactiveSagaLockManager;

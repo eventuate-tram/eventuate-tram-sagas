@@ -1,9 +1,9 @@
 package io.eventuate.tram.sagas.reactive.orchestration;
 
 import io.eventuate.common.id.IdGenerator;
-import io.eventuate.common.jdbc.EventuateDuplicateKeyException;
-import io.eventuate.common.jdbc.EventuateSchema;
-import io.eventuate.common.reactive.jdbc.EventuateReactiveJdbcStatementExecutor;
+import io.eventuate.common.database.jdbc.EventuateDuplicateKeyException;
+import io.eventuate.common.database.jdbc.EventuateSchema;
+import io.eventuate.common.database.reactive.jdbc.EventuateReactiveJdbcStatementExecutor;
 import io.eventuate.tram.sagas.orchestration.DestinationAndResource;
 import io.eventuate.tram.sagas.orchestration.SagaInstance;
 import io.eventuate.tram.sagas.orchestration.SagaInstanceRepositorySql;

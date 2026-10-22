@@ -1,8 +1,8 @@
 package io.eventuate.tram.sagas.spring.orchestration;
 
 import io.eventuate.common.id.ApplicationIdGenerator;
-import io.eventuate.common.jdbc.EventuateJdbcStatementExecutor;
-import io.eventuate.common.jdbc.EventuateSchema;
+import io.eventuate.common.database.jdbc.EventuateJdbcStatementExecutor;
+import io.eventuate.common.database.jdbc.EventuateSchema;
 import io.eventuate.tram.commands.producer.CommandProducer;
 import io.eventuate.tram.spring.commands.producer.TramCommandProducerConfiguration;
 import io.eventuate.tram.messaging.consumer.MessageConsumer;

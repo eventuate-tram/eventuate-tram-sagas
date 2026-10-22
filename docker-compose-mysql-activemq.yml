@@ -1,6 +1,6 @@
 services:
   zookeeper:
-    image: eventuateio/eventuate-zookeeper:${EVENTUATE_COMMON_VERSION?}
+    image: eventuateio/eventuate-zookeeper:${EVENTUATE_COMMON_ZOOKEEPER_VERSION?}
     ports:
       - 2181:2181
     environment:

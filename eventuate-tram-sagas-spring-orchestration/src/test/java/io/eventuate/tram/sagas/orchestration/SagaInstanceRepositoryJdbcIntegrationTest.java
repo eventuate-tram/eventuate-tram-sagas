@@ -1,9 +1,9 @@
 package io.eventuate.tram.sagas.orchestration;
 
 import io.eventuate.common.id.ApplicationIdGenerator;
-import io.eventuate.common.jdbc.EventuateJdbcStatementExecutor;
-import io.eventuate.common.jdbc.EventuateSchema;
-import io.eventuate.common.spring.jdbc.EventuateCommonJdbcOperationsConfiguration;
+import io.eventuate.common.database.jdbc.EventuateJdbcStatementExecutor;
+import io.eventuate.common.database.jdbc.EventuateSchema;
+import io.eventuate.common.database.spring.jdbc.EventuateCommonJdbcOperationsConfiguration;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;

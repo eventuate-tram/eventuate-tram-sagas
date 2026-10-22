@@ -1,6 +1,6 @@
 package io.eventuate.examples.tram.sagas.ordersandcustomers.spring.orders;
 
-import io.eventuate.common.jdbc.EventuateTransactionTemplate;
+import io.eventuate.common.database.jdbc.EventuateTransactionTemplate;
 import io.eventuate.examples.tram.sagas.ordersandcustomers.orders.domain.OrderDao;
 import io.eventuate.examples.tram.sagas.ordersandcustomers.orders.sagas.createorder.CreateOrderSaga;
 import io.eventuate.examples.tram.sagas.ordersandcustomers.orders.sagas.createorder.CreateOrderSagaData;

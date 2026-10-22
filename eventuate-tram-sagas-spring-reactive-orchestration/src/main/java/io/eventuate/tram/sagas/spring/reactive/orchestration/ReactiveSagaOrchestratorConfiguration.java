@@ -1,8 +1,8 @@
 package io.eventuate.tram.sagas.spring.reactive.orchestration;
 
 import io.eventuate.common.id.ApplicationIdGenerator;
-import io.eventuate.common.jdbc.EventuateSchema;
-import io.eventuate.common.reactive.jdbc.EventuateReactiveJdbcStatementExecutor;
+import io.eventuate.common.database.jdbc.EventuateSchema;
+import io.eventuate.common.database.reactive.jdbc.EventuateReactiveJdbcStatementExecutor;
 import io.eventuate.tram.consumer.common.reactive.ReactiveMessageConsumer;
 import io.eventuate.tram.reactive.commands.producer.ReactiveCommandProducer;
 import io.eventuate.tram.sagas.reactive.common.ReactiveSagaLockManager;

@@ -17,7 +17,7 @@ dependencyManagement {
 
 
 dependencies {
-    api "io.eventuate.common:eventuate-common-id:$eventuateCommonVersion"
+    api "io.eventuate.common.id:eventuate-common-id:$eventuateCommonIdVersion"
     api "io.eventuate.tram.core:eventuate-tram-spring-testing-support-cloud-contract:$eventuateTramVersion"
     api project(":eventuate-tram-sagas-spring-orchestration-simple-dsl")
     api 'org.springframework.cloud:spring-cloud-starter-contract-verifier'

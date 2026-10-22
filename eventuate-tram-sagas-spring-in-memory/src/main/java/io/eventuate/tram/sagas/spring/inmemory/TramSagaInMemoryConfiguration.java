@@ -1,6 +1,6 @@
 package io.eventuate.tram.sagas.spring.inmemory;
 
-import io.eventuate.common.inmemorydatabase.EventuateDatabaseScriptSupplier;
+import io.eventuate.common.database.inmemorydatabase.EventuateDatabaseScriptSupplier;
 import io.eventuate.tram.spring.inmemory.TramInMemoryConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
